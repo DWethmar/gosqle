@@ -8,11 +8,11 @@ Table of Contents:
       - [Generate a select query:](#generate-a-select-query)
       - [Generate select query using group by and aggregate functions:](#generate-select-query-using-group-by-and-aggregate-functions)
     - [Insert statement](#insert-statement)
-      - [Generate a insert query:](#generate-a-insert-query)
+      - [Generate an insert query:](#generate-an-insert-query)
     - [Delete statement](#delete-statement)
       - [Generate a delete query:](#generate-a-delete-query)
     - [Update statement](#update-statement)
-      - [Generate a update query:](#generate-a-update-query)
+      - [Generate an update query:](#generate-an-update-query)
   - [Syntax used](#syntax-used)
 
 ## Examples
@@ -47,7 +47,7 @@ gosqle.NewSelect(...columns)
 ```go
 gosqle.NewInsert(table, ...columns)
 ```
-#### Generate a insert query:
+#### Generate an insert query:
 ```go
 {{insertGoFile "examples/insert.go" }}
 ```
@@ -59,7 +59,7 @@ gosqle.NewInsert(table, ...columns)
 ```
 
 ### Update statement
-#### Generate a update query:
+#### Generate an update query:
 ```go
 {{insertGoFile "examples/update.go" }}
 ```
