@@ -5,9 +5,14 @@ Table of Contents:
 - [gosqle](#gosqle)
   - [Examples](#examples)
     - [Select statement](#select-statement)
+      - [Generate a select query:](#generate-a-select-query)
+      - [Generate select query using group by and aggregate functions:](#generate-select-query-using-group-by-and-aggregate-functions)
     - [Insert statement](#insert-statement)
+      - [Generate a insert query:](#generate-a-insert-query)
     - [Delete statement](#delete-statement)
+      - [Generate a delete query:](#generate-a-delete-query)
     - [Update statement](#update-statement)
+      - [Generate a update query:](#generate-a-update-query)
   - [Syntax used](#syntax-used)
 
 ## Examples
@@ -24,25 +29,37 @@ docker-compose up -d
 ```
 
 ### Select statement
-Generate a select query:
+Create a select statement with the following syntax:
+```go
+gosqle.NewSelect(...columns)
+```
+#### Generate a select query:
 ```go
 {{insertGoFile "examples/select.go" }}
 ```
 
+#### Generate select query using group by and aggregate functions:
+```go
+{{insertGoFile "examples/select-aggregate.go" }}
+```
+
 ### Insert statement
-Generate a insert query:
+```go
+gosqle.NewInsert(table, ...columns)
+```
+#### Generate a insert query:
 ```go
 {{insertGoFile "examples/insert.go" }}
 ```
 
 ### Delete statement
-Generate a delete query:
+#### Generate a delete query:
 ```go
 {{insertGoFile "examples/delete.go" }}
 ```
 
 ### Update statement
-Generate a update query:
+#### Generate a update query:
 ```go
 {{insertGoFile "examples/update.go" }}
 ```

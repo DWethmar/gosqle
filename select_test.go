@@ -95,8 +95,8 @@ func TestSelect_ToSQL(t *testing.T) {
 			).From(expressions.Table{
 				Name: "users",
 			}).OrderBy(
-				orderby.Sort{Column: expressions.Column{Name: "username"}, Direction: orderby.ASC},
-				orderby.Sort{Column: expressions.Column{Name: "age"}, Direction: orderby.DESC},
+				orderby.Sort{Column: &expressions.Column{Name: "username"}, Direction: orderby.ASC},
+				orderby.Sort{Column: &expressions.Column{Name: "age"}, Direction: orderby.DESC},
 			),
 			want:    "SELECT * FROM users ORDER BY username ASC, age DESC;",
 			wantErr: false,
@@ -129,10 +129,8 @@ func TestSelect_ToSQL(t *testing.T) {
 				Name: "users",
 			}).GroupBy(
 				&groupby.ColumnGrouping{
-					Columns: []*expressions.Column{
-						expressions.NewColumn("username"),
-						expressions.NewColumn("email"),
-					},
+					expressions.NewColumn("username"),
+					expressions.NewColumn("email"),
 				},
 			),
 			want:    "SELECT username FROM users GROUP BY username, email;",
@@ -148,10 +146,8 @@ func TestSelect_ToSQL(t *testing.T) {
 				Name: "users",
 			}).GroupBy(
 				&groupby.ColumnGrouping{
-					Columns: []*expressions.Column{
-						expressions.NewColumn("username"),
-						expressions.NewColumn("email"),
-					},
+					expressions.NewColumn("username"),
+					expressions.NewColumn("email"),
 				},
 			).Having(
 				predicates.GT{

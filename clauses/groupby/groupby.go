@@ -37,12 +37,10 @@ type Grouping interface {
 var _ Grouping = &ColumnGrouping{}
 
 // ColumnGrouping represents a group by clause with columns
-type ColumnGrouping struct {
-	Columns []*expressions.Column
-}
+type ColumnGrouping []*expressions.Column
 
-func (c *ColumnGrouping) WriteTo(sw io.StringWriter) error { return WriteGroupByColumns(sw, c.Columns) }
-func (*ColumnGrouping) g()                                 {}
+func (c ColumnGrouping) WriteTo(sw io.StringWriter) error { return WriteGroupByColumns(sw, c) }
+func (ColumnGrouping) g()                                 {}
 
 var (
 	_ clauses.Clause = &Clause{}

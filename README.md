@@ -5,9 +5,14 @@ Table of Contents:
 - [gosqle](#gosqle)
   - [Examples](#examples)
     - [Select statement](#select-statement)
+      - [Generate a select query:](#generate-a-select-query)
+      - [Generate select query using group by and aggregate functions:](#generate-select-query-using-group-by-and-aggregate-functions)
     - [Insert statement](#insert-statement)
+      - [Generate a insert query:](#generate-a-insert-query)
     - [Delete statement](#delete-statement)
+      - [Generate a delete query:](#generate-a-delete-query)
     - [Update statement](#update-statement)
+      - [Generate a update query:](#generate-a-update-query)
   - [Syntax used](#syntax-used)
 
 ## Examples
@@ -24,7 +29,11 @@ docker-compose up -d
 ```
 
 ### Select statement
-Generate a select query:
+Create a select statement with the following syntax:
+```go
+gosqle.NewSelect(...columns)
+```
+#### Generate a select query:
 ```go
 package main
 
@@ -49,7 +58,7 @@ func SelectUsers(db *sql.DB) ([]User, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 
-	// SELECT u.id AS id, u.name AS name, u.email AS email FROM users AS u LIMIT $1
+	// SELECT u.id AS id, u.name AS name, u.email AS email FROM users u LIMIT $1
 	err := gosqle.NewSelect(
 		clauses.Selectable{
 			Expr: expressions.NewColumn("id").SetFrom("u"),
@@ -91,8 +100,82 @@ func SelectUsers(db *sql.DB) ([]User, string, error) {
 
 ```
 
+#### Generate select query using group by and aggregate functions:
+```go
+package main
+
+import (
+	"database/sql"
+	"strings"
+
+	"github.com/dwethmar/gosqle"
+	"github.com/dwethmar/gosqle/clauses"
+	"github.com/dwethmar/gosqle/clauses/groupby"
+	"github.com/dwethmar/gosqle/clauses/orderby"
+	"github.com/dwethmar/gosqle/expressions"
+	"github.com/dwethmar/gosqle/postgres"
+)
+
+type AmountOfAddressesPerCountry struct {
+	Country string
+	Count   int64
+}
+
+// SelectAmountOfAddressesPerCountry select amount of addresses per country
+func SelectAmountOfAddressesPerCountry(db *sql.DB) ([]AmountOfAddressesPerCountry, string, error) {
+	sb := new(strings.Builder)
+	args := postgres.NewArguments()
+
+	/**
+	SELECT country, COUNT(id) AS address_count
+	FROM addresses
+	GROUP BY country
+	ORDER BY address_count DESC;
+	**/
+	err := gosqle.NewSelect(
+		clauses.Selectable{Expr: expressions.NewColumn("country")},
+		clauses.Selectable{Expr: expressions.NewCount(expressions.NewColumn("id")), As: "address_count"},
+	).From(expressions.Table{
+		Name: "addresses",
+	}).GroupBy(
+		groupby.ColumnGrouping{
+			expressions.NewColumn("country"),
+		},
+	).OrderBy(
+		orderby.Sort{
+			Column:    expressions.NewColumn("address_count"),
+			Direction: orderby.DESC,
+		},
+	).WriteTo(sb)
+	if err != nil {
+		return nil, "", err
+	}
+
+	rows, err := db.Query(sb.String(), args.Args...)
+	if err != nil {
+		return nil, "", err
+	}
+
+	var r []AmountOfAddressesPerCountry
+	for rows.Next() {
+		var a AmountOfAddressesPerCountry
+		err = rows.Scan(&a.Country, &a.Count)
+		if err != nil {
+			return nil, "", err
+		}
+		r = append(r, a)
+	}
+
+	return r, sb.String(), nil
+}
+
+```
+
 ### Insert statement
-Generate a insert query:
+```go
+gosqle.NewInsert(table, ...columns)
+```
+#### Generate a insert query:
 ```go
 package main
 
@@ -131,7 +214,7 @@ func InsertUser(db *sql.DB) (string, error) {
 ```
 
 ### Delete statement
-Generate a delete query:
+#### Generate a delete query:
 ```go
 package main
 
@@ -148,7 +231,7 @@ func Delete(db *sql.DB) error {
 ```
 
 ### Update statement
-Generate a update query:
+#### Generate a update query:
 ```go
 package main
 

@@ -27,9 +27,17 @@ const (
 // Column to order by.
 type Sort struct {
 	// Column to order by.
-	expressions.Column
+	*expressions.Column
 	// Direction of the order.
 	Direction Direction
+}
+
+// NewSort creates a new Sort.
+func NewSort(column *expressions.Column, direction Direction) Sort {
+	return Sort{
+		Column:    column,
+		Direction: direction,
+	}
 }
 
 // WriteTo writes a ORDER BY clause to the given string writer.

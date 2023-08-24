@@ -107,10 +107,8 @@ func TestClause_WriteTo(t *testing.T) {
 			name: "should write group by with one column",
 			fields: fields{
 				Grouping: &ColumnGrouping{
-					Columns: []*expressions.Column{
-						expressions.NewColumn("id").SetFrom("users"),
-						expressions.NewColumn("email").SetFrom("users"),
-					},
+					expressions.NewColumn("id").SetFrom("users"),
+					expressions.NewColumn("email").SetFrom("users"),
 				},
 			},
 			args: args{
@@ -122,10 +120,8 @@ func TestClause_WriteTo(t *testing.T) {
 			name: "should write group by with multiple columns",
 			fields: fields{
 				Grouping: &ColumnGrouping{
-					Columns: []*expressions.Column{
-						expressions.NewColumn("id").SetFrom("users"),
-						expressions.NewColumn("email").SetFrom("users"),
-					},
+					expressions.NewColumn("id").SetFrom("users"),
+					expressions.NewColumn("email").SetFrom("users"),
 				},
 			},
 			args: args{
@@ -159,18 +155,14 @@ func TestNew(t *testing.T) {
 			name: "should create a new clause",
 			args: args{
 				Grouping: &ColumnGrouping{
-					Columns: []*expressions.Column{
-						expressions.NewColumn("id").SetFrom("users"),
-						expressions.NewColumn("email").SetFrom("users"),
-					},
+					expressions.NewColumn("id").SetFrom("users"),
+					expressions.NewColumn("email").SetFrom("users"),
 				},
 			},
 			want: &Clause{
 				grouping: &ColumnGrouping{
-					Columns: []*expressions.Column{
-						expressions.NewColumn("id").SetFrom("users"),
-						expressions.NewColumn("email").SetFrom("users"),
-					},
+					expressions.NewColumn("id").SetFrom("users"),
+					expressions.NewColumn("email").SetFrom("users"),
 				},
 			},
 		},

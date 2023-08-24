@@ -21,7 +21,7 @@ func SelectUsers(db *sql.DB) ([]User, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 
-	// SELECT u.id AS id, u.name AS name, u.email AS email FROM users AS u LIMIT $1
+	// SELECT u.id AS id, u.name AS name, u.email AS email FROM users u LIMIT $1
 	err := gosqle.NewSelect(
 		clauses.Selectable{
 			Expr: expressions.NewColumn("id").SetFrom("u"),

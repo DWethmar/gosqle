@@ -21,6 +21,16 @@ var examples = map[string]func(*sql.DB){
 			fmt.Printf("#%d %+v\n", i, u)
 		}
 	},
+	"select-aggregate": func(d *sql.DB) {
+		amounts, query, err := SelectAmountOfAddressesPerCountry(d)
+		if err != nil {
+			fmt.Printf("error selecting amounts: %v\n", err)
+		}
+		fmt.Printf("Query: %q\n", query)
+		for i, a := range amounts {
+			fmt.Printf("#%d %+v\n", i, a)
+		}
+	},
 	"insert": func(d *sql.DB) {
 		if q, err := InsertUser(d); err == nil {
 			fmt.Printf("Query: %q\n", q)

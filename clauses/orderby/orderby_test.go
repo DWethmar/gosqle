@@ -35,13 +35,13 @@ func TestWrite(t *testing.T) {
 				sb: new(strings.Builder),
 				sorting: []Sort{
 					{
-						Column: expressions.Column{
+						Column: &expressions.Column{
 							Name: "field_a",
 						},
 						Direction: ASC,
 					},
 					{
-						Column: expressions.Column{
+						Column: &expressions.Column{
 							Name: "field_b",
 						},
 						Direction: DESC,
@@ -73,13 +73,13 @@ func TestWrite(t *testing.T) {
 
 		if err := Write(writer, []Sort{
 			{
-				Column: expressions.Column{
+				Column: &expressions.Column{
 					Name: "field_a",
 				},
 				Direction: ASC,
 			},
 			{
-				Column: expressions.Column{
+				Column: &expressions.Column{
 					Name: "field_b",
 				},
 				Direction: DESC,
