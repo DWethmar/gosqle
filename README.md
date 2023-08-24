@@ -18,6 +18,7 @@ To generate the examples into this README.md file, run the following command:
 
 To run examples from the [examples](examples) folder, run the following command:
 ```bash
+docker-compose up -d
 ./run_examples.sh
 ```
 
