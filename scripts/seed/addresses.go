@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"log"
 
 	"github.com/lib/pq"
 )
@@ -13,26 +12,20 @@ func seedAddressTypes(txn *sql.Tx) error {
 		return fmt.Errorf("transaction is nil")
 	}
 
-	stmt, err := txn.Prepare(pq.CopyIn("address_type", "id", "type"))
+	stmt, err := txn.Prepare(pq.CopyIn("address_types", "name"))
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("error preparing statement: %w", err)
 	}
 
-	for i, t := range addressTypes {
-		_, err = stmt.Exec(i+1, t)
+	for _, t := range addressTypes {
+		_, err = stmt.Exec(t.Name)
 		if err != nil {
-			log.Fatal(err)
+			return fmt.Errorf("error executing statement: %w", err)
 		}
 	}
 
-	_, err = stmt.Exec()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = stmt.Close()
-	if err != nil {
-		log.Fatal(err)
+	if err = stmt.Close(); err != nil {
+		return fmt.Errorf("error closing statement: %w", err)
 	}
 
 	return nil
@@ -41,7 +34,7 @@ func seedAddressTypes(txn *sql.Tx) error {
 func GetAddressTypes(txn *sql.Tx) ([]AddressType, error) {
 	rows, err := txn.Query("SELECT id, name FROM address_types")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error querying address_types: %w", err)
 	}
 	defer rows.Close()
 
@@ -50,7 +43,7 @@ func GetAddressTypes(txn *sql.Tx) ([]AddressType, error) {
 		var addressType AddressType
 		err := rows.Scan(&addressType.ID, &addressType.Name)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error scanning address_types: %w", err)
 		}
 
 		addressTypes = append(addressTypes, addressType)
@@ -62,7 +55,7 @@ func GetAddressTypes(txn *sql.Tx) ([]AddressType, error) {
 func seedAddresses(txn *sql.Tx) error {
 	addressTypes, err := GetAddressTypes(txn)
 	if err != nil {
-		return err
+		return fmt.Errorf("error getting address types: %w", err)
 	}
 
 	if txn == nil {
@@ -84,7 +77,7 @@ func seedAddresses(txn *sql.Tx) error {
 		"address_type_id",
 	))
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("error preparing statement: %w", err)
 	}
 
 	for i, a := range addresses {
@@ -110,18 +103,13 @@ func seedAddresses(txn *sql.Tx) error {
 			addressTypeID,
 		)
 		if err != nil {
-			log.Fatal(err)
+			return fmt.Errorf("error executing statement: %w", err)
 		}
-	}
-
-	_, err = stmt.Exec()
-	if err != nil {
-		log.Fatal(err)
 	}
 
 	err = stmt.Close()
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("error closing statement: %w", err)
 	}
 
 	return nil

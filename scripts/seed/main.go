@@ -55,14 +55,17 @@ func main() {
 	}()
 
 	if err = seedUsers(tx); err != nil {
+		fmt.Printf("Error seeding users: %v\n", err)
 		return
 	}
 
 	if err = seedAddressTypes(tx); err != nil {
+		fmt.Printf("Error seeding address types: %v\n", err)
 		return
 	}
 
 	if err = seedAddresses(tx); err != nil {
+		fmt.Printf("Error seeding addresses: %v\n", err)
 		return
 	}
 }
@@ -76,19 +79,19 @@ func truncate(db *sql.DB) error {
 	// truncate the address table
 	_, err = tx.Exec("TRUNCATE TABLE addresses CASCADE")
 	if err != nil {
-		return err
+		return fmt.Errorf("error truncating addresses table: %v", err)
 	}
 
 	// truncate the users table
 	_, err = tx.Exec("TRUNCATE TABLE users CASCADE")
 	if err != nil {
-		return err
+		return fmt.Errorf("error truncating users table: %v", err)
 	}
 
 	// truncate the address_type
-	_, err = tx.Exec("TRUNCATE TABLE address_type CASCADE")
+	_, err = tx.Exec("TRUNCATE TABLE address_types CASCADE")
 	if err != nil {
-		return err
+		return fmt.Errorf("error truncating address_types table: %v", err)
 	}
 
 	return tx.Commit()

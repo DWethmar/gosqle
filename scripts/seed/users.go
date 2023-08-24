@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/lib/pq"
@@ -16,7 +15,7 @@ func seedUsers(txn *sql.Tx) error {
 
 	emailDomains, err := readLines("scripts/seed/email_domain.txt")
 	if err != nil {
-		return err
+		return fmt.Errorf("error reading email domains: %w", err)
 	}
 
 	emailDomainsMap := make(map[string]string)
@@ -27,7 +26,7 @@ func seedUsers(txn *sql.Tx) error {
 
 	stmt, err := txn.Prepare(pq.CopyIn("users", "id", "name", "email"))
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("error preparing statement: %w", err)
 	}
 
 	for i, a := range addresses {
@@ -37,18 +36,12 @@ func seedUsers(txn *sql.Tx) error {
 
 		_, err = stmt.Exec(i+1, strings.ToLower(a.RecipientName), email)
 		if err != nil {
-			log.Fatal(err)
+			return fmt.Errorf("error executing statement: %w", err)
 		}
 	}
 
-	_, err = stmt.Exec()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = stmt.Close()
-	if err != nil {
-		log.Fatal(err)
+	if err = stmt.Close(); err != nil {
+		return fmt.Errorf("error closing statement: %w", err)
 	}
 
 	return nil
