@@ -58,23 +58,13 @@ func SelectUsers(db *sql.DB) ([]User, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 
-	// SELECT u.id AS id, u.name AS name, u.email AS email FROM users u LIMIT $1
+	// SELECT id, name, email FROM users LIMIT 10;
 	err := gosqle.NewSelect(
-		clauses.Selectable{
-			Expr: expressions.NewColumn("id").SetFrom("u"),
-			As:   "id",
-		},
-		clauses.Selectable{
-			Expr: expressions.NewColumn("name").SetFrom("u"),
-			As:   "name",
-		},
-		clauses.Selectable{
-			Expr: expressions.NewColumn("email").SetFrom("u"),
-			As:   "email",
-		},
+		clauses.Selectable{Expr: expressions.NewColumn("id")},
+		clauses.Selectable{Expr: expressions.NewColumn("name")},
+		clauses.Selectable{Expr: expressions.NewColumn("email")},
 	).From(expressions.Table{
-		Name:  "users",
-		Alias: "u",
+		Name: "users",
 	}).Limit(args.NewArgument(10)).WriteTo(sb)
 	if err != nil {
 		return nil, "", err
