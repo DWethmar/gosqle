@@ -30,7 +30,6 @@ func SelectUsers(db *sql.DB) ([]User, string, error) {
 		Name:  "users",
 		Alias: "u",
 	}).Limit(args.NewArgument(10)).WriteTo(sb)
-
 	if err != nil {
 		return nil, "", err
 	}

@@ -4,8 +4,8 @@ import (
 	"database/sql"
 )
 
-// Delete deletes a user.
-func Delete(db *sql.DB) error {
+// Update updates a user.
+func Update(db *sql.DB) error {
 	// TODO: Implement
 	return nil
 }
