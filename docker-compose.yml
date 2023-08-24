@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_DB=customers
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5439:5432'
+    volumes: 
+      - db:/var/lib/postgresql/data
+
+  migrate:
+    image: arigaio/atlas:0.13.1
+    command: migrate apply --url "postgres://postgres:postgres@db:5432/customers?sslmode=disable"
+    volumes:
+      - ./migrations:/migrations
+    depends_on:
+      - db
+
+volumes:
+  db:
+    driver: local

@@ -1,0 +1,17 @@
+[
+    {
+        "name": "billing"
+    },
+    {
+        "name": "shipping"
+    },
+    {
+        "name": "other"
+    },
+    {
+        "name": "residential"
+    },
+    {
+        "name": "business"
+    }
+]
