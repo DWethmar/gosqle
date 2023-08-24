@@ -3,24 +3,32 @@ gosqle is a golang package that can generate sql queries.
 
 Table of Contents:
 - [gosqle](#gosqle)
-  - [Select statement](#select-statement)
-  - [Insert statement](#insert-statement)
-  - [Delete statement](#delete-statement)
+  - [Examples](#examples)
+    - [Select statement](#select-statement)
+    - [Insert statement](#insert-statement)
+    - [Delete statement](#delete-statement)
   - [Syntax used](#syntax-used)
 
-## Select statement
+## Examples
+Examples shown here are generated into this README.md file from the [examples](examples) folder. See README.tmpl.md for more information.
+To generate the examples into this README.md file, run the following command:
+```bash
+./run_readme.sh
+```
+
+### Select statement
 Generate a select query:
 ```go
 {{insertGoFile "examples/select.go" }}
 ```
 
-## Insert statement
+### Insert statement
 Generate a insert query:
 ```go
 {{insertGoFile "examples/insert.go" }}
 ```
 
-## Delete statement
+### Delete statement
 Generate a delete query:
 ```go
 {{insertGoFile "examples/delete.go" }}
