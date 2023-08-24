@@ -2,33 +2,32 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"strings"
+	"time"
 
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/postgres"
 )
 
-// Insert inserts a user.
-func Insert(db *sql.DB) error {
+// InsertUser inserts a user.
+func InsertUser(db *sql.DB) (string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 
-	// INSERT INTO users (id, name) VALUES ($1, $2)
-	err := gosqle.NewInsert("users",
-		"id",
-		"name",
-	).Values(
-		args.NewArgument(1),
+	// INSERT INTO users (name, email) VALUES ($1, $2)
+	err := gosqle.NewInsert("users", "name", "email").Values(
 		args.NewArgument("John"),
+		args.NewArgument(fmt.Sprintf("john%d@%s", time.Now().Unix(), "example.com")),
 	).WriteTo(sb)
 
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	if _, err = db.Exec(sb.String(), args.Args...); err != nil {
-		return err
+		return "", err
 	}
 
-	return nil
+	return sb.String(), nil
 }

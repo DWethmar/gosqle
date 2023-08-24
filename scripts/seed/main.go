@@ -15,16 +15,12 @@ func main() {
 	// Define the flag. The default value for the database URL is an empty string.
 	var dbURL string
 	flag.StringVar(&dbURL, "dburl", "", "The URL of the database to connect to")
-
-	// Parse the flags
 	flag.Parse()
 
 	if dbURL == "" {
 		fmt.Println("Please provide a database URL using the -dburl flag.")
 		return
 	}
-
-	fmt.Println("Database URL:", dbURL)
 
 	db, err := sql.Open("postgres", dbURL)
 	if err != nil {

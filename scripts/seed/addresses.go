@@ -62,6 +62,11 @@ func seedAddresses(txn *sql.Tx) error {
 		return fmt.Errorf("transaction is nil")
 	}
 
+	users, err := getUsers(txn)
+	if err != nil {
+		return fmt.Errorf("error getting users: %w", err)
+	}
+
 	stmt, err := txn.Prepare(pq.CopyIn(
 		"addresses",
 		"user_id",
@@ -89,8 +94,15 @@ func seedAddresses(txn *sql.Tx) error {
 			}
 		}
 
+		var user User
+		if i < len(users) {
+			user = users[i]
+		} else {
+			user = users[0]
+		}
+
 		_, err = stmt.Exec(
-			i+1,
+			user.ID,
 			a.RecipientName,
 			a.AddressLine1,
 			a.AddressLine2,

@@ -38,6 +38,12 @@ type Address struct {
 	Type                string `json:"type"`
 }
 
+type User struct {
+	ID    int64
+	Name  string
+	Email string
+}
+
 func init() {
 	err := json.Unmarshal(addressesFile, &addresses)
 	if err != nil {
