@@ -16,6 +16,11 @@ To generate the examples into this README.md file, run the following command:
 ./run_readme.sh
 ```
 
+To run examples from the [examples](examples) folder, run the following command:
+```bash
+./run_examples.sh
+```
+
 ### Select statement
 Generate a select query:
 ```go
