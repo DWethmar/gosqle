@@ -7,10 +7,11 @@ Table of Contents:
     - [Select statement](#select-statement)
     - [Insert statement](#insert-statement)
     - [Delete statement](#delete-statement)
+    - [Update statement](#update-statement)
   - [Syntax used](#syntax-used)
 
 ## Examples
-Examples shown here are generated into this README.md file from the [examples](examples) folder. See README.tmpl.md for more information.
+Examples shown here are generated into this README.md file from the [examples](examples) folder. See [README.tmpl.md](README.tmpl.md) for more information.
 To generate the examples into this README.md file, run the following command:
 ```bash
 ./run_readme.sh
@@ -140,6 +141,23 @@ import (
 
 // Delete deletes a user.
 func Delete(db *sql.DB) error {
+	// TODO: Implement
+	return nil
+}
+
+```
+
+### Update statement
+Generate a update query:
+```go
+package main
+
+import (
+	"database/sql"
+)
+
+// Update updates a user.
+func Update(db *sql.DB) error {
 	// TODO: Implement
 	return nil
 }
