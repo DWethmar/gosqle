@@ -6,6 +6,7 @@ import (
 
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/clauses"
+	"github.com/dwethmar/gosqle/clauses/from"
 	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/postgres"
 )
@@ -26,7 +27,7 @@ func SelectUsers(db *sql.DB) ([]User, string, error) {
 		clauses.Selectable{Expr: expressions.NewColumn("id")},
 		clauses.Selectable{Expr: expressions.NewColumn("name")},
 		clauses.Selectable{Expr: expressions.NewColumn("email")},
-	).From(expressions.Table{
+	).From(from.Table{
 		Name: "users",
 	}).Limit(args.NewArgument(10)).WriteTo(sb)
 	if err != nil {

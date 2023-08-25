@@ -23,7 +23,7 @@ type Select struct {
 	statement.Statement
 }
 
-func (s *Select) From(table expressions.Table) *Select {
+func (s *Select) From(table from.Table) *Select {
 	return s.SetClause(from.New(table))
 }
 

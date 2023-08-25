@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/dwethmar/gosqle/clauses"
+	"github.com/dwethmar/gosqle/clauses/from"
 	"github.com/dwethmar/gosqle/clauses/groupby"
 	"github.com/dwethmar/gosqle/clauses/join"
 	"github.com/dwethmar/gosqle/clauses/orderby"
@@ -27,18 +28,18 @@ func TestSelect_ToSQL(t *testing.T) {
 			sel: NewSelect(
 				clauses.Selectable{Expr: expressions.NewColumn("username").SetFrom("u")},
 				clauses.Selectable{Expr: expressions.NewColumn("country").SetFrom("u"), As: "c"},
-			).From(expressions.Table{
-				Name:  "users",
-				Alias: "u",
+			).From(from.Table{
+				Name: "users",
+				As:   "u",
 			}),
-			want:    "SELECT u.username, u.country AS c FROM users u;",
+			want:    "SELECT u.username, u.country AS c FROM users AS u;",
 			wantErr: false,
 		},
 		{
 			name: "select all",
 			sel: NewSelect(
 				clauses.Selectable{Expr: expressions.Column{Name: "*"}},
-			).From(expressions.Table{
+			).From(from.Table{
 				Name: "users",
 			}),
 			want:    "SELECT * FROM users;",
@@ -49,7 +50,7 @@ func TestSelect_ToSQL(t *testing.T) {
 			sel: NewSelect(
 				clauses.Selectable{Expr: expressions.Column{Name: "*", From: "users"}},
 				clauses.Selectable{Expr: expressions.Column{Name: "*", From: "companies"}},
-			).From(expressions.Table{
+			).From(from.Table{
 				Name: "users",
 			}).Join(
 				join.Options{
@@ -72,7 +73,7 @@ func TestSelect_ToSQL(t *testing.T) {
 			name: "select where",
 			sel: NewSelect(
 				clauses.Selectable{Expr: expressions.Column{Name: "*"}},
-			).From(expressions.Table{
+			).From(from.Table{
 				Name: "users",
 			}).Where(
 				predicates.EQ{
@@ -92,7 +93,7 @@ func TestSelect_ToSQL(t *testing.T) {
 			name: "select order by",
 			sel: NewSelect(
 				clauses.Selectable{Expr: expressions.Column{Name: "*"}},
-			).From(expressions.Table{
+			).From(from.Table{
 				Name: "users",
 			}).OrderBy(
 				orderby.Sort{Column: &expressions.Column{Name: "username"}, Direction: orderby.ASC},
@@ -105,7 +106,7 @@ func TestSelect_ToSQL(t *testing.T) {
 			name: "select limit",
 			sel: NewSelect(
 				clauses.Selectable{Expr: expressions.Column{Name: "*"}},
-			).From(expressions.Table{
+			).From(from.Table{
 				Name: "users",
 			}).Limit(postgres.NewArgument(12, 1)),
 			want:    "SELECT * FROM users LIMIT $1;",
@@ -115,7 +116,7 @@ func TestSelect_ToSQL(t *testing.T) {
 			name: "select offset",
 			sel: NewSelect(
 				clauses.Selectable{Expr: expressions.Column{Name: "*"}},
-			).From(expressions.Table{
+			).From(from.Table{
 				Name: "users",
 			}).Offset(postgres.NewArgument(100, 1)),
 			want:    "SELECT * FROM users OFFSET $1;",
@@ -125,7 +126,7 @@ func TestSelect_ToSQL(t *testing.T) {
 			name: "select group by columns",
 			sel: NewSelect(
 				clauses.Selectable{Expr: expressions.Column{Name: "username"}},
-			).From(expressions.Table{
+			).From(from.Table{
 				Name: "users",
 			}).GroupBy(
 				&groupby.ColumnGrouping{
@@ -142,7 +143,7 @@ func TestSelect_ToSQL(t *testing.T) {
 				clauses.Selectable{
 					Expr: expressions.Column{Name: "username"},
 				},
-			).From(expressions.Table{
+			).From(from.Table{
 				Name: "users",
 			}).GroupBy(
 				&groupby.ColumnGrouping{
