@@ -38,6 +38,13 @@ var examples = map[string]func(*sql.DB){
 			fmt.Printf("error inserting user: %v\n", err)
 		}
 	},
+	"update": func(d *sql.DB) {
+		if q, err := UpdateUser(d); err == nil {
+			fmt.Printf("Query: %q\n", q)
+		} else {
+			fmt.Printf("error updating user: %v\n", err)
+		}
+	},
 }
 
 func main() {

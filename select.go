@@ -23,7 +23,7 @@ type Select struct {
 	statement.Statement
 }
 
-func (s *Select) From(table expressions.Table) *Select {
+func (s *Select) From(table from.Table) *Select {
 	return s.SetClause(from.New(table))
 }
 
@@ -44,7 +44,7 @@ func (s *Select) Where(predicates ...predicates.Predicate) *Select {
 		return s
 	}
 
-	return s.SetClause(where.NewWhere(predicates))
+	return s.SetClause(where.New(predicates))
 }
 
 // GroupBy adds a group by clause to the select statement.

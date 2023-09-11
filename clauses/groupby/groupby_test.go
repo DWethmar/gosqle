@@ -29,7 +29,7 @@ func TestWriteGroupByColumns(t *testing.T) {
 			args: args{
 				sw: &strings.Builder{},
 				columns: []*expressions.Column{
-					expressions.NewColumn("id").SetFrom("users"),
+					&expressions.Column{Name: "id", From: "users"},
 				},
 			},
 			checkString: true,
@@ -41,8 +41,8 @@ func TestWriteGroupByColumns(t *testing.T) {
 			args: args{
 				sw: &strings.Builder{},
 				columns: []*expressions.Column{
-					expressions.NewColumn("id").SetFrom("users"),
-					expressions.NewColumn("email").SetFrom("users"),
+					&expressions.Column{Name: "id", From: "users"},
+					&expressions.Column{Name: "email", From: "users"},
 				},
 			},
 			checkString: true,
@@ -56,7 +56,7 @@ func TestWriteGroupByColumns(t *testing.T) {
 					return 0, errors.New("some error")
 				}),
 				columns: []*expressions.Column{
-					expressions.NewColumn("id").SetFrom("users"),
+					&expressions.Column{Name: "id", From: "users"},
 				},
 			},
 			checkString: false,
@@ -107,8 +107,8 @@ func TestClause_WriteTo(t *testing.T) {
 			name: "should write group by with one column",
 			fields: fields{
 				Grouping: &ColumnGrouping{
-					expressions.NewColumn("id").SetFrom("users"),
-					expressions.NewColumn("email").SetFrom("users"),
+					&expressions.Column{Name: "id", From: "users"},
+					&expressions.Column{Name: "email", From: "users"},
 				},
 			},
 			args: args{
@@ -120,8 +120,8 @@ func TestClause_WriteTo(t *testing.T) {
 			name: "should write group by with multiple columns",
 			fields: fields{
 				Grouping: &ColumnGrouping{
-					expressions.NewColumn("id").SetFrom("users"),
-					expressions.NewColumn("email").SetFrom("users"),
+					&expressions.Column{Name: "id", From: "users"},
+					&expressions.Column{Name: "email", From: "users"},
 				},
 			},
 			args: args{
@@ -155,14 +155,14 @@ func TestNew(t *testing.T) {
 			name: "should create a new clause",
 			args: args{
 				Grouping: &ColumnGrouping{
-					expressions.NewColumn("id").SetFrom("users"),
-					expressions.NewColumn("email").SetFrom("users"),
+					&expressions.Column{Name: "id", From: "users"},
+					&expressions.Column{Name: "email", From: "users"},
 				},
 			},
 			want: &Clause{
 				grouping: &ColumnGrouping{
-					expressions.NewColumn("id").SetFrom("users"),
-					expressions.NewColumn("email").SetFrom("users"),
+					&expressions.Column{Name: "id", From: "users"},
+					&expressions.Column{Name: "email", From: "users"},
 				},
 			},
 		},

@@ -45,6 +45,7 @@ import (
 
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/clauses"
+	"github.com/dwethmar/gosqle/clauses/from"
 	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/postgres"
 )
@@ -59,24 +60,21 @@ type User struct {
 func SelectUsers(db *sql.DB) ([]User, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
-
 	// SELECT id, name, email FROM users LIMIT 10;
 	err := gosqle.NewSelect(
-		clauses.Selectable{Expr: expressions.NewColumn("id")},
-		clauses.Selectable{Expr: expressions.NewColumn("name")},
-		clauses.Selectable{Expr: expressions.NewColumn("email")},
-	).From(expressions.Table{
+		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
+		clauses.Selectable{Expr: expressions.Column{Name: "name"}},
+		clauses.Selectable{Expr: expressions.Column{Name: "email"}},
+	).From(from.Table{
 		Name: "users",
 	}).Limit(args.NewArgument(10)).WriteTo(sb)
 	if err != nil {
 		return nil, "", err
 	}
-
 	rows, err := db.Query(sb.String(), args.Args...)
 	if err != nil {
 		return nil, "", err
 	}
-
 	var users []User
 	for rows.Next() {
 		var user User
@@ -86,7 +84,6 @@ func SelectUsers(db *sql.DB) ([]User, string, error) {
 		}
 		users = append(users, user)
 	}
-
 	return users, sb.String(), nil
 }
 
@@ -102,6 +99,7 @@ import (
 
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/clauses"
+	"github.com/dwethmar/gosqle/clauses/from"
 	"github.com/dwethmar/gosqle/clauses/groupby"
 	"github.com/dwethmar/gosqle/clauses/orderby"
 	"github.com/dwethmar/gosqle/expressions"
@@ -124,14 +122,19 @@ func SelectAmountOfAddressesPerCountry(db *sql.DB) ([]AmountOfAddressesPerCountr
 	ORDER BY address_count DESC;
 	**/
 	err := gosqle.NewSelect(
-		clauses.Selectable{Expr: expressions.NewColumn("country")},
-		clauses.Selectable{Expr: expressions.NewCount(expressions.NewColumn("id")), As: "address_count"},
-	).From(expressions.Table{
+		clauses.Selectable{
+			Expr: &expressions.Column{Name: "country"},
+		},
+		clauses.Selectable{
+			Expr: expressions.NewCount(&expressions.Column{Name: "id"}),
+			As:   "address_count",
+		},
+	).From(from.Table{
 		Name: "addresses",
 	}).GroupBy(groupby.ColumnGrouping{
-		expressions.NewColumn("country"),
+		&expressions.Column{Name: "country"},
 	}).OrderBy(orderby.Sort{
-		Column:    expressions.NewColumn("address_count"),
+		Column:    &expressions.Column{Name: "address_count"},
 		Direction: orderby.DESC,
 	}).WriteTo(sb)
 	if err != nil {
@@ -224,12 +227,44 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
+	"strings"
+	"time"
+
+	"github.com/dwethmar/gosqle"
+	"github.com/dwethmar/gosqle/clauses/set"
+	"github.com/dwethmar/gosqle/expressions"
+	"github.com/dwethmar/gosqle/postgres"
+	"github.com/dwethmar/gosqle/predicates"
 )
 
-// Update updates a user.
-func Update(db *sql.DB) error {
-	// TODO: Implement
-	return nil
+// UpdateUser updates a user.
+func UpdateUser(db *sql.DB) (string, error) {
+	sb := new(strings.Builder)
+	args := postgres.NewArguments()
+
+	// UPDATE users SET name = $1 WHERE id = $2
+	err := gosqle.NewUpdate("users").Set(
+		set.Change{
+			Col:  "name",
+			Expr: args.NewArgument(fmt.Sprintf("new name %d", time.Now().Unix())),
+		},
+	).Where(
+		predicates.EQ{
+			Col:  expressions.Column{Name: "id"},
+			Expr: args.NewArgument(1),
+		},
+	).WriteTo(sb)
+
+	if err != nil {
+		return "", err
+	}
+
+	if _, err = db.Exec(sb.String(), args.Args...); err != nil {
+		return "", err
+	}
+
+	return sb.String(), nil
 }
 
 ```

@@ -1,26 +1,24 @@
-package expressions
+package from
 
 import (
 	"fmt"
 	"io"
 
+	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/util"
 )
 
 var (
-	_ Expression = (*Table)(nil)
+	_ expressions.Expression = (*Table)(nil)
 )
 
 // Table represents a table in a query.
 type Table struct {
 	// Name of the table.
 	Name string
-	// Alias of the table.
-	Alias string
+	// As of the table: "table AS alias".
+	As string
 }
-
-func (t Table) SetParamOffset(int)  {}
-func (t Table) Args() []interface{} { return nil }
 
 // Write writes a table to the given Writer.
 func (t Table) WriteTo(sw io.StringWriter) error {
@@ -28,8 +26,8 @@ func (t Table) WriteTo(sw io.StringWriter) error {
 		return fmt.Errorf("name is empty")
 	}
 
-	if t.Alias != "" {
-		if err := util.WriteStrings(sw, t.Name, " ", t.Alias); err != nil {
+	if t.As != "" {
+		if err := util.WriteStrings(sw, t.Name, " AS ", t.As); err != nil {
 			return fmt.Errorf("error writing table: %w", err)
 		}
 	} else {

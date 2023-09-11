@@ -36,12 +36,12 @@ func TestWriteJoin(t *testing.T) {
 				Match: &JoinOn{
 					Predicates: []predicates.Predicate{
 						predicates.EQ{
-							Col:  expressions.NewColumn("field_a").SetFrom("table"),
-							Expr: expressions.NewColumn("field_b").SetFrom("other_table"),
+							Col:  expressions.Column{Name: "field_a", From: "table"},
+							Expr: expressions.Column{Name: "field_b", From: "other_table"},
 						},
 						predicates.LT{
-							Col:  expressions.NewColumn("field_c").SetFrom("table"),
-							Expr: expressions.NewColumn("field_d").SetFrom("other_table"),
+							Col:  expressions.Column{Name: "field_c", From: "table"},
+							Expr: expressions.Column{Name: "field_d", From: "other_table"},
 						},
 					},
 				},
@@ -58,12 +58,12 @@ func TestWriteJoin(t *testing.T) {
 				Match: &JoinOn{
 					Predicates: []predicates.Predicate{
 						predicates.EQ{
-							Col:  expressions.NewColumn("field_a").SetFrom("table"),
-							Expr: expressions.NewColumn("field_b").SetFrom("other_table"),
+							Col:  expressions.Column{Name: "field_a", From: "table"},
+							Expr: expressions.Column{Name: "field_b", From: "other_table"},
 						},
 						predicates.LT{
-							Col:  expressions.NewColumn("field_c").SetFrom("table"),
-							Expr: expressions.NewColumn("field_d").SetFrom("other_table"),
+							Col:  expressions.Column{Name: "field_c", From: "table"},
+							Expr: expressions.Column{Name: "field_d", From: "other_table"},
 						},
 					},
 				},
@@ -80,18 +80,18 @@ func TestWriteJoin(t *testing.T) {
 				Match: &JoinOn{
 					Predicates: []predicates.Predicate{
 						predicates.EQ{
-							Col:  expressions.NewColumn("field_a").SetFrom("table"),
-							Expr: expressions.NewColumn("field_b").SetFrom("other_table"),
+							Col:  expressions.Column{Name: "field_a", From: "table"},
+							Expr: expressions.Column{Name: "field_b", From: "other_table"},
 						},
 						predicates.Wrap{
 							Predicates: []predicates.Predicate{
 								predicates.LT{
-									Col:  expressions.NewColumn("field_c").SetFrom("table"),
-									Expr: expressions.NewColumn("field_d").SetFrom("other_table"),
+									Col:  expressions.Column{Name: "field_c", From: "table"},
+									Expr: expressions.Column{Name: "field_d", From: "other_table"},
 								},
 								predicates.EQ{
-									Col:   expressions.NewColumn("field_a").SetFrom("table"),
-									Expr:  expressions.NewColumn("field_b").SetFrom("other_table"),
+									Col:   expressions.Column{Name: "field_a", From: "table"},
+									Expr:  expressions.Column{Name: "field_b", From: "other_table"},
 									Logic: predicates.OR,
 								},
 							},
@@ -111,12 +111,12 @@ func TestWriteJoin(t *testing.T) {
 				Match: &JoinOn{
 					Predicates: []predicates.Predicate{
 						predicates.EQ{
-							Col:  expressions.NewColumn("field_a").SetFrom("table"),
-							Expr: expressions.NewColumn("field_b").SetFrom("other_table"),
+							Col:  expressions.Column{Name: "field_a", From: "table"},
+							Expr: expressions.Column{Name: "field_b", From: "other_table"},
 						},
 						predicates.LT{
-							Col:  expressions.NewColumn("field_c").SetFrom("table"),
-							Expr: expressions.NewColumn("field_d").SetFrom("other_table"),
+							Col:  expressions.Column{Name: "field_c", From: "table"},
+							Expr: expressions.Column{Name: "field_d", From: "other_table"},
 						},
 					},
 				},
@@ -172,8 +172,8 @@ func TestJoin_WriteTo(t *testing.T) {
 						Match: &JoinOn{
 							Predicates: []predicates.Predicate{
 								predicates.EQ{
-									Col:  expressions.NewColumn("field_a").SetFrom("table"),
-									Expr: expressions.NewColumn("field_b").SetFrom("other_table"),
+									Col:  expressions.Column{Name: "field_a", From: "table"},
+									Expr: expressions.Column{Name: "field_b", From: "other_table"},
 								},
 							},
 						},
@@ -211,11 +211,11 @@ func TestJoin_WriteTo(t *testing.T) {
 						Match: &JoinOn{
 							Predicates: []predicates.Predicate{
 								predicates.EQ{
-									Col:  expressions.NewColumn("field_a").SetFrom("table"),
-									Expr: expressions.NewColumn("field_b").SetFrom("other_table"),
+									Col:  expressions.Column{Name: "field_a", From: "table"},
+									Expr: expressions.Column{Name: "field_b", From: "other_table"},
 								},
 								predicates.LT{
-									Col:  expressions.NewColumn("field_c").SetFrom("table"),
+									Col:  expressions.Column{Name: "field_c", From: "table"},
 									Expr: postgres.NewArgument("value", 1),
 								},
 							},
@@ -237,8 +237,8 @@ func TestJoin_WriteTo(t *testing.T) {
 						Match: &JoinOn{
 							Predicates: []predicates.Predicate{
 								predicates.EQ{
-									Col:  expressions.NewColumn("field_a").SetFrom("table"),
-									Expr: expressions.NewColumn("field_b").SetFrom("other_table"),
+									Col:  expressions.Column{Name: "field_a", From: "table"},
+									Expr: expressions.Column{Name: "field_b", From: "other_table"},
 								},
 							},
 						},
@@ -249,8 +249,8 @@ func TestJoin_WriteTo(t *testing.T) {
 						Match: &JoinOn{
 							Predicates: []predicates.Predicate{
 								predicates.EQ{
-									Col:  expressions.NewColumn("field_a").SetFrom("table"),
-									Expr: expressions.NewColumn("field_b").SetFrom("other_table"),
+									Col:  expressions.Column{Name: "field_a", From: "table"},
+									Expr: expressions.Column{Name: "field_b", From: "other_table"},
 								},
 							},
 						},
@@ -298,8 +298,8 @@ func TestNewJoin(t *testing.T) {
 						Match: &JoinOn{
 							Predicates: []predicates.Predicate{
 								predicates.EQ{
-									Col:  expressions.NewColumn("field_a").SetFrom("table"),
-									Expr: expressions.NewColumn("field_b").SetFrom("other_table"),
+									Col:  expressions.Column{Name: "field_a", From: "table"},
+									Expr: expressions.Column{Name: "field_b", From: "other_table"},
 								},
 							},
 						},
@@ -314,8 +314,8 @@ func TestNewJoin(t *testing.T) {
 						Match: &JoinOn{
 							Predicates: []predicates.Predicate{
 								predicates.EQ{
-									Col:  expressions.NewColumn("field_a").SetFrom("table"),
-									Expr: expressions.NewColumn("field_b").SetFrom("other_table"),
+									Col:  expressions.Column{Name: "field_a", From: "table"},
+									Expr: expressions.Column{Name: "field_b", From: "other_table"},
 								},
 							},
 						},
@@ -360,8 +360,8 @@ func TestJoinOn_WriteTo(t *testing.T) {
 			fields: fields{
 				Predicates: []predicates.Predicate{
 					predicates.EQ{
-						Col:  expressions.NewColumn("field_a").SetFrom("table"),
-						Expr: expressions.NewColumn("field_b").SetFrom("other_table"),
+						Col:  expressions.Column{Name: "field_a", From: "table"},
+						Expr: expressions.Column{Name: "field_b", From: "other_table"},
 					},
 				},
 			},
@@ -375,7 +375,7 @@ func TestJoinOn_WriteTo(t *testing.T) {
 			fields: fields{
 				Predicates: []predicates.Predicate{
 					predicates.EQ{
-						Col:  expressions.NewColumn("field_a").SetFrom("table"),
+						Col:  expressions.Column{Name: "field_a", From: "table"},
 						Expr: postgres.NewArgument("value", 1),
 					},
 				},
@@ -390,7 +390,7 @@ func TestJoinOn_WriteTo(t *testing.T) {
 			fields: fields{
 				Predicates: []predicates.Predicate{
 					predicates.EQ{
-						Col:  expressions.NewColumn("field_a").SetFrom("table"),
+						Col:  expressions.Column{Name: "field_a", From: "table"},
 						Expr: postgres.NewArgument("value", 1),
 					},
 				},

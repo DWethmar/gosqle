@@ -17,14 +17,6 @@ type Column struct {
 	Name string // column name
 }
 
-// SetFrom sets the from value and returns a new column
-func (s *Column) SetFrom(from string) *Column {
-	return &Column{
-		From: from,
-		Name: s.Name,
-	}
-}
-
 // Write writes the column to the given writer
 func (s Column) WriteTo(sw io.StringWriter) error {
 	if s.Name == "" {
@@ -42,11 +34,4 @@ func (s Column) WriteTo(sw io.StringWriter) error {
 	}
 
 	return nil
-}
-
-// NewColumn creates a new column
-func NewColumn(name string) *Column {
-	return &Column{
-		Name: name,
-	}
 }

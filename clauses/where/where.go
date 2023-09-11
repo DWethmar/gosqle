@@ -40,8 +40,8 @@ type Where struct {
 func (w *Where) Type() clauses.ClauseType         { return clauses.WhereType }
 func (w *Where) WriteTo(sw io.StringWriter) error { return WriteWhere(sw, w.predicates) }
 
-// NewWhere
-func NewWhere(predicates []predicates.Predicate) *Where {
+// New
+func New(predicates []predicates.Predicate) *Where {
 	return &Where{
 		predicates: predicates,
 	}

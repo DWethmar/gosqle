@@ -14,7 +14,7 @@ import (
 func TestWrite(t *testing.T) {
 	type args struct {
 		sb    *strings.Builder
-		table expressions.Table
+		table Table
 	}
 	tests := []struct {
 		name    string
@@ -26,7 +26,7 @@ func TestWrite(t *testing.T) {
 			name: "should write From",
 			args: args{
 				sb:    &strings.Builder{},
-				table: expressions.Table{Name: "table"},
+				table: Table{Name: "table"},
 			},
 			want:    "FROM table",
 			wantErr: false,
@@ -35,9 +35,9 @@ func TestWrite(t *testing.T) {
 			name: "should write From with alias",
 			args: args{
 				sb:    &strings.Builder{},
-				table: expressions.Table{Name: "table", Alias: "alias"},
+				table: Table{Name: "table", As: "alias"},
 			},
-			want:    "FROM table alias",
+			want:    "FROM table AS alias",
 			wantErr: false,
 		},
 	}
@@ -60,8 +60,8 @@ func TestWrite(t *testing.T) {
 			return 0, errors.New("error")
 		})
 
-		err := Write(writer, expressions.Table{
-			Name: "table", Alias: "alias"},
+		err := Write(writer, Table{
+			Name: "table", As: "alias"},
 		)
 
 		if err == nil {
@@ -95,7 +95,7 @@ func TestFrom_WriteTo(t *testing.T) {
 	}{
 		{
 			name:    "should write From",
-			fields:  fields{Expression: expressions.Table{Name: "table"}},
+			fields:  fields{Expression: Table{Name: "table"}},
 			args:    args{sb: new(strings.Builder)},
 			want:    "FROM table",
 			wantErr: false,
@@ -129,8 +129,8 @@ func TestNewFrom(t *testing.T) {
 	}{
 		{
 			name: "should create new From",
-			args: args{expr: expressions.Table{Name: "table"}},
-			want: &Clause{Expression: expressions.Table{Name: "table"}},
+			args: args{expr: Table{Name: "table"}},
+			want: &Clause{Expression: Table{Name: "table"}},
 		},
 	}
 	for _, tt := range tests {
