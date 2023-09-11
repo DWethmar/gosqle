@@ -12,10 +12,10 @@ func TestInsert_WriteTo(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		name      string
-		insert    *Insert
-		wantQuery string
-		wantErr   bool
+		name    string
+		insert  *Insert
+		want    string
+		wantErr bool
 	}{
 		{
 			name: "select columns mysql",
@@ -23,8 +23,8 @@ func TestInsert_WriteTo(t *testing.T) {
 				mysql.NewArgument(1),
 				mysql.NewArgument("test"),
 			),
-			wantQuery: "INSERT INTO users (id, username) VALUES (?, ?);",
-			wantErr:   false,
+			want:    "INSERT INTO users (id, username) VALUES (?, ?);",
+			wantErr: false,
 		},
 		{
 			name: "select columns postgres",
@@ -32,14 +32,14 @@ func TestInsert_WriteTo(t *testing.T) {
 				postgres.NewArgument(1, 1),
 				postgres.NewArgument("test", 2),
 			),
-			wantQuery: "INSERT INTO users (id, username) VALUES ($1, $2);",
-			wantErr:   false,
+			want:    "INSERT INTO users (id, username) VALUES ($1, $2);",
+			wantErr: false,
 		},
 		{
-			name:      "error on no table",
-			insert:    NewInsert("", "email", "username"),
-			wantQuery: "",
-			wantErr:   true,
+			name:    "error on no table",
+			insert:  NewInsert("", "email", "username"),
+			want:    "",
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
@@ -52,8 +52,8 @@ func TestInsert_WriteTo(t *testing.T) {
 				return
 			}
 
-			if query := sb.String(); query != tt.wantQuery {
-				t.Errorf("Insert.WriteTo() query = %q, wantQuery %q", query, tt.wantQuery)
+			if query := sb.String(); query != tt.want {
+				t.Errorf("Insert.WriteTo() query = %q, wantQuery %q", query, tt.want)
 			}
 		})
 	}
