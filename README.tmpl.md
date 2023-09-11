@@ -4,14 +4,14 @@ gosqle is a golang package that can generate sql queries.
 Table of Contents:
 - [gosqle](#gosqle)
   - [Examples](#examples)
-    - [Select statement](#select-statement)
+    - [Select](#select)
       - [Generate a select query:](#generate-a-select-query)
       - [Generate select query using group by and aggregate functions:](#generate-select-query-using-group-by-and-aggregate-functions)
-    - [Insert statement](#insert-statement)
+    - [Insert](#insert)
       - [Generate an insert query:](#generate-an-insert-query)
-    - [Delete statement](#delete-statement)
+    - [Delete](#delete)
       - [Generate a delete query:](#generate-a-delete-query)
-    - [Update statement](#update-statement)
+    - [Update](#update)
       - [Generate an update query:](#generate-an-update-query)
   - [Syntax used](#syntax-used)
 
@@ -30,7 +30,7 @@ docker-compose up -d
 ./run_examples.sh
 ```
 
-### Select statement
+### Select
 Create a select statement with the following syntax:
 ```go
 gosqle.NewSelect(...columns)
@@ -45,7 +45,7 @@ gosqle.NewSelect(...columns)
 {{insertGoFile "examples/select-aggregate.go" }}
 ```
 
-### Insert statement
+### Insert
 ```go
 gosqle.NewInsert(table, ...columns)
 ```
@@ -54,13 +54,13 @@ gosqle.NewInsert(table, ...columns)
 {{insertGoFile "examples/insert.go" }}
 ```
 
-### Delete statement
+### Delete
 #### Generate a delete query:
 ```go
 {{insertGoFile "examples/delete.go" }}
 ```
 
-### Update statement
+### Update
 #### Generate an update query:
 ```go
 {{insertGoFile "examples/update.go" }}

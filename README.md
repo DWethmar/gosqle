@@ -4,14 +4,14 @@ gosqle is a golang package that can generate sql queries.
 Table of Contents:
 - [gosqle](#gosqle)
   - [Examples](#examples)
-    - [Select statement](#select-statement)
+    - [Select](#select)
       - [Generate a select query:](#generate-a-select-query)
       - [Generate select query using group by and aggregate functions:](#generate-select-query-using-group-by-and-aggregate-functions)
-    - [Insert statement](#insert-statement)
+    - [Insert](#insert)
       - [Generate an insert query:](#generate-an-insert-query)
-    - [Delete statement](#delete-statement)
+    - [Delete](#delete)
       - [Generate a delete query:](#generate-a-delete-query)
-    - [Update statement](#update-statement)
+    - [Update](#update)
       - [Generate an update query:](#generate-an-update-query)
   - [Syntax used](#syntax-used)
 
@@ -30,7 +30,7 @@ docker-compose up -d
 ./run_examples.sh
 ```
 
-### Select statement
+### Select
 Create a select statement with the following syntax:
 ```go
 gosqle.NewSelect(...columns)
@@ -161,7 +161,7 @@ func SelectAmountOfAddressesPerCountry(db *sql.DB) ([]AmountOfAddressesPerCountr
 
 ```
 
-### Insert statement
+### Insert
 ```go
 gosqle.NewInsert(table, ...columns)
 ```
@@ -203,24 +203,46 @@ func InsertUser(db *sql.DB) (string, error) {
 
 ```
 
-### Delete statement
+### Delete
 #### Generate a delete query:
 ```go
 package main
 
 import (
 	"database/sql"
+	"strings"
+
+	"github.com/dwethmar/gosqle"
+	"github.com/dwethmar/gosqle/expressions"
+	"github.com/dwethmar/gosqle/postgres"
+	"github.com/dwethmar/gosqle/predicates"
 )
 
 // Delete deletes a user.
-func Delete(db *sql.DB) error {
-	// TODO: Implement
-	return nil
+func DeleteAddress(db *sql.DB) (string, error) {
+	sb := new(strings.Builder)
+	args := postgres.NewArguments()
+
+	// DELETE FROM addresses WHERE user_id = $1
+	err := gosqle.NewDelete("addresses").Where(
+		predicates.EQ{
+			Col:  expressions.Column{Name: "user_id"},
+			Expr: args.NewArgument(111),
+		},
+	).WriteTo(sb)
+	if err != nil {
+		return "", err
+	}
+	if _, err = db.Exec(sb.String(), args.Args...); err != nil {
+		return "", err
+	}
+
+	return sb.String(), nil
 }
 
 ```
 
-### Update statement
+### Update
 #### Generate an update query:
 ```go
 package main
@@ -244,26 +266,19 @@ func UpdateUser(db *sql.DB) (string, error) {
 	args := postgres.NewArguments()
 
 	// UPDATE users SET name = $1 WHERE id = $2
-	err := gosqle.NewUpdate("users").Set(
-		set.Change{
-			Col:  "name",
-			Expr: args.NewArgument(fmt.Sprintf("new name %d", time.Now().Unix())),
-		},
-	).Where(
-		predicates.EQ{
-			Col:  expressions.Column{Name: "id"},
-			Expr: args.NewArgument(1),
-		},
-	).WriteTo(sb)
-
+	err := gosqle.NewUpdate("users").Set(set.Change{
+		Col:  "name",
+		Expr: args.NewArgument(fmt.Sprintf("new name %d", time.Now().Unix())),
+	}).Where(predicates.EQ{
+		Col:  expressions.Column{Name: "id"},
+		Expr: args.NewArgument(1),
+	}).WriteTo(sb)
 	if err != nil {
 		return "", err
 	}
-
 	if _, err = db.Exec(sb.String(), args.Args...); err != nil {
 		return "", err
 	}
-
 	return sb.String(), nil
 }
 

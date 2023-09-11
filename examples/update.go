@@ -19,17 +19,13 @@ func UpdateUser(db *sql.DB) (string, error) {
 	args := postgres.NewArguments()
 
 	// UPDATE users SET name = $1 WHERE id = $2
-	err := gosqle.NewUpdate("users").Set(
-		set.Change{
-			Col:  "name",
-			Expr: args.NewArgument(fmt.Sprintf("new name %d", time.Now().Unix())),
-		},
-	).Where(
-		predicates.EQ{
-			Col:  expressions.Column{Name: "id"},
-			Expr: args.NewArgument(1),
-		},
-	).WriteTo(sb)
+	err := gosqle.NewUpdate("users").Set(set.Change{
+		Col:  "name",
+		Expr: args.NewArgument(fmt.Sprintf("new name %d", time.Now().Unix())),
+	}).Where(predicates.EQ{
+		Col:  expressions.Column{Name: "id"},
+		Expr: args.NewArgument(1),
+	}).WriteTo(sb)
 	if err != nil {
 		return "", err
 	}
