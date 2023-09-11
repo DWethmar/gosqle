@@ -10,7 +10,7 @@ import (
 	"github.com/dwethmar/gosqle/statement"
 )
 
-// Insert generates a insert into query.
+// Insert is a wrapper for a insert query statement.
 type Insert struct {
 	statement.Statement
 }
@@ -21,6 +21,7 @@ func (i *Insert) Values(arguments ...expressions.Expression) *Insert {
 	return i
 }
 
+// SetClause sets the clause for the query.
 func (i *Insert) SetClause(c clauses.Clause) *Insert {
 	i.Statement.SetClause(c)
 	return i

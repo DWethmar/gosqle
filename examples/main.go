@@ -45,10 +45,16 @@ var examples = map[string]func(*sql.DB){
 			fmt.Printf("error updating user: %v\n", err)
 		}
 	},
+	"delete": func(d *sql.DB) {
+		if q, err := DeleteAddress(d); err == nil {
+			fmt.Printf("Query: %q\n", q)
+		} else {
+			fmt.Printf("error deleting user: %v\n", err)
+		}
+	},
 }
 
 func main() {
-	// Define the flag. The default value for the database URL is an empty string.
 	var dbURL string
 	var example string
 

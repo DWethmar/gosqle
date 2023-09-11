@@ -30,14 +30,11 @@ func UpdateUser(db *sql.DB) (string, error) {
 			Expr: args.NewArgument(1),
 		},
 	).WriteTo(sb)
-
 	if err != nil {
 		return "", err
 	}
-
 	if _, err = db.Exec(sb.String(), args.Args...); err != nil {
 		return "", err
 	}
-
 	return sb.String(), nil
 }

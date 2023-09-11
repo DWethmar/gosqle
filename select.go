@@ -18,7 +18,7 @@ import (
 	"github.com/dwethmar/gosqle/statement"
 )
 
-// Select generates a sql query that can extracts data from a database.
+// Select is a wrapper for a select query statement.
 type Select struct {
 	statement.Statement
 }
@@ -102,7 +102,7 @@ func (s *Select) WriteTo(sw io.StringWriter) error {
 	return nil
 }
 
-// NewSelect creates a new select wrapper for a select query statement.
+// NewSelect creates a new select query.
 func NewSelect(
 	selectables ...clauses.Selectable,
 ) *Select {

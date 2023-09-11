@@ -13,7 +13,7 @@ import (
 	"github.com/dwethmar/gosqle/statement"
 )
 
-// Select generates a sql query that can extracts data from a database.
+// Update is a wrapper for a update query statement.
 type Update struct {
 	statement.Statement
 }
@@ -70,7 +70,7 @@ func (u *Update) WriteTo(sw io.StringWriter) error {
 	return nil
 }
 
-// NewSelect creates a new select wrapper for a select query statement.
+// NewUpdate creates a new update query.
 func NewUpdate(
 	table string,
 ) *Update {
