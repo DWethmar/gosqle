@@ -27,6 +27,19 @@ type ClauseWriter struct {
 
 // SetClause implements Statement SetClause.
 func (s *ClauseWriter) SetClause(c clauses.Clause) {
+	// check if clause is in order
+	found := false
+	for _, t := range s.order {
+		if t == c.Type() {
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		return
+	}
+
 	if c == nil {
 		delete(s.clauses, c.Type())
 		return

@@ -35,7 +35,7 @@ func WriteUpdate(sw io.StringWriter, table string) error {
 	return nil
 }
 
-// SelectWriter writes a SQL From string to the given string writer.
+// Update writes an update statement to the given string writer.
 type Update struct {
 	ClauseWriter
 	table string
@@ -65,6 +65,11 @@ func NewUpdate(
 	table string,
 ) *Update {
 	return &Update{
+		ClauseWriter: ClauseWriter{
+			clauses:         map[clauses.ClauseType]clauses.Clause{},
+			order:           updateClausesOrder,
+			ClauseSeparator: SpaceSeparator,
+		},
 		table: table,
 	}
 }

@@ -21,24 +21,21 @@ type User struct {
 func SelectUsers(db *sql.DB) ([]User, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
-
 	// SELECT id, name, email FROM users LIMIT 10;
 	err := gosqle.NewSelect(
-		clauses.Selectable{Expr: expressions.NewColumn("id")},
-		clauses.Selectable{Expr: expressions.NewColumn("name")},
-		clauses.Selectable{Expr: expressions.NewColumn("email")},
+		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
+		clauses.Selectable{Expr: expressions.Column{Name: "name"}},
+		clauses.Selectable{Expr: expressions.Column{Name: "email"}},
 	).From(from.Table{
 		Name: "users",
 	}).Limit(args.NewArgument(10)).WriteTo(sb)
 	if err != nil {
 		return nil, "", err
 	}
-
 	rows, err := db.Query(sb.String(), args.Args...)
 	if err != nil {
 		return nil, "", err
 	}
-
 	var users []User
 	for rows.Next() {
 		var user User
@@ -48,6 +45,5 @@ func SelectUsers(db *sql.DB) ([]User, string, error) {
 		}
 		users = append(users, user)
 	}
-
 	return users, sb.String(), nil
 }

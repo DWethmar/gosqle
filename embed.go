@@ -2,7 +2,6 @@ package gosqle
 
 import (
 	"embed"
-	_ "embed"
 )
 
 //go:embed examples/*.go

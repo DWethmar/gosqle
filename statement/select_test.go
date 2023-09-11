@@ -1,89 +1,110 @@
 package statement
 
 import (
-	"errors"
+	"io"
+	"reflect"
 	"strings"
 	"testing"
 
 	"github.com/dwethmar/gosqle/clauses"
+	"github.com/dwethmar/gosqle/clauses/from"
 	"github.com/dwethmar/gosqle/expressions"
-	"github.com/dwethmar/gosqle/mock"
 )
 
-func TestSelect(t *testing.T) {
+func TestWriteSelect(t *testing.T) {
+	t.Run("should write SELECT", func(t *testing.T) {
+		sb := new(strings.Builder)
+		if err := WriteSelect(sb, []clauses.Selectable{
+			{
+				Expr: expressions.Column{Name: "column1"},
+			},
+		}); err != nil {
+			t.Errorf("WriteSelect() error = %v", err)
+		}
+
+		if sb.String() != "SELECT column1" {
+			t.Errorf("WriteSelect() got = %v, want %v", sb.String(), "SELECT column1")
+		}
+	})
+}
+
+func TestSelect_WriteTo(t *testing.T) {
+	type fields struct {
+		ClauseWriter  ClauseWriter
+		selectColumns []clauses.Selectable
+	}
 	type args struct {
-		sb          *strings.Builder
-		expressions []clauses.Selectable
+		sw io.StringWriter
 	}
 	tests := []struct {
 		name    string
+		fields  fields
 		args    args
 		want    string
 		wantErr bool
 	}{
 		{
-			name: "should return error when no fields are supplied",
-			args: args{
-				sb:          new(strings.Builder),
-				expressions: []clauses.Selectable{},
-			},
-			want:    "",
-			wantErr: true,
-		},
-		{
-			name: "should render Select clause",
-			args: args{
-				sb: new(strings.Builder),
-				expressions: []clauses.Selectable{
-					{
-						Expr: expressions.Column{
-							From: "table_a",
-							Name: "field_a",
-						},
-						As: "alias_a",
+			name: "should write SELECT",
+			fields: fields{
+				ClauseWriter: ClauseWriter{
+					clauses: map[clauses.ClauseType]clauses.Clause{
+						clauses.FromType: from.New(from.Table{Name: "table"}),
 					},
+					order:           selectClausesOrder,
+					ClauseSeparator: SpaceSeparator,
+				},
+				selectColumns: []clauses.Selectable{
 					{
-						Expr: expressions.Column{
-							From: "table_b",
-							Name: "field_b",
-						},
-						As: "alias_b",
+						Expr: expressions.Column{Name: "column1"},
 					},
 				},
 			},
-			want:    "SELECT table_a.field_a AS alias_a, table_b.field_b AS alias_b",
+			args: args{
+				sw: new(strings.Builder),
+			},
+			want:    "SELECT column1 FROM table",
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := WriteSelect(tt.args.sb, tt.args.expressions); (err != nil) != tt.wantErr {
-				t.Errorf("Select() error = %v, wantErr %v", err, tt.wantErr)
+			s := &Select{
+				ClauseWriter:  tt.fields.ClauseWriter,
+				selectColumns: tt.fields.selectColumns,
+			}
+			if err := s.WriteTo(tt.args.sw); (err != nil) != tt.wantErr {
+				t.Errorf("Select.WriteTo() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
-			if sb := tt.args.sb; sb != nil {
-				if str := sb.String(); str != tt.want {
-					t.Errorf("Select() got = %q, want %q", str, tt.want)
+			if tt.want != "" {
+				if sw, ok := tt.args.sw.(*strings.Builder); ok {
+					if sw.String() != tt.want {
+						t.Errorf("Select.WriteTo() got = %v, want %v", sw.String(), tt.want)
+					}
+				} else {
+					t.Errorf("expected string builder")
 				}
 			}
 		})
 	}
+}
 
-	t.Run("should return io.writer error", func(t *testing.T) {
-		writer := mock.StringWriterFn(func(s string) (n int, err error) {
-			return 0, errors.New("error")
+func TestNewSelect(t *testing.T) {
+	type args struct {
+		selectColumns []clauses.Selectable
+	}
+	tests := []struct {
+		name string
+		args args
+		want *Select
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := NewSelect(tt.args.selectColumns); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewSelect() = %v, want %v", got, tt.want)
+			}
 		})
-
-		if err := WriteSelect(writer, []clauses.Selectable{
-			{
-				Expr: expressions.Column{
-					From: "table_a",
-					Name: "field_a",
-				},
-				As: "alias_a",
-			},
-		}); err == nil {
-			t.Error("expected error")
-		}
-	})
+	}
 }

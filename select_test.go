@@ -26,8 +26,8 @@ func TestSelect_ToSQL(t *testing.T) {
 		{
 			name: "select columns",
 			sel: NewSelect(
-				clauses.Selectable{Expr: expressions.NewColumn("username").SetFrom("u")},
-				clauses.Selectable{Expr: expressions.NewColumn("country").SetFrom("u"), As: "c"},
+				clauses.Selectable{Expr: expressions.Column{Name: "username", From: "u"}},
+				clauses.Selectable{Expr: expressions.Column{Name: "country", From: "u"}, As: "c"},
 			).From(from.Table{
 				Name: "users",
 				As:   "u",
@@ -59,8 +59,8 @@ func TestSelect_ToSQL(t *testing.T) {
 					Match: &join.JoinOn{
 						Predicates: []predicates.Predicate{
 							predicates.EQ{
-								Col:  expressions.NewColumn("id").SetFrom("companies"),
-								Expr: expressions.NewColumn("company_id").SetFrom("users"),
+								Col:  expressions.Column{Name: "id", From: "companies"},
+								Expr: expressions.Column{Name: "company_id", From: "users"},
 							},
 						},
 					},
@@ -77,11 +77,11 @@ func TestSelect_ToSQL(t *testing.T) {
 				Name: "users",
 			}).Where(
 				predicates.EQ{
-					Col:  expressions.NewColumn("username"),
+					Col:  expressions.Column{Name: "username"},
 					Expr: postgres.NewArgument("david", 1),
 				},
 				predicates.EQ{
-					Col:   expressions.NewColumn("email"),
+					Col:   expressions.Column{Name: "email"},
 					Expr:  postgres.NewArgument("test@test.com", 2),
 					Logic: predicates.OR,
 				},
@@ -130,8 +130,8 @@ func TestSelect_ToSQL(t *testing.T) {
 				Name: "users",
 			}).GroupBy(
 				&groupby.ColumnGrouping{
-					expressions.NewColumn("username"),
-					expressions.NewColumn("email"),
+					&expressions.Column{Name: "username"},
+					&expressions.Column{Name: "email"},
 				},
 			),
 			want:    "SELECT username FROM users GROUP BY username, email;",
@@ -147,16 +147,16 @@ func TestSelect_ToSQL(t *testing.T) {
 				Name: "users",
 			}).GroupBy(
 				&groupby.ColumnGrouping{
-					expressions.NewColumn("username"),
-					expressions.NewColumn("email"),
+					&expressions.Column{Name: "username"},
+					&expressions.Column{Name: "email"},
 				},
 			).Having(
 				predicates.GT{
-					Col:  expressions.NewMax(expressions.NewColumn("id")),
+					Col:  expressions.NewMax(&expressions.Column{Name: "id"}),
 					Expr: postgres.NewArgument(12, 1),
 				},
 				predicates.LT{
-					Col:   expressions.NewMax(expressions.NewColumn("id")),
+					Col:   expressions.NewMax(&expressions.Column{Name: "id"}),
 					Expr:  postgres.NewArgument(12, 2),
 					Logic: predicates.OR,
 				},

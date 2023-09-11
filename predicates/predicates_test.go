@@ -29,11 +29,11 @@ func TestWrap(t *testing.T) {
 		f := Wrap{
 			Predicates: []Predicate{
 				EQ{
-					Col:  expressions.NewColumn("id"),
+					Col:  expressions.Column{Name: "id"},
 					Expr: postgres.NewArgument("123", 1),
 				},
 				EQ{
-					Col:  expressions.NewColumn("name"),
+					Col:  expressions.Column{Name: "name"},
 					Expr: postgres.NewArgument("John", 2),
 				},
 			},
@@ -59,7 +59,11 @@ func TestEQ(t *testing.T) {
 	})
 
 	t.Run("LogicOr", func(t *testing.T) {
-		f := EQ{Col: expressions.NewColumn("name"), Expr: postgres.NewArgument("dennis", 0), Logic: OR}
+		f := EQ{
+			Col:   expressions.Column{Name: "name"},
+			Expr:  postgres.NewArgument("dennis", 0),
+			Logic: OR,
+		}
 
 		if got := f.LogicOp(); got != OR {
 			t.Errorf("EQ.LogicOp() = %v, want %v", got, OR)
@@ -68,7 +72,7 @@ func TestEQ(t *testing.T) {
 
 	t.Run("write to sql", func(t *testing.T) {
 		f := EQ{
-			Col:   expressions.NewColumn("id"),
+			Col:   expressions.Column{Name: "id"},
 			Expr:  postgres.NewArgument("123", 1),
 			Logic: OR,
 		}
@@ -102,7 +106,7 @@ func TestNE(t *testing.T) {
 
 	t.Run("write to sql", func(t *testing.T) {
 		f := NE{
-			Col:   expressions.NewColumn("id"),
+			Col:   expressions.Column{Name: "id"},
 			Expr:  postgres.NewArgument("123", 1),
 			Logic: OR,
 		}
@@ -139,7 +143,7 @@ func TestGT(t *testing.T) {
 
 	t.Run("write to sql", func(t *testing.T) {
 		f := GT{
-			Col:  expressions.NewColumn("id"),
+			Col:  expressions.Column{Name: "id"},
 			Expr: postgres.NewArgument("123", 1),
 		}
 
@@ -173,7 +177,7 @@ func TestGTE(t *testing.T) {
 
 	t.Run("write to sql", func(t *testing.T) {
 		f := GTE{
-			Col:  expressions.NewColumn("id"),
+			Col:  expressions.Column{Name: "id"},
 			Expr: postgres.NewArgument("123", 1),
 		}
 		sb := new(strings.Builder)
@@ -192,7 +196,7 @@ func TestGTE(t *testing.T) {
 func TestLT(t *testing.T) {
 	t.Run("LogicAnd", func(t *testing.T) {
 		f := LT{
-			Col:  expressions.NewColumn("id"),
+			Col:  expressions.Column{Name: "id"},
 			Expr: postgres.NewArgument("123", 0),
 		}
 		if got := f.LogicOp(); got != AND {
@@ -202,7 +206,7 @@ func TestLT(t *testing.T) {
 
 	t.Run("LogicOr", func(t *testing.T) {
 		f := LT{
-			Col:   expressions.NewColumn("id"),
+			Col:   expressions.Column{Name: "id"},
 			Expr:  postgres.NewArgument("123", 0),
 			Logic: OR,
 		}
@@ -213,7 +217,7 @@ func TestLT(t *testing.T) {
 
 	t.Run("write to sql", func(t *testing.T) {
 		f := LT{
-			Col:  expressions.NewColumn("id"),
+			Col:  expressions.Column{Name: "id"},
 			Expr: postgres.NewArgument("123", 1),
 		}
 
@@ -250,7 +254,7 @@ func TestLTE(t *testing.T) {
 
 	t.Run("write to sql", func(t *testing.T) {
 		f := LTE{
-			Col:  expressions.NewColumn("id"),
+			Col:  expressions.Column{Name: "id"},
 			Expr: postgres.NewArgument("123", 1),
 		}
 
@@ -287,7 +291,7 @@ func TestIn(t *testing.T) {
 
 	t.Run("write to sql", func(t *testing.T) {
 		f := In{
-			Col: expressions.NewColumn("id"),
+			Col: expressions.Column{Name: "id"},
 			Expressions: []expressions.Expression{
 				postgres.NewArgument("123", 1),
 				postgres.NewArgument("456", 2),
@@ -325,7 +329,7 @@ func TestLike(t *testing.T) {
 
 	t.Run("write to sql", func(t *testing.T) {
 		f := Like{
-			Col:  expressions.NewColumn("id"),
+			Col:  expressions.Column{Name: "id"},
 			Expr: postgres.NewArgument("%123", 1),
 		}
 
@@ -358,7 +362,7 @@ func TestIsNull(t *testing.T) {
 
 	t.Run("write to sql", func(t *testing.T) {
 		f := IsNull{
-			Col: expressions.NewColumn("id"),
+			Col: expressions.Column{Name: "id"},
 		}
 
 		sb := new(strings.Builder)
@@ -391,7 +395,7 @@ func TestBetween(t *testing.T) {
 
 	t.Run("write to sql", func(t *testing.T) {
 		f := Between{
-			Col:  expressions.NewColumn("id"),
+			Col:  expressions.Column{Name: "id"},
 			Low:  postgres.NewArgument("123", 1),
 			High: postgres.NewArgument("456", 2),
 		}
@@ -437,7 +441,7 @@ func TestNot(t *testing.T) {
 
 		f := Not{
 			Predicate: EQ{
-				Col:  expressions.NewColumn("id"),
+				Col:  expressions.Column{Name: "id"},
 				Expr: arg,
 			},
 		}
@@ -458,7 +462,7 @@ func TestNot(t *testing.T) {
 	t.Run("should return io.writer error", func(t *testing.T) {
 		f := Not{
 			Predicate: EQ{
-				Col:  expressions.NewColumn("id"),
+				Col:  expressions.Column{Name: "id"},
 				Expr: postgres.NewArgument("123", 0),
 			},
 		}

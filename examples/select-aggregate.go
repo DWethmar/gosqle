@@ -29,14 +29,19 @@ func SelectAmountOfAddressesPerCountry(db *sql.DB) ([]AmountOfAddressesPerCountr
 	ORDER BY address_count DESC;
 	**/
 	err := gosqle.NewSelect(
-		clauses.Selectable{Expr: expressions.NewColumn("country")},
-		clauses.Selectable{Expr: expressions.NewCount(expressions.NewColumn("id")), As: "address_count"},
+		clauses.Selectable{
+			Expr: &expressions.Column{Name: "country"},
+		},
+		clauses.Selectable{
+			Expr: expressions.NewCount(&expressions.Column{Name: "id"}),
+			As:   "address_count",
+		},
 	).From(from.Table{
 		Name: "addresses",
 	}).GroupBy(groupby.ColumnGrouping{
-		expressions.NewColumn("country"),
+		&expressions.Column{Name: "country"},
 	}).OrderBy(orderby.Sort{
-		Column:    expressions.NewColumn("address_count"),
+		Column:    &expressions.Column{Name: "address_count"},
 		Direction: orderby.DESC,
 	}).WriteTo(sb)
 	if err != nil {

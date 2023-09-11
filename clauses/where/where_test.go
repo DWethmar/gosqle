@@ -39,7 +39,7 @@ func TestWhere(t *testing.T) {
 				sb: &strings.Builder{},
 				predicates: []predicates.Predicate{
 					predicates.EQ{
-						Col:  expressions.NewColumn("id"),
+						Col:  expressions.Column{Name: "id"},
 						Expr: postgres.NewArgument(1, 1),
 					},
 				},

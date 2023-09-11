@@ -38,7 +38,7 @@ func (u *Update) Where(predicates ...predicates.Predicate) *Update {
 		return u
 	}
 
-	return u.SetClause(where.NewWhere(predicates))
+	return u.SetClause(where.New(predicates))
 }
 
 // OrderBy adds a order by clause to the select statement.
@@ -73,8 +73,8 @@ func (u *Update) WriteTo(sw io.StringWriter) error {
 // NewSelect creates a new select wrapper for a select query statement.
 func NewUpdate(
 	table string,
-) *Select {
-	return &Select{
+) *Update {
+	return &Update{
 		Statement: statement.NewUpdate(table),
 	}
 }
