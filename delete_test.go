@@ -19,12 +19,10 @@ func TestDelete_WriteTo(t *testing.T) {
 	}{
 		{
 			name: "delete from",
-			delete: NewDelete("users").Where(
-				predicates.EQ{
-					Col:  expressions.Column{Name: "id"},
-					Expr: mysql.NewArgument(1),
-				},
-			),
+			delete: NewDelete("users").Where(predicates.EQ{
+				Col:  expressions.Column{Name: "id"},
+				Expr: mysql.NewArgument(1),
+			}),
 			want: "DELETE FROM users WHERE id = ?;",
 		},
 	}
