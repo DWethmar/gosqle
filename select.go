@@ -23,8 +23,8 @@ type Select struct {
 	statement.Statement
 }
 
-func (s *Select) From(table from.Table) *Select {
-	return s.SetClause(from.New(table))
+func (s *Select) From(f from.From) *Select {
+	return s.SetClause(from.New(f))
 }
 
 // Join adds a join clause to the select statement.

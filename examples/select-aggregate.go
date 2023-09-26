@@ -36,8 +36,8 @@ func SelectAmountOfAddressesPerCountry(db *sql.DB) ([]AmountOfAddressesPerCountr
 			Expr: expressions.NewCount(&expressions.Column{Name: "id"}),
 			As:   "address_count",
 		},
-	).From(from.Table{
-		Name: "addresses",
+	).From(from.From{
+		Expr: from.Table("addresses"),
 	}).GroupBy(groupby.ColumnGrouping{
 		&expressions.Column{Name: "country"},
 	}).OrderBy(orderby.Sort{

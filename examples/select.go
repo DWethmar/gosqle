@@ -26,8 +26,8 @@ func SelectUsers(db *sql.DB) ([]User, string, error) {
 		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
 		clauses.Selectable{Expr: expressions.Column{Name: "name"}},
 		clauses.Selectable{Expr: expressions.Column{Name: "email"}},
-	).From(from.Table{
-		Name: "users",
+	).From(from.From{
+		Expr: from.Table("users"),
 	}).Limit(args.NewArgument(10)).WriteTo(sb)
 	if err != nil {
 		return nil, "", err

@@ -333,13 +333,6 @@ func TestNewJoin(t *testing.T) {
 	}
 }
 
-func TestJoinOn_t(t *testing.T) {
-	t.Run("should do nothing", func(t *testing.T) {
-		j := &JoinOn{}
-		j.t()
-	})
-}
-
 func TestJoinOn_WriteTo(t *testing.T) {
 	type fields struct {
 		Predicates []predicates.Predicate

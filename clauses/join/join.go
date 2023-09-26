@@ -30,7 +30,6 @@ var joinTypes = map[JoinType]string{
 // JoinMatcher is a join clause.
 type JoinMatcher interface {
 	expressions.Expression
-	t() // prevent external implementations
 }
 
 var _ JoinMatcher = (*JoinOn)(nil)
@@ -44,7 +43,6 @@ type JoinOn struct {
 	Predicates []predicates.Predicate
 }
 
-func (j *JoinOn) t() {}
 func (j *JoinOn) WriteTo(sw io.StringWriter) error {
 	if _, err := sw.WriteString("ON "); err != nil {
 		return fmt.Errorf("failed to write JOIN: %w", err)
