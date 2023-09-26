@@ -13,6 +13,12 @@ var (
 	_ clauses.Clause = &Clause{}
 )
 
+// From represents a FROM.
+type From struct {
+	Expr expressions.Expression
+	As   string
+}
+
 // Write writes a SQL Write string to the given string writer.
 //
 // Examples:
@@ -20,13 +26,19 @@ var (
 //	FROM table AS alias
 //	FROM table
 //	FROM (SELECT * FROM table) AS alias
-func Write(sw io.StringWriter, expr expressions.Expression) error {
+func Write(sw io.StringWriter, from From) error {
 	if err := util.WriteStrings(sw, "FROM "); err != nil {
 		return fmt.Errorf("from: %v", err)
 	}
 
-	if err := expr.WriteTo(sw); err != nil {
+	if err := from.Expr.WriteTo(sw); err != nil {
 		return fmt.Errorf("from: %v", err)
+	}
+
+	if from.As != "" {
+		if err := util.WriteStrings(sw, " AS ", from.As); err != nil {
+			return fmt.Errorf("from: %v", err)
+		}
 	}
 
 	return nil
@@ -34,15 +46,15 @@ func Write(sw io.StringWriter, expr expressions.Expression) error {
 
 // Clause represents a FROM clause.
 type Clause struct {
-	expressions.Expression
+	from From
 }
 
 func (c *Clause) Type() clauses.ClauseType         { return clauses.FromType }
-func (c *Clause) WriteTo(sw io.StringWriter) error { return Write(sw, c.Expression) }
+func (c *Clause) WriteTo(sw io.StringWriter) error { return Write(sw, c.from) }
 
 // New creates a new from clause
-func New(expr expressions.Expression) *Clause {
+func New(from From) *Clause {
 	return &Clause{
-		Expression: expr,
+		from: from,
 	}
 }

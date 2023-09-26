@@ -48,16 +48,16 @@ func TestSelect_WriteTo(t *testing.T) {
 			fields: fields{
 				ClauseWriter: ClauseWriter{
 					clauses: map[clauses.ClauseType]clauses.Clause{
-						clauses.FromType: from.New(from.Table{Name: "table"}),
+						clauses.FromType: from.New(from.From{
+							Expr: from.Table("table"),
+						}),
 					},
 					order:           selectClausesOrder,
 					ClauseSeparator: SpaceSeparator,
 				},
-				selectColumns: []clauses.Selectable{
-					{
-						Expr: expressions.Column{Name: "column1"},
-					},
-				},
+				selectColumns: []clauses.Selectable{{
+					Expr: expressions.Column{Name: "column1"},
+				}},
 			},
 			args: args{
 				sw: new(strings.Builder),

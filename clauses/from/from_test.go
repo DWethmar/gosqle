@@ -1,20 +1,19 @@
 package from
 
 import (
-	"errors"
+	"io"
 	"reflect"
 	"strings"
 	"testing"
 
 	"github.com/dwethmar/gosqle/clauses"
 	"github.com/dwethmar/gosqle/expressions"
-	"github.com/dwethmar/gosqle/mock"
 )
 
 func TestWrite(t *testing.T) {
 	type args struct {
-		sb    *strings.Builder
-		table Table
+		sw   io.StringWriter
+		from From
 	}
 	tests := []struct {
 		name    string
@@ -25,8 +24,10 @@ func TestWrite(t *testing.T) {
 		{
 			name: "should write From",
 			args: args{
-				sb:    &strings.Builder{},
-				table: Table{Name: "table"},
+				sw: &strings.Builder{},
+				from: From{
+					Expr: Table("table"),
+				},
 			},
 			want:    "FROM table",
 			wantErr: false,
@@ -34,8 +35,11 @@ func TestWrite(t *testing.T) {
 		{
 			name: "should write From with alias",
 			args: args{
-				sb:    &strings.Builder{},
-				table: Table{Name: "table", As: "alias"},
+				sw: &strings.Builder{},
+				from: From{
+					Expr: Table("table"),
+					As:   "alias",
+				},
 			},
 			want:    "FROM table AS alias",
 			wantErr: false,
@@ -43,31 +47,21 @@ func TestWrite(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := Write(tt.args.sb, tt.args.table); (err != nil) != tt.wantErr {
+			if err := Write(tt.args.sw, tt.args.from); (err != nil) != tt.wantErr {
 				t.Errorf("Write() error = %v, wantErr %v", err, tt.wantErr)
-			}
-
-			if sb := tt.args.sb; sb != nil {
-				if str := sb.String(); str != tt.want {
-					t.Errorf("Write() got = %q, want %q", str, tt.want)
+			} else {
+				if tt.want != "" {
+					if sb, ok := tt.args.sw.(*strings.Builder); ok {
+						if got := sb.String(); got != tt.want {
+							t.Errorf("Write() = %q, want %q", got, tt.want)
+						}
+					} else {
+						t.Errorf("expected string builder")
+					}
 				}
 			}
 		})
 	}
-
-	t.Run("should return io.writer error", func(t *testing.T) {
-		writer := mock.StringWriterFn(func(s string) (n int, err error) {
-			return 0, errors.New("error")
-		})
-
-		err := Write(writer, Table{
-			Name: "table", As: "alias"},
-		)
-
-		if err == nil {
-			t.Error("expected error")
-		}
-	})
 }
 
 func TestFrom_Type(t *testing.T) {
@@ -95,7 +89,7 @@ func TestFrom_WriteTo(t *testing.T) {
 	}{
 		{
 			name:    "should write From",
-			fields:  fields{Expression: Table{Name: "table"}},
+			fields:  fields{Expression: Table("table")},
 			args:    args{sb: new(strings.Builder)},
 			want:    "FROM table",
 			wantErr: false,
@@ -104,7 +98,9 @@ func TestFrom_WriteTo(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			f := &Clause{
-				Expression: tt.fields.Expression,
+				from: From{
+					Expr: tt.fields.Expression,
+				},
 			}
 			if err := f.WriteTo(tt.args.sb); (err != nil) != tt.wantErr {
 				t.Errorf("From.WriteTo() error = %v, wantErr %v", err, tt.wantErr)
@@ -120,7 +116,7 @@ func TestFrom_WriteTo(t *testing.T) {
 
 func TestNewFrom(t *testing.T) {
 	type args struct {
-		expr expressions.Expression
+		from From
 	}
 	tests := []struct {
 		name string
@@ -129,13 +125,23 @@ func TestNewFrom(t *testing.T) {
 	}{
 		{
 			name: "should create new From",
-			args: args{expr: Table{Name: "table"}},
-			want: &Clause{Expression: Table{Name: "table"}},
+			args: args{
+				from: From{
+					Expr: Table("table"),
+					As:   "",
+				},
+			},
+			want: &Clause{
+				from: From{
+					Expr: Table("table"),
+					As:   "",
+				},
+			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := New(tt.args.expr); !reflect.DeepEqual(got, tt.want) {
+			if got := New(tt.args.from); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewFrom() = %v, want %v", got, tt.want)
 			}
 		})
