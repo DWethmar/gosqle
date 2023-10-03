@@ -14,8 +14,6 @@ import (
 func InsertUser(db *sql.DB) (string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
-
-	// INSERT INTO users (name, email) VALUES ($1, $2)
 	err := gosqle.NewInsert("users", "name", "email").Values(
 		args.NewArgument("John"),
 		args.NewArgument(fmt.Sprintf("john%d@%s", time.Now().Unix(), "example.com")),

@@ -13,9 +13,6 @@ import (
 )
 
 // WhereIsNull selects addresses where phone is null
-// Example:
-//
-//	SELECT id FROM addresses WHERE phone IS NULL;
 func WhereIsNull(db *sql.DB) ([]User, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()

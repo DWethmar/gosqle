@@ -16,13 +16,6 @@ import (
 func PeopleOfAmsterdam(db *sql.DB) ([]User, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
-	// SELECT name
-	// FROM users
-	// WHERE id IN (
-	//     SELECT user_id
-	//     FROM addresses
-	//     WHERE city = 'New York'
-	// );
 	err := gosqle.NewSelect(
 		clauses.Selectable{Expr: expressions.Column{Name: "name"}},
 	).From(from.From{

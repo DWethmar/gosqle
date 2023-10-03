@@ -13,9 +13,6 @@ import (
 )
 
 // WhereEQ selects users where name is equal to 'John'.
-// Example:
-//
-//	SELECT id FROM users WHERE name = $1;
 func WhereEQ(db *sql.DB) ([]User, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()

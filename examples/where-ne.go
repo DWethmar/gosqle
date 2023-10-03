@@ -13,9 +13,6 @@ import (
 )
 
 // WhereNE selects users where name is not equal to 'John'.
-// Example:
-//
-//	SELECT id FROM users WHERE name != $1;
 func WhereNE(db *sql.DB) ([]User, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()

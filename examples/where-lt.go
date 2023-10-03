@@ -13,9 +13,6 @@ import (
 )
 
 // WhereLT selects users where id is less than 10
-// Example:
-//
-//	SELECT id FROM users WHERE id < $1;
 func WhereLT(db *sql.DB) ([]User, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()

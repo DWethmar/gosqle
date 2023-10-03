@@ -13,9 +13,6 @@ import (
 )
 
 // WhereLike selects users where name is like anna%
-// Example:
-//
-//	SELECT id FROM users WHERE name LIKE $1;
 func WhereLike(db *sql.DB) ([]User, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()

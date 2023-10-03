@@ -13,9 +13,6 @@ import (
 )
 
 // WhereBetween selects users where id is between 10 and 20
-// Example:
-//
-//	SELECT id FROM users WHERE id BETWEEN $1 AND $2;
 func WhereBetween(db *sql.DB) ([]User, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()

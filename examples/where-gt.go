@@ -13,9 +13,6 @@ import (
 )
 
 // WhereGT selects users where id is greater than 10
-// Example:
-//
-//	SELECT id FROM users WHERE id > $1;
 func WhereGT(db *sql.DB) ([]User, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()

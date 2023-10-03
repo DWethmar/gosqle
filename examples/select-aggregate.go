@@ -22,12 +22,6 @@ type AmountOfAddressesPerCountry struct {
 func SelectAmountOfAddressesPerCountry(db *sql.DB) ([]AmountOfAddressesPerCountry, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
-	/**
-	SELECT country, COUNT(id) AS address_count
-	FROM addresses
-	GROUP BY country
-	ORDER BY address_count DESC;
-	**/
 	err := gosqle.NewSelect(
 		clauses.Selectable{
 			Expr: &expressions.Column{Name: "country"},

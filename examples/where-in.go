@@ -13,9 +13,6 @@ import (
 )
 
 // WhereIN selects users where name is in 'John', 'Jane' or 'Joe'.
-// Example:
-//
-//	SELECT id FROM users WHERE name IN ($1, $2, $3);
 func WhereIN(db *sql.DB) ([]User, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
