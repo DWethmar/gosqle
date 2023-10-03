@@ -20,10 +20,12 @@ Table of Contents:
       - [Greater than](#greater-than)
       - [Greater than or equal](#greater-than-or-equal)
       - [Less than](#less-than)
+      - [Less than or equal](#less-than-or-equal)
       - [Like](#like)
       - [In](#in)
       - [Between](#between)
       - [Is null](#is-null)
+      - [Grouping](#grouping)
       - [Not](#not)
   - [Syntax used](#syntax-used)
 
@@ -118,6 +120,7 @@ SELECT id FROM users WHERE name = $1;
 ```go
 {{insertGoFile "examples/where-eq.go" }}
 ```
+
 #### Not equal
 ```sql
 SELECT id FROM users WHERE name != $1;
@@ -125,6 +128,7 @@ SELECT id FROM users WHERE name != $1;
 ```go
 {{insertGoFile "examples/where-ne.go" }}
 ```
+
 #### Greater than
 ```sql
 SELECT id FROM users WHERE id > $1;
@@ -132,6 +136,7 @@ SELECT id FROM users WHERE id > $1;
 ```go
 {{insertGoFile "examples/where-gt.go" }}
 ```
+
 #### Greater than or equal
 ```sql
 SELECT id FROM users WHERE id >= $1;
@@ -139,10 +144,15 @@ SELECT id FROM users WHERE id >= $1;
 ```go
 {{insertGoFile "examples/where-gte.go" }}
 ```
+
 #### Less than
 ```sql
 SELECT id FROM users WHERE id < $1;
+```
 ```go
+{{insertGoFile "examples/where-lt.go" }}
+```
+
 #### Less than or equal
 ```sql
 SELECT id FROM users WHERE id <= $1;
@@ -150,6 +160,7 @@ SELECT id FROM users WHERE id <= $1;
 ```go
 {{insertGoFile "examples/where-lte.go" }}
 ```
+
 #### Like
 ```sql
 SELECT id FROM users WHERE name LIKE $1;
@@ -157,6 +168,7 @@ SELECT id FROM users WHERE name LIKE $1;
 ```go
 {{insertGoFile "examples/where-like.go" }}
 ```
+
 #### In
 ```sql
 SELECT id FROM users WHERE name IN ($1, $2, $3);
@@ -164,6 +176,7 @@ SELECT id FROM users WHERE name IN ($1, $2, $3);
 ```go
 {{insertGoFile "examples/where-in.go" }}
 ```
+
 #### Between 
 ```sql
 SELECT id FROM users WHERE id BETWEEN $1 AND $2;
@@ -171,10 +184,15 @@ SELECT id FROM users WHERE id BETWEEN $1 AND $2;
 ```go
 {{insertGoFile "examples/where-between.go" }}
 ```
+
 #### Is null
 ```sql
 SELECT id FROM addresses WHERE phone IS NULL;
+```
 ```go
+{{insertGoFile "examples/where-is-null.go" }}
+```
+
 #### Grouping
 ```sql
 SELECT id FROM users WHERE (id BETWEEN $1 AND $2 OR id BETWEEN $3 AND $4) OR name = $5;
@@ -182,6 +200,7 @@ SELECT id FROM users WHERE (id BETWEEN $1 AND $2 OR id BETWEEN $3 AND $4) OR nam
 ```go
 {{insertGoFile "examples/where-wrap.go" }}
 ```
+
 #### Not
 ```sql
 SELECT id FROM users WHERE NOT name = $1;
@@ -191,5 +210,4 @@ SELECT id FROM users WHERE NOT name = $1;
 ```
 
 ## Syntax used
-
 ![image](provision/images/SQL_syntax.svg)
