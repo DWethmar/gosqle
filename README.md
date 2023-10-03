@@ -20,12 +20,10 @@ Table of Contents:
       - [Greater than](#greater-than)
       - [Greater than or equal](#greater-than-or-equal)
       - [Less than](#less-than)
-      - [Less than or equal](#less-than-or-equal)
       - [Like](#like)
       - [In](#in)
       - [Between](#between)
       - [Is null](#is-null)
-      - [Grouping](#grouping)
       - [Not](#not)
   - [Syntax used](#syntax-used)
 
@@ -501,6 +499,12 @@ import (
 )
 
 // WhereGT selects users where id is greater than 10
+<<<<<<< HEAD
+=======
+// Example:
+//
+//	SELECT id FROM users WHERE id > $1;
+>>>>>>> main
 func WhereGT(db *sql.DB) ([]User, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
@@ -592,57 +596,7 @@ func WhereGTE(db *sql.DB) ([]User, string, error) {
 #### Less than
 ```sql
 SELECT id FROM users WHERE id &lt; $1;
-```
 ```go
-package main
-
-import (
-	"database/sql"
-	"strings"
-
-	"github.com/dwethmar/gosqle"
-	"github.com/dwethmar/gosqle/clauses"
-	"github.com/dwethmar/gosqle/clauses/from"
-	"github.com/dwethmar/gosqle/expressions"
-	"github.com/dwethmar/gosqle/postgres"
-	"github.com/dwethmar/gosqle/predicates"
-)
-
-// WhereLT selects users where id is less than 10
-func WhereLT(db *sql.DB) ([]User, string, error) {
-	sb := new(strings.Builder)
-	args := postgres.NewArguments()
-	err := gosqle.NewSelect(
-		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
-	).From(from.From{
-		Expr: from.Table("users"),
-	}).Where(predicates.LT{
-		Col:  expressions.Column{Name: "id"},
-		Expr: args.NewArgument(10),
-	}).WriteTo(sb)
-
-	if err != nil {
-		return nil, "", err
-	}
-
-	rows, err := db.Query(sb.String(), args.Args...)
-	if err != nil {
-		return nil, "", err
-	}
-
-	var users []User
-	for rows.Next() {
-		var user User
-		if err = rows.Scan(&user.ID); err != nil {
-			return nil, "", err
-		}
-		users = append(users, user)
-	}
-
-	return users, sb.String(), nil
-}
-
-```
 #### Less than or equal
 ```sql
 SELECT id FROM users WHERE id &lt;= $1;
@@ -717,6 +671,12 @@ import (
 )
 
 // WhereLike selects users where name is like anna%
+<<<<<<< HEAD
+=======
+// Example:
+//
+//	SELECT id FROM users WHERE name LIKE $1;
+>>>>>>> main
 func WhereLike(db *sql.DB) ([]User, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
@@ -771,6 +731,12 @@ import (
 )
 
 // WhereIN selects users where name is in 'John', 'Jane' or 'Joe'.
+<<<<<<< HEAD
+=======
+// Example:
+//
+//	SELECT id FROM users WHERE name IN ($1, $2, $3);
+>>>>>>> main
 func WhereIN(db *sql.DB) ([]User, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
@@ -867,56 +833,7 @@ func WhereBetween(db *sql.DB) ([]User, string, error) {
 #### Is null
 ```sql
 SELECT id FROM addresses WHERE phone IS NULL;
-```
 ```go
-package main
-
-import (
-	"database/sql"
-	"strings"
-
-	"github.com/dwethmar/gosqle"
-	"github.com/dwethmar/gosqle/clauses"
-	"github.com/dwethmar/gosqle/clauses/from"
-	"github.com/dwethmar/gosqle/expressions"
-	"github.com/dwethmar/gosqle/postgres"
-	"github.com/dwethmar/gosqle/predicates"
-)
-
-// WhereIsNull selects addresses where phone is null
-func WhereIsNull(db *sql.DB) ([]User, string, error) {
-	sb := new(strings.Builder)
-	args := postgres.NewArguments()
-	err := gosqle.NewSelect(
-		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
-	).From(from.From{
-		Expr: from.Table("addresses"),
-	}).Where(predicates.IsNull{
-		Col: expressions.Column{Name: "phone"},
-	}).WriteTo(sb)
-
-	if err != nil {
-		return nil, "", err
-	}
-
-	rows, err := db.Query(sb.String(), args.Args...)
-	if err != nil {
-		return nil, "", err
-	}
-
-	var users []User
-	for rows.Next() {
-		var user User
-		if err = rows.Scan(&user.ID); err != nil {
-			return nil, "", err
-		}
-		users = append(users, user)
-	}
-
-	return users, sb.String(), nil
-}
-
-```
 #### Grouping
 ```sql
 SELECT id FROM users WHERE (id BETWEEN $1 AND $2 OR id BETWEEN $3 AND $4) OR name = $5;

@@ -20,12 +20,10 @@ Table of Contents:
       - [Greater than](#greater-than)
       - [Greater than or equal](#greater-than-or-equal)
       - [Less than](#less-than)
-      - [Less than or equal](#less-than-or-equal)
       - [Like](#like)
       - [In](#in)
       - [Between](#between)
       - [Is null](#is-null)
-      - [Grouping](#grouping)
       - [Not](#not)
   - [Syntax used](#syntax-used)
 
@@ -144,10 +142,7 @@ SELECT id FROM users WHERE id >= $1;
 #### Less than
 ```sql
 SELECT id FROM users WHERE id < $1;
-```
 ```go
-{{insertGoFile "examples/where-lt.go" }}
-```
 #### Less than or equal
 ```sql
 SELECT id FROM users WHERE id <= $1;
@@ -179,10 +174,7 @@ SELECT id FROM users WHERE id BETWEEN $1 AND $2;
 #### Is null
 ```sql
 SELECT id FROM addresses WHERE phone IS NULL;
-```
 ```go
-{{insertGoFile "examples/where-is-null.go" }}
-```
 #### Grouping
 ```sql
 SELECT id FROM users WHERE (id BETWEEN $1 AND $2 OR id BETWEEN $3 AND $4) OR name = $5;
