@@ -13,9 +13,6 @@ import (
 )
 
 // WhereWrap selects users where id is between 10 and 20 or 30 and 40 or name is john
-// Example:
-//
-//	SELECT id FROM users WHERE (id BETWEEN $1 AND $2 OR id BETWEEN $3 AND $4) OR name = $5;
 func WhereWrap(db *sql.DB) ([]User, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()

@@ -13,9 +13,6 @@ import (
 )
 
 // WhereLTE selects users where id is less than or equal to 10
-// Example:
-//
-//	SELECT id FROM users WHERE id <= $1;
 func WhereLTE(db *sql.DB) ([]User, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()

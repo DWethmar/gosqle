@@ -15,7 +15,6 @@ import (
 func SelectUsers(db *sql.DB) ([]User, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
-	// SELECT id, name, email FROM users LIMIT 10;
 	err := gosqle.NewSelect(
 		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
 		clauses.Selectable{Expr: expressions.Column{Name: "name"}},

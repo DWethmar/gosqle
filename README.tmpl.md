@@ -20,13 +20,11 @@ Table of Contents:
       - [Greater than](#greater-than)
       - [Greater than or equal](#greater-than-or-equal)
       - [Less than](#less-than)
-      - [Less than or equal](#less-than-or-equal)
       - [Like](#like)
       - [In](#in)
       - [Between](#between)
       - [Is null](#is-null)
-      - [Grouping](#grouping)
-    - [Not](#not)
+      - [Not](#not)
   - [Syntax used](#syntax-used)
 
 ## Examples
@@ -50,16 +48,34 @@ Create a select statement with the following syntax:
 gosqle.NewSelect(...columns)
 ```
 #### Generate a select query:
+```sql
+SELECT id, name, email FROM users LIMIT 10;
+```
 ```go
 {{insertGoFile "examples/select.go" }}
 ```
 
 #### Generate select query using group by and aggregate functions:
+```sql
+SELECT country, COUNT(id) AS address_count
+FROM addresses
+GROUP BY country
+ORDER BY address_count DESC;
+```
 ```go
 {{insertGoFile "examples/select-aggregate.go" }}
 ```
 
 #### Subquery
+```sql
+SELECT name
+FROM users
+WHERE id IN (
+  SELECT user_id
+  FROM addresses
+  WHERE city = 'Amsterdam'
+);
+```
 ```go
 {{insertGoFile "examples/subquery.go" }}
 ```
@@ -69,68 +85,107 @@ gosqle.NewSelect(...columns)
 gosqle.NewInsert(table, ...columns)
 ```
 #### Generate an insert query:
+```sql
+INSERT INTO users (name, email) VALUES ($1, $2)
+```
 ```go
 {{insertGoFile "examples/insert.go" }}
 ```
 
 ### Delete
 #### Generate a delete query:
+```sql
+DELETE FROM users WHERE id = $1
+```
 ```go
 {{insertGoFile "examples/delete.go" }}
 ```
 
 ### Update
 #### Generate an update query:
+```sql
+UPDATE users SET name = $1 WHERE id = $2
+```
 ```go
 {{insertGoFile "examples/update.go" }}
 ```
 
 ### Where conditions
 #### equal
+```sql
+SELECT id FROM users WHERE name = $1;
+```
 ```go
 {{insertGoFile "examples/where-eq.go" }}
 ```
 #### Not equal
+```sql
+SELECT id FROM users WHERE name != $1;
+```
 ```go
 {{insertGoFile "examples/where-ne.go" }}
 ```
 #### Greater than
+```sql
+SELECT id FROM users WHERE id > $1;
+```
 ```go
 {{insertGoFile "examples/where-gt.go" }}
 ```
 #### Greater than or equal
+```sql
+SELECT id FROM users WHERE id >= $1;
+```
 ```go
 {{insertGoFile "examples/where-gte.go" }}
 ```
 #### Less than
+```sql
+SELECT id FROM users WHERE id < $1;
 ```go
-{{insertGoFile "examples/where-lt.go" }}
-```
 #### Less than or equal
+```sql
+SELECT id FROM users WHERE id <= $1;
+```
 ```go
 {{insertGoFile "examples/where-lte.go" }}
 ```
 #### Like
+```sql
+SELECT id FROM users WHERE name LIKE $1;
+```
 ```go
 {{insertGoFile "examples/where-like.go" }}
 ```
 #### In
+```sql
+SELECT id FROM users WHERE name IN ($1, $2, $3);
+```
 ```go
 {{insertGoFile "examples/where-in.go" }}
 ```
 #### Between 
+```sql
+SELECT id FROM users WHERE id BETWEEN $1 AND $2;
+```
 ```go
 {{insertGoFile "examples/where-between.go" }}
 ```
 #### Is null
+```sql
+SELECT id FROM addresses WHERE phone IS NULL;
 ```go
-{{insertGoFile "examples/where-is-null.go" }}
-```
 #### Grouping
+```sql
+SELECT id FROM users WHERE (id BETWEEN $1 AND $2 OR id BETWEEN $3 AND $4) OR name = $5;
+```
 ```go
 {{insertGoFile "examples/where-wrap.go" }}
 ```
-### Not 
+#### Not
+```sql
+SELECT id FROM users WHERE NOT name = $1;
+```
 ```go
 {{insertGoFile "examples/where-not.go" }}
 ```

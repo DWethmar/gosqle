@@ -17,8 +17,6 @@ import (
 func UpdateUser(db *sql.DB) (string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
-
-	// UPDATE users SET name = $1 WHERE id = $2
 	err := gosqle.NewUpdate("users").Set(set.Change{
 		Col:  "name",
 		Expr: args.NewArgument(fmt.Sprintf("new name %d", time.Now().Unix())),

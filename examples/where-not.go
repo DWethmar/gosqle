@@ -12,10 +12,7 @@ import (
 	"github.com/dwethmar/gosqle/predicates"
 )
 
-// WhereNOT selects users where name is not John
-// Example:
-//
-//	SELECT id FROM users WHERE NOT name = $1;
+// WhereNOT selects users where name is not John.
 func WhereNOT(db *sql.DB) ([]User, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
