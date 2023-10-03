@@ -14,6 +14,19 @@ Table of Contents:
       - [Generate a delete query:](#generate-a-delete-query)
     - [Update](#update)
       - [Generate an update query:](#generate-an-update-query)
+    - [Where conditions](#where-conditions)
+      - [equal](#equal)
+      - [Not equal](#not-equal)
+      - [Greater than](#greater-than)
+      - [Greater than or equal](#greater-than-or-equal)
+      - [Less than](#less-than)
+      - [Less than or equal](#less-than-or-equal)
+      - [Like](#like)
+      - [In](#in)
+      - [Between](#between)
+      - [Is null](#is-null)
+      - [Grouping](#grouping)
+    - [Not](#not)
   - [Syntax used](#syntax-used)
 
 ## Examples
@@ -70,6 +83,56 @@ gosqle.NewInsert(table, ...columns)
 #### Generate an update query:
 ```go
 {{insertGoFile "examples/update.go" }}
+```
+
+### Where conditions
+#### equal
+```go
+{{insertGoFile "examples/where-eq.go" }}
+```
+#### Not equal
+```go
+{{insertGoFile "examples/where-ne.go" }}
+```
+#### Greater than
+```go
+{{insertGoFile "examples/where-gt.go" }}
+```
+#### Greater than or equal
+```go
+{{insertGoFile "examples/where-gte.go" }}
+```
+#### Less than
+```go
+{{insertGoFile "examples/where-lt.go" }}
+```
+#### Less than or equal
+```go
+{{insertGoFile "examples/where-lte.go" }}
+```
+#### Like
+```go
+{{insertGoFile "examples/where-like.go" }}
+```
+#### In
+```go
+{{insertGoFile "examples/where-in.go" }}
+```
+#### Between 
+```go
+{{insertGoFile "examples/where-between.go" }}
+```
+#### Is null
+```go
+{{insertGoFile "examples/where-is-null.go" }}
+```
+#### Grouping
+```go
+{{insertGoFile "examples/where-wrap.go" }}
+```
+### Not 
+```go
+{{insertGoFile "examples/where-not.go" }}
 ```
 
 ## Syntax used
