@@ -7,6 +7,7 @@ Table of Contents:
     - [Select](#select)
       - [Generate a select query:](#generate-a-select-query)
       - [Generate select query using group by and aggregate functions:](#generate-select-query-using-group-by-and-aggregate-functions)
+      - [Subquery](#subquery)
     - [Insert](#insert)
       - [Generate an insert query:](#generate-an-insert-query)
     - [Delete](#delete)
@@ -43,6 +44,11 @@ gosqle.NewSelect(...columns)
 #### Generate select query using group by and aggregate functions:
 ```go
 {{insertGoFile "examples/select-aggregate.go" }}
+```
+
+#### Subquery
+```go
+{{insertGoFile "examples/subquery.go" }}
 ```
 
 ### Insert

@@ -9,35 +9,58 @@ import (
 	"github.com/dwethmar/gosqle/clauses/from"
 	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/postgres"
+	"github.com/dwethmar/gosqle/predicates"
 )
 
 // SelectUsers selects users.
-func SelectUsers(db *sql.DB) ([]User, string, error) {
+func PeopleOfAmsterdam(db *sql.DB) ([]User, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
-	// SELECT id, name, email FROM users LIMIT 10;
+	// SELECT name
+	// FROM users
+	// WHERE id IN (
+	//     SELECT user_id
+	//     FROM addresses
+	//     WHERE city = 'New York'
+	// );
 	err := gosqle.NewSelect(
-		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
 		clauses.Selectable{Expr: expressions.Column{Name: "name"}},
-		clauses.Selectable{Expr: expressions.Column{Name: "email"}},
 	).From(from.From{
 		Expr: from.Table("users"),
-	}).Limit(args.NewArgument(10)).WriteTo(sb)
+	}).Where(
+		predicates.In{
+			Col: expressions.Column{Name: "id"},
+			Expr: gosqle.NewSelect(
+				clauses.Selectable{Expr: expressions.Column{Name: "user_id"}},
+			).From(from.From{
+				Expr: from.Table("addresses"),
+			}).Where(
+				predicates.EQ{
+					Col:  expressions.Column{Name: "city"},
+					Expr: args.NewArgument("Amsterdam"),
+				},
+			).Statement, // <- This is the subquery, so without semicolon.
+		},
+	).WriteTo(sb)
+
 	if err != nil {
 		return nil, "", err
 	}
+
 	rows, err := db.Query(sb.String(), args.Args...)
 	if err != nil {
 		return nil, "", err
 	}
+
 	var users []User
 	for rows.Next() {
 		var user User
-		err = rows.Scan(&user.ID, &user.Name, &user.Email)
+		err = rows.Scan(&user.Name)
 		if err != nil {
 			return nil, "", err
 		}
 		users = append(users, user)
 	}
+
 	return users, sb.String(), nil
 }

@@ -292,7 +292,7 @@ func TestIn(t *testing.T) {
 	t.Run("write to sql", func(t *testing.T) {
 		f := In{
 			Col: expressions.Column{Name: "id"},
-			Expressions: []expressions.Expression{
+			Expr: expressions.List{
 				postgres.NewArgument("123", 1),
 				postgres.NewArgument("456", 2),
 			},
