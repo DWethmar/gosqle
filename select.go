@@ -91,7 +91,7 @@ func (s *Select) SetClause(c clauses.Clause) *Select {
 // It also adds a semicolon to the end of the query.
 func (s *Select) WriteTo(sw io.StringWriter) error {
 	if err := s.Statement.WriteTo(sw); err != nil {
-		return fmt.Errorf("failed to write insert statement: %v", err)
+		return fmt.Errorf("failed to write select statement: %v", err)
 	}
 
 	// Add a semicolon to the end of the query.

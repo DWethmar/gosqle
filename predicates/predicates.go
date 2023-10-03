@@ -212,36 +212,30 @@ func (f LTE) WriteTo(writer io.StringWriter) error {
 }
 
 // In is an IN condition.
+// For example: WHERE col IN (1, 2, 3)
+// use expressions.NewList to create the list.
 type In struct {
-	Col         expressions.Expression
-	Expressions []expressions.Expression
-	Logic       Logic
+	Col   expressions.Expression
+	Expr  expressions.Expression
+	Logic Logic
 }
 
 func (f In) LogicOp() Logic { return f.Logic }
 func (f In) WriteTo(writer io.StringWriter) error {
 	if err := f.Col.WriteTo(writer); err != nil {
-		return fmt.Errorf("error writing GT column: %v", err)
+		return fmt.Errorf("error writing IN column: %v", err)
 	}
 
 	if _, err := writer.WriteString(" IN ("); err != nil {
-		return fmt.Errorf("error writing GT operator")
+		return fmt.Errorf("error writing IN operator")
 	}
 
-	for i, argument := range f.Expressions {
-		if err := argument.WriteTo(writer); err != nil {
-			return fmt.Errorf("could not write argument at index %d: %w", i, err)
-		}
-
-		if i < len(f.Expressions)-1 {
-			if _, err := writer.WriteString(", "); err != nil {
-				return fmt.Errorf("error writing comma: %w", err)
-			}
-		}
+	if err := f.Expr.WriteTo(writer); err != nil {
+		return fmt.Errorf("error writing IN expression: %v", err)
 	}
 
 	if _, err := writer.WriteString(")"); err != nil {
-		return fmt.Errorf("error writing GT operator")
+		return fmt.Errorf("error writing IN operator")
 	}
 
 	return nil

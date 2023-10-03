@@ -31,6 +31,16 @@ var examples = map[string]func(*sql.DB){
 			fmt.Printf("#%d %+v\n", i, a)
 		}
 	},
+	"subquery": func(d *sql.DB) {
+		users, query, err := PeopleOfAmsterdam(d)
+		if err != nil {
+			fmt.Printf("error selecting users: %v\n", err)
+		}
+		fmt.Printf("Query: %q\n", query)
+		for i, u := range users {
+			fmt.Printf("#%d %+v\n", i, u)
+		}
+	},
 	"insert": func(d *sql.DB) {
 		if q, err := InsertUser(d); err == nil {
 			fmt.Printf("Query: %q\n", q)
