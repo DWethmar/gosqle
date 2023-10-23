@@ -18,23 +18,21 @@ func PeopleOfAmsterdam(db *sql.DB) ([]User, string, error) {
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
 		clauses.Selectable{Expr: expressions.Column{Name: "name"}},
-	).From(from.From{
-		Expr: from.Table("users"),
-	}).Where(
+	).From(
+		from.NewFrom("users", ""),
+	).Where(
 		predicates.In{
 			Col: expressions.Column{Name: "id"},
 			Expr: gosqle.NewSelect(
 				clauses.Selectable{Expr: expressions.Column{Name: "user_id"}},
-			).From(from.From{
-				Expr: from.Table("addresses"),
-			}).Where(
-				predicates.EQ{
-					Col:  expressions.Column{Name: "city"},
-					Expr: args.NewArgument("Amsterdam"),
-				},
-			).Statement, // <- This is the subquery, so without semicolon.
+			).From(
+				from.NewFrom("addresses", ""),
+			).Where(predicates.EQ{
+				Col:  expressions.Column{Name: "city"},
+				Expr: args.NewArgument("Amsterdam"),
+			}).Statement, // <- This is the subquery, so without semicolon.
 		},
-	).WriteTo(sb)
+	).Write(sb)
 
 	if err != nil {
 		return nil, "", err

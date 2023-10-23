@@ -7,15 +7,15 @@ import (
 
 // Expression is a generic SQL expression.
 type Expression interface {
-	WriteTo(io.StringWriter) error
+	Write(io.StringWriter) error
 }
 
 // List is a list of expressions separated by a comma.
 type List []Expression
 
-func (e List) WriteTo(writer io.StringWriter) error {
+func (e List) Write(writer io.StringWriter) error {
 	for i, argument := range e {
-		if err := argument.WriteTo(writer); err != nil {
+		if err := argument.Write(writer); err != nil {
 			return fmt.Errorf("could not write expression at index %d: %w", i, err)
 		}
 

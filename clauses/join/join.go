@@ -43,7 +43,7 @@ type JoinOn struct {
 	Predicates []predicates.Predicate
 }
 
-func (j *JoinOn) WriteTo(sw io.StringWriter) error {
+func (j *JoinOn) Write(sw io.StringWriter) error {
 	if _, err := sw.WriteString("ON "); err != nil {
 		return fmt.Errorf("failed to write JOIN: %w", err)
 	}
@@ -67,7 +67,7 @@ type JoinUsing struct {
 }
 
 func (j *JoinUsing) t() {}
-func (j *JoinUsing) WriteTo(sw io.StringWriter) error {
+func (j *JoinUsing) Write(sw io.StringWriter) error {
 	if err := util.WriteStrings(sw, "USING (", strings.Join(j.Uses, ", "), ")"); err != nil {
 		return fmt.Errorf("failed to write JOIN: %w", err)
 	}
@@ -90,7 +90,7 @@ func Write(sw io.StringWriter, joinType JoinType, from string, match JoinMatcher
 		return fmt.Errorf("failed to write JOIN: %w", err)
 	}
 
-	if err := match.WriteTo(sw); err != nil {
+	if err := match.Write(sw); err != nil {
 		return fmt.Errorf("failed to write JOIN: %w", err)
 	}
 
@@ -109,7 +109,7 @@ type Clause struct {
 }
 
 func (j *Clause) Type() clauses.ClauseType { return clauses.JoinType }
-func (j *Clause) WriteTo(sw io.StringWriter) error {
+func (j *Clause) Write(sw io.StringWriter) error {
 	for i, join := range j.joins {
 		if err := Write(sw, join.Type, join.From, join.Match); err != nil {
 			return fmt.Errorf("failed to write JOIN: %w", err)

@@ -6,7 +6,6 @@ import (
 
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/clauses"
-	"github.com/dwethmar/gosqle/clauses/from"
 	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
@@ -18,13 +17,12 @@ func WhereBetween(db *sql.DB) ([]User, string, error) {
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
 		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
-	).From(from.From{
-		Expr: from.Table("users"),
-	}).Where(predicates.Between{
-		Col:  expressions.Column{Name: "id"},
-		Low:  args.NewArgument(10),
-		High: args.NewArgument(20),
-	}).WriteTo(sb)
+	).FromTable("users", nil).
+		Where(predicates.Between{
+			Col:  expressions.Column{Name: "id"},
+			Low:  args.NewArgument(10),
+			High: args.NewArgument(20),
+		}).Write(sb)
 
 	if err != nil {
 		return nil, "", err

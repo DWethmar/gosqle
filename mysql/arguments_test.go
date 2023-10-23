@@ -42,7 +42,7 @@ func TestArgument_Value(t *testing.T) {
 	}
 }
 
-func TestArgument_WriteTo(t *testing.T) {
+func TestArgument_Write(t *testing.T) {
 	type fields struct {
 		V interface{}
 	}
@@ -71,11 +71,11 @@ func TestArgument_WriteTo(t *testing.T) {
 			s := &Argument{
 				V: tt.fields.V,
 			}
-			if err := s.WriteTo(tt.args.sb); (err != nil) != tt.wantErr {
-				t.Errorf("Argument.WriteTo() error = %v, wantErr %v", err, tt.wantErr)
+			if err := s.Write(tt.args.sb); (err != nil) != tt.wantErr {
+				t.Errorf("Argument.Write() error = %v, wantErr %v", err, tt.wantErr)
 			} else {
 				if tt.want != tt.args.sb.String() {
-					t.Errorf("Argument.WriteTo() got = %v, want %v", tt.args.sb.String(), tt.want)
+					t.Errorf("Argument.Write() got = %v, want %v", tt.args.sb.String(), tt.want)
 				}
 			}
 		})

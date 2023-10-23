@@ -36,7 +36,7 @@ func WriteDelete(sw io.StringWriter, table string) error {
 }
 
 // ToSQL returns the query as a string and it's arguments and an error if any.
-func (d *Delete) WriteTo(sw io.StringWriter) error {
+func (d *Delete) Write(sw io.StringWriter) error {
 	if err := WriteDelete(sw, d.table); err != nil {
 		return err
 	}
@@ -46,7 +46,7 @@ func (d *Delete) WriteTo(sw io.StringWriter) error {
 			return fmt.Errorf("failed to write space: %v", err)
 		}
 
-		if err := d.ClauseWriter.WriteTo(sw); err != nil {
+		if err := d.ClauseWriter.Write(sw); err != nil {
 			return err
 		}
 	}

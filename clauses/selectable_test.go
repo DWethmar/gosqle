@@ -10,7 +10,7 @@ import (
 	"github.com/dwethmar/gosqle/mock"
 )
 
-func TestSelectable_WriteTo(t *testing.T) {
+func TestSelectable_Write(t *testing.T) {
 	type fields struct {
 		Expr expressions.Expression
 		As   string
@@ -97,13 +97,13 @@ func TestSelectable_WriteTo(t *testing.T) {
 				Expr: tt.fields.Expr,
 				As:   tt.fields.As,
 			}
-			if err := s.WriteTo(tt.args.sw); (err != nil) != tt.wantErr {
-				t.Errorf("Selectable.WriteTo() error = %v, wantErr %v", err, tt.wantErr)
+			if err := s.Write(tt.args.sw); (err != nil) != tt.wantErr {
+				t.Errorf("Selectable.Write() error = %v, wantErr %v", err, tt.wantErr)
 			} else {
 				if tt.checkString {
 					if sb, ok := tt.args.sw.(*strings.Builder); ok {
 						if got := sb.String(); got != tt.want {
-							t.Errorf("Selectable.WriteTo() = %q, want %q", got, tt.want)
+							t.Errorf("Selectable.Write() = %q, want %q", got, tt.want)
 						}
 					} else {
 						t.Errorf("expected string builder")

@@ -148,7 +148,7 @@ func TestJoin_Type(t *testing.T) {
 	})
 }
 
-func TestJoin_WriteTo(t *testing.T) {
+func TestJoin_Write(t *testing.T) {
 	type fields struct {
 		joins []Options
 	}
@@ -267,12 +267,12 @@ func TestJoin_WriteTo(t *testing.T) {
 			j := &Clause{
 				joins: tt.fields.joins,
 			}
-			if err := j.WriteTo(tt.args.sb); (err != nil) != tt.wantErr {
-				t.Errorf("Join.WriteTo() error = %v, wantErr %v", err, tt.wantErr)
+			if err := j.Write(tt.args.sb); (err != nil) != tt.wantErr {
+				t.Errorf("Join.Write() error = %v, wantErr %v", err, tt.wantErr)
 			} else {
 				got := tt.args.sb.String()
 				if got != tt.want {
-					t.Errorf("Join.WriteTo() = %q, want %q", got, tt.want)
+					t.Errorf("Join.Write() = %q, want %q", got, tt.want)
 				}
 			}
 		})
@@ -333,7 +333,7 @@ func TestNewJoin(t *testing.T) {
 	}
 }
 
-func TestJoinOn_WriteTo(t *testing.T) {
+func TestJoinOn_Write(t *testing.T) {
 	type fields struct {
 		Predicates []predicates.Predicate
 	}
@@ -403,14 +403,14 @@ func TestJoinOn_WriteTo(t *testing.T) {
 			j := &JoinOn{
 				Predicates: tt.fields.Predicates,
 			}
-			if err := j.WriteTo(tt.args.sw); (err != nil) != tt.wantErr {
-				t.Errorf("JoinOn.WriteTo() error = %v, wantErr %v", err, tt.wantErr)
+			if err := j.Write(tt.args.sw); (err != nil) != tt.wantErr {
+				t.Errorf("JoinOn.Write() error = %v, wantErr %v", err, tt.wantErr)
 			} else if tt.checkString {
 				// Check if we can get the string from the string builder.
 				if sb, ok := tt.args.sw.(*strings.Builder); ok {
 					got := sb.String()
 					if got != tt.want {
-						t.Errorf("JoinOn.WriteTo() = %q, want %q", got, tt.want)
+						t.Errorf("JoinOn.Write() = %q, want %q", got, tt.want)
 					}
 				} else {
 					t.Errorf("could not get string from string builder")
@@ -427,7 +427,7 @@ func TestJoinUsing_t(t *testing.T) {
 	})
 }
 
-func TestJoinUsing_WriteTo(t *testing.T) {
+func TestJoinUsing_Write(t *testing.T) {
 	type fields struct {
 		Uses []string
 	}
@@ -474,14 +474,14 @@ func TestJoinUsing_WriteTo(t *testing.T) {
 			j := &JoinUsing{
 				Uses: tt.fields.Uses,
 			}
-			if err := j.WriteTo(tt.args.sw); (err != nil) != tt.wantErr {
-				t.Errorf("JoinUsing.WriteTo() error = %v, wantErr %v", err, tt.wantErr)
+			if err := j.Write(tt.args.sw); (err != nil) != tt.wantErr {
+				t.Errorf("JoinUsing.Write() error = %v, wantErr %v", err, tt.wantErr)
 			} else if tt.checkString {
 				// Check if we can get the string from the string builder.
 				if sb, ok := tt.args.sw.(*strings.Builder); ok {
 					got := sb.String()
 					if got != tt.want {
-						t.Errorf("JoinUsing.WriteTo() = %q, want %q", got, tt.want)
+						t.Errorf("JoinUsing.Write() = %q, want %q", got, tt.want)
 					}
 				} else {
 					t.Errorf("could not get string from string builder")

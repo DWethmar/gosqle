@@ -27,8 +27,8 @@ type Clause struct {
 	Predicates []predicates.Predicate
 }
 
-func (*Clause) Type() clauses.ClauseType           { return clauses.HavingType }
-func (c *Clause) WriteTo(sw io.StringWriter) error { return WriteHaving(sw, c.Predicates) }
+func (*Clause) Type() clauses.ClauseType         { return clauses.HavingType }
+func (c *Clause) Write(sw io.StringWriter) error { return WriteHaving(sw, c.Predicates) }
 
 func New(predicates []predicates.Predicate) *Clause {
 	return &Clause{

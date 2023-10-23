@@ -26,7 +26,7 @@ func TestWriteDelete(t *testing.T) {
 	})
 }
 
-func TestDelete_WriteTo(t *testing.T) {
+func TestDelete_Write(t *testing.T) {
 	type fields struct {
 		ClauseWriter ClauseWriter
 		table        string
@@ -71,14 +71,14 @@ func TestDelete_WriteTo(t *testing.T) {
 				ClauseWriter: tt.fields.ClauseWriter,
 				table:        tt.fields.table,
 			}
-			if err := d.WriteTo(tt.args.sw); (err != nil) != tt.wantErr {
-				t.Errorf("Delete.WriteTo() error = %v, wantErr %v", err, tt.wantErr)
+			if err := d.Write(tt.args.sw); (err != nil) != tt.wantErr {
+				t.Errorf("Delete.Write() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
 			if tt.want != "" {
 				if sw, ok := tt.args.sw.(*strings.Builder); ok {
 					if sw.String() != tt.want {
-						t.Errorf("Delete.WriteTo() got = %v, want %v", sw.String(), tt.want)
+						t.Errorf("Delete.Write() got = %v, want %v", sw.String(), tt.want)
 					}
 				} else {
 					t.Errorf("expected string builder")

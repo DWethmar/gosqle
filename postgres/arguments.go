@@ -19,7 +19,7 @@ type Argument struct {
 }
 
 // WriteTo implements Expression.
-func (s *Argument) WriteTo(sw io.StringWriter) error {
+func (s *Argument) Write(sw io.StringWriter) error {
 	if _, err := sw.WriteString(fmt.Sprintf("$%d", s.Index)); err != nil {
 		return fmt.Errorf("could not write to io.StringWriter")
 	}

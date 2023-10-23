@@ -77,7 +77,7 @@ func SelectUsers(db *sql.DB) ([]User, string, error) {
 		clauses.Selectable{Expr: expressions.Column{Name: "email"}},
 	).From(from.From{
 		Expr: from.Table("users"),
-	}).Limit(args.NewArgument(10)).WriteTo(sb)
+	}).Limit(args.NewArgument(10)).Write(sb)
 	if err != nil {
 		return nil, "", err
 	}
@@ -146,7 +146,7 @@ func SelectAmountOfAddressesPerCountry(db *sql.DB) ([]AmountOfAddressesPerCountr
 	}).OrderBy(orderby.Sort{
 		Column:    &expressions.Column{Name: "address_count"},
 		Direction: orderby.DESC,
-	}).WriteTo(sb)
+	}).Write(sb)
 	if err != nil {
 		return nil, "", err
 	}
@@ -218,7 +218,7 @@ func PeopleOfAmsterdam(db *sql.DB) ([]User, string, error) {
 				},
 			).Statement, // <- This is the subquery, so without semicolon.
 		},
-	).WriteTo(sb)
+	).Write(sb)
 
 	if err != nil {
 		return nil, "", err
@@ -272,7 +272,7 @@ func InsertUser(db *sql.DB) (string, error) {
 	err := gosqle.NewInsert("users", "name", "email").Values(
 		args.NewArgument("John"),
 		args.NewArgument(fmt.Sprintf("john%d@%s", time.Now().Unix(), "example.com")),
-	).WriteTo(sb)
+	).Write(sb)
 
 	if err != nil {
 		return "", err
@@ -316,7 +316,7 @@ func DeleteAddress(db *sql.DB) (string, error) {
 			Col:  expressions.Column{Name: "user_id"},
 			Expr: args.NewArgument(111),
 		},
-	).WriteTo(sb)
+	).Write(sb)
 	if err != nil {
 		return "", err
 	}
@@ -360,7 +360,7 @@ func UpdateUser(db *sql.DB) (string, error) {
 	}).Where(predicates.EQ{
 		Col:  expressions.Column{Name: "id"},
 		Expr: args.NewArgument(1),
-	}).WriteTo(sb)
+	}).Write(sb)
 	if err != nil {
 		return "", err
 	}
@@ -403,7 +403,7 @@ func WhereEQ(db *sql.DB) ([]User, string, error) {
 	}).Where(predicates.EQ{
 		Col:  expressions.Column{Name: "name"},
 		Expr: args.NewArgument("John"),
-	}).WriteTo(sb)
+	}).Write(sb)
 
 	if err != nil {
 		return nil, "", err
@@ -458,7 +458,7 @@ func WhereNE(db *sql.DB) ([]User, string, error) {
 	}).Where(predicates.NE{
 		Col:  expressions.Column{Name: "name"},
 		Expr: args.NewArgument("John"),
-	}).WriteTo(sb)
+	}).Write(sb)
 
 	if err != nil {
 		return nil, "", err
@@ -513,7 +513,7 @@ func WhereGT(db *sql.DB) ([]User, string, error) {
 	}).Where(predicates.GT{
 		Col:  expressions.Column{Name: "id"},
 		Expr: args.NewArgument(10),
-	}).WriteTo(sb)
+	}).Write(sb)
 
 	if err != nil {
 		return nil, "", err
@@ -568,7 +568,7 @@ func WhereGTE(db *sql.DB) ([]User, string, error) {
 	}).Where(predicates.GTE{
 		Col:  expressions.Column{Name: "id"},
 		Expr: args.NewArgument(10),
-	}).WriteTo(sb)
+	}).Write(sb)
 
 	if err != nil {
 		return nil, "", err
@@ -623,7 +623,7 @@ func WhereLT(db *sql.DB) ([]User, string, error) {
 	}).Where(predicates.LT{
 		Col:  expressions.Column{Name: "id"},
 		Expr: args.NewArgument(10),
-	}).WriteTo(sb)
+	}).Write(sb)
 
 	if err != nil {
 		return nil, "", err
@@ -678,7 +678,7 @@ func WhereLTE(db *sql.DB) ([]User, string, error) {
 	}).Where(predicates.LT{
 		Col:  expressions.Column{Name: "id"},
 		Expr: args.NewArgument(10),
-	}).WriteTo(sb)
+	}).Write(sb)
 
 	if err != nil {
 		return nil, "", err
@@ -733,7 +733,7 @@ func WhereLike(db *sql.DB) ([]User, string, error) {
 	}).Where(predicates.Like{
 		Col:  expressions.Column{Name: "name"},
 		Expr: args.NewArgument("anna%"),
-	}).WriteTo(sb)
+	}).Write(sb)
 
 	if err != nil {
 		return nil, "", err
@@ -792,7 +792,7 @@ func WhereIN(db *sql.DB) ([]User, string, error) {
 			args.NewArgument("Jane"),
 			args.NewArgument("Joe"),
 		},
-	}).WriteTo(sb)
+	}).Write(sb)
 
 	if err != nil {
 		return nil, "", err
@@ -848,7 +848,7 @@ func WhereBetween(db *sql.DB) ([]User, string, error) {
 		Col:  expressions.Column{Name: "id"},
 		Low:  args.NewArgument(10),
 		High: args.NewArgument(20),
-	}).WriteTo(sb)
+	}).Write(sb)
 
 	if err != nil {
 		return nil, "", err
@@ -902,7 +902,7 @@ func WhereIsNull(db *sql.DB) ([]User, string, error) {
 		Expr: from.Table("addresses"),
 	}).Where(predicates.IsNull{
 		Col: expressions.Column{Name: "phone"},
-	}).WriteTo(sb)
+	}).Write(sb)
 
 	if err != nil {
 		return nil, "", err
@@ -973,7 +973,7 @@ func WhereWrap(db *sql.DB) ([]User, string, error) {
 			Expr:  args.NewArgument("John"),
 			Logic: predicates.OR,
 		},
-	).WriteTo(sb)
+	).Write(sb)
 
 	if err != nil {
 		return nil, "", err
@@ -1030,7 +1030,7 @@ func WhereNOT(db *sql.DB) ([]User, string, error) {
 			Col:  expressions.Column{Name: "name"},
 			Expr: args.NewArgument("John"),
 		},
-	}).WriteTo(sb)
+	}).Write(sb)
 
 	if err != nil {
 		return nil, "", err

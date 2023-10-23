@@ -21,12 +21,12 @@ type Change struct {
 }
 
 // Write writes a SQL string to the given string writer.
-func (c *Change) WriteTo(sw io.StringWriter) error {
+func (c *Change) Write(sw io.StringWriter) error {
 	if err := util.WriteStrings(sw, c.Col, " = "); err != nil {
 		return fmt.Errorf("failed to write column=%s: %w", c.Col, err)
 	}
 
-	if err := c.Expr.WriteTo(sw); err != nil {
+	if err := c.Expr.Write(sw); err != nil {
 		return fmt.Errorf("failed to write expression")
 	}
 
@@ -51,7 +51,7 @@ func Write(sw io.StringWriter, changes []Change) error {
 	}
 
 	for i, change := range changes {
-		if err := change.WriteTo(sw); err != nil {
+		if err := change.Write(sw); err != nil {
 			return fmt.Errorf("failed to write change: %w", err)
 		}
 
@@ -70,8 +70,8 @@ type Clause struct {
 	changes []Change
 }
 
-func (s *Clause) Type() clauses.ClauseType         { return clauses.SetType }
-func (s *Clause) WriteTo(sw io.StringWriter) error { return Write(sw, s.changes) }
+func (s *Clause) Type() clauses.ClauseType       { return clauses.SetType }
+func (s *Clause) Write(sw io.StringWriter) error { return Write(sw, s.changes) }
 
 func New(changes []Change) *Clause {
 	return &Clause{

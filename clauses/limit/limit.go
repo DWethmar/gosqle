@@ -25,7 +25,7 @@ func Write(sw io.StringWriter, s expressions.Expression) error {
 		return fmt.Errorf("could not write limit clause")
 	}
 
-	if err := s.WriteTo(sw); err != nil {
+	if err := s.Write(sw); err != nil {
 		return fmt.Errorf("could not write limit expression")
 	}
 
@@ -37,8 +37,8 @@ type Clause struct {
 	expressions.Expression
 }
 
-func (l *Clause) Type() clauses.ClauseType         { return clauses.LimitType }
-func (l *Clause) WriteTo(sw io.StringWriter) error { return Write(sw, l.Expression) }
+func (l *Clause) Type() clauses.ClauseType       { return clauses.LimitType }
+func (l *Clause) Write(sw io.StringWriter) error { return Write(sw, l.Expression) }
 
 func New(limit expressions.Expression) *Clause {
 	return &Clause{

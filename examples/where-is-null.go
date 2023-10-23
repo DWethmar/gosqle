@@ -6,7 +6,6 @@ import (
 
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/clauses"
-	"github.com/dwethmar/gosqle/clauses/from"
 	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
@@ -18,11 +17,9 @@ func WhereIsNull(db *sql.DB) ([]User, string, error) {
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
 		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
-	).From(from.From{
-		Expr: from.Table("addresses"),
-	}).Where(predicates.IsNull{
+	).FromTable("users", nil).Where(predicates.IsNull{
 		Col: expressions.Column{Name: "phone"},
-	}).WriteTo(sb)
+	}).Write(sb)
 
 	if err != nil {
 		return nil, "", err

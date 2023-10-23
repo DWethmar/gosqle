@@ -16,12 +16,10 @@ func DeleteAddress(db *sql.DB) (string, error) {
 	args := postgres.NewArguments()
 
 	// DELETE FROM addresses WHERE user_id = $1
-	err := gosqle.NewDelete("addresses").Where(
-		predicates.EQ{
-			Col:  expressions.Column{Name: "user_id"},
-			Expr: args.NewArgument(111),
-		},
-	).WriteTo(sb)
+	err := gosqle.NewDelete("addresses").Where(predicates.EQ{
+		Col:  expressions.Column{Name: "user_id"},
+		Expr: args.NewArgument(111),
+	}).Write(sb)
 	if err != nil {
 		return "", err
 	}

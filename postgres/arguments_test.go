@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestArgument_WriteTo(t *testing.T) {
+func TestArgument_Write(t *testing.T) {
 	type fields struct {
 		Index int
 		Value interface{}
@@ -41,12 +41,12 @@ func TestArgument_WriteTo(t *testing.T) {
 				Value: tt.fields.Value,
 			}
 
-			if err := s.WriteTo(tt.args.sb); (err != nil) != tt.wantErr {
-				t.Errorf("Argument.WriteTo() error = %v, wantErr %v", err, tt.wantErr)
+			if err := s.Write(tt.args.sb); (err != nil) != tt.wantErr {
+				t.Errorf("Argument.Write() error = %v, wantErr %v", err, tt.wantErr)
 			} else {
 				if sb := tt.args.sb; sb != nil {
 					if str := sb.String(); str != tt.want {
-						t.Errorf("Argument.WriteTo() got = %q, want %q", str, tt.want)
+						t.Errorf("Argument.Write() got = %q, want %q", str, tt.want)
 					}
 				}
 			}

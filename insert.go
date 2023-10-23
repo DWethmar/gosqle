@@ -29,8 +29,8 @@ func (i *Insert) SetClause(c clauses.Clause) *Insert {
 
 // Write writes the insert query to the given writer.
 // It also adds a semicolon to the end of the query.
-func (i *Insert) WriteTo(sw io.StringWriter) error {
-	if err := i.Statement.WriteTo(sw); err != nil {
+func (i *Insert) Write(sw io.StringWriter) error {
+	if err := i.Statement.Write(sw); err != nil {
 		return fmt.Errorf("failed to write insert statement: %v", err)
 	}
 

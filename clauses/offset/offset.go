@@ -25,7 +25,7 @@ func Write(sw io.StringWriter, s expressions.Expression) error {
 		return fmt.Errorf("could not write offset clause")
 	}
 
-	if err := s.WriteTo(sw); err != nil {
+	if err := s.Write(sw); err != nil {
 		return fmt.Errorf("could not write offset expression")
 	}
 
@@ -37,8 +37,8 @@ type Clause struct {
 	expressions.Expression
 }
 
-func (o *Clause) Type() clauses.ClauseType         { return clauses.OffsetType }
-func (o *Clause) WriteTo(sw io.StringWriter) error { return Write(sw, o.Expression) }
+func (o *Clause) Type() clauses.ClauseType       { return clauses.OffsetType }
+func (o *Clause) Write(sw io.StringWriter) error { return Write(sw, o.Expression) }
 
 func New(offset expressions.Expression) *Clause {
 	return &Clause{

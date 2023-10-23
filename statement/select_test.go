@@ -28,7 +28,7 @@ func TestWriteSelect(t *testing.T) {
 	})
 }
 
-func TestSelect_WriteTo(t *testing.T) {
+func TestSelect_Write(t *testing.T) {
 	type fields struct {
 		ClauseWriter  ClauseWriter
 		selectColumns []clauses.Selectable
@@ -49,7 +49,7 @@ func TestSelect_WriteTo(t *testing.T) {
 				ClauseWriter: ClauseWriter{
 					clauses: map[clauses.ClauseType]clauses.Clause{
 						clauses.FromType: from.New(from.From{
-							Expr: from.Table("table"),
+							Expr: expressions.String("table"),
 						}),
 					},
 					order:           selectClausesOrder,
@@ -72,14 +72,14 @@ func TestSelect_WriteTo(t *testing.T) {
 				ClauseWriter:  tt.fields.ClauseWriter,
 				selectColumns: tt.fields.selectColumns,
 			}
-			if err := s.WriteTo(tt.args.sw); (err != nil) != tt.wantErr {
-				t.Errorf("Select.WriteTo() error = %v, wantErr %v", err, tt.wantErr)
+			if err := s.Write(tt.args.sw); (err != nil) != tt.wantErr {
+				t.Errorf("Select.Write() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
 			if tt.want != "" {
 				if sw, ok := tt.args.sw.(*strings.Builder); ok {
 					if sw.String() != tt.want {
-						t.Errorf("Select.WriteTo() got = %v, want %v", sw.String(), tt.want)
+						t.Errorf("Select.Write() got = %v, want %v", sw.String(), tt.want)
 					}
 				} else {
 					t.Errorf("expected string builder")

@@ -31,8 +31,8 @@ func (d *Delete) SetClause(c clauses.Clause) *Delete {
 }
 
 // WriteTo writes the delete statement to the given string writer.
-func (d *Delete) WriteTo(sw io.StringWriter) error {
-	if err := d.Statement.WriteTo(sw); err != nil {
+func (d *Delete) Write(sw io.StringWriter) error {
+	if err := d.Statement.Write(sw); err != nil {
 		return fmt.Errorf("failed to write delete statement: %v", err)
 	}
 

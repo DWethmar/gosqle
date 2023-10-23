@@ -15,12 +15,12 @@ type Count struct {
 }
 
 // WriteTo implements Expression.
-func (c *Count) WriteTo(sw io.StringWriter) error {
+func (c *Count) Write(sw io.StringWriter) error {
 	if err := util.WriteStrings(sw, "COUNT("); err != nil {
 		return fmt.Errorf("error writing COUNT function: %v", err)
 	}
 
-	if err := c.Expr.WriteTo(sw); err != nil {
+	if err := c.Expr.Write(sw); err != nil {
 		return fmt.Errorf("error writing COUNT expression: %v", err)
 	}
 
@@ -45,12 +45,12 @@ type Max struct {
 	Expr Expression
 }
 
-func (m *Max) WriteTo(sw io.StringWriter) error {
+func (m *Max) Write(sw io.StringWriter) error {
 	if err := util.WriteStrings(sw, "MAX("); err != nil {
 		return fmt.Errorf("error writing MAX function: %v", err)
 	}
 
-	if err := m.Expr.WriteTo(sw); err != nil {
+	if err := m.Expr.Write(sw); err != nil {
 		return fmt.Errorf("error writing MAX expression: %v", err)
 	}
 
@@ -75,12 +75,12 @@ type Min struct {
 	Expr Expression
 }
 
-func (m *Min) WriteTo(sw io.StringWriter) error {
+func (m *Min) Write(sw io.StringWriter) error {
 	if err := util.WriteStrings(sw, "MIN("); err != nil {
 		return fmt.Errorf("error writing MIN function: %v", err)
 	}
 
-	if err := m.Expr.WriteTo(sw); err != nil {
+	if err := m.Expr.Write(sw); err != nil {
 		return fmt.Errorf("error writing MIN expression: %v", err)
 	}
 
@@ -105,12 +105,12 @@ type Sum struct {
 	Expr Expression
 }
 
-func (s *Sum) WriteTo(sw io.StringWriter) error {
+func (s *Sum) Write(sw io.StringWriter) error {
 	if err := util.WriteStrings(sw, "SUM("); err != nil {
 		return fmt.Errorf("error writing SUM function: %v", err)
 	}
 
-	if err := s.Expr.WriteTo(sw); err != nil {
+	if err := s.Expr.Write(sw); err != nil {
 		return fmt.Errorf("error writing SUM expression: %v", err)
 	}
 
@@ -135,12 +135,12 @@ type Avg struct {
 	Expr Expression
 }
 
-func (a *Avg) WriteTo(sw io.StringWriter) error {
+func (a *Avg) Write(sw io.StringWriter) error {
 	if err := util.WriteStrings(sw, "AVG("); err != nil {
 		return fmt.Errorf("error writing AVG function: %v", err)
 	}
 
-	if err := a.Expr.WriteTo(sw); err != nil {
+	if err := a.Expr.Write(sw); err != nil {
 		return fmt.Errorf("error writing AVG expression: %v", err)
 	}
 
