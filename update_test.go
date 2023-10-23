@@ -18,15 +18,15 @@ func TestUpdate_ToSQL(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			sb := new(strings.Builder)
-			err := tt.update.WriteTo(sb)
+			err := tt.update.Write(sb)
 
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Update.WriteTo() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Update.Write() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 
 			if query := sb.String(); query != tt.want {
-				t.Errorf("Update.WriteTo() query = %q, wantQuery %q", query, tt.want)
+				t.Errorf("Update.Write() query = %q, wantQuery %q", query, tt.want)
 			}
 		})
 	}

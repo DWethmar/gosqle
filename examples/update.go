@@ -23,7 +23,7 @@ func UpdateUser(db *sql.DB) (string, error) {
 	}).Where(predicates.EQ{
 		Col:  expressions.Column{Name: "id"},
 		Expr: args.NewArgument(1),
-	}).WriteTo(sb)
+	}).Write(sb)
 	if err != nil {
 		return "", err
 	}

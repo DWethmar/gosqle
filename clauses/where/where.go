@@ -37,8 +37,8 @@ type Where struct {
 	predicates []predicates.Predicate
 }
 
-func (w *Where) Type() clauses.ClauseType         { return clauses.WhereType }
-func (w *Where) WriteTo(sw io.StringWriter) error { return WriteWhere(sw, w.predicates) }
+func (w *Where) Type() clauses.ClauseType       { return clauses.WhereType }
+func (w *Where) Write(sw io.StringWriter) error { return WriteWhere(sw, w.predicates) }
 
 // New
 func New(predicates []predicates.Predicate) *Where {

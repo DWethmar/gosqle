@@ -6,7 +6,6 @@ import (
 
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/clauses"
-	"github.com/dwethmar/gosqle/clauses/from"
 	"github.com/dwethmar/gosqle/clauses/groupby"
 	"github.com/dwethmar/gosqle/clauses/orderby"
 	"github.com/dwethmar/gosqle/expressions"
@@ -30,14 +29,12 @@ func SelectAmountOfAddressesPerCountry(db *sql.DB) ([]AmountOfAddressesPerCountr
 			Expr: expressions.NewCount(&expressions.Column{Name: "id"}),
 			As:   "address_count",
 		},
-	).From(from.From{
-		Expr: from.Table("addresses"),
-	}).GroupBy(groupby.ColumnGrouping{
+	).FromTable("addresses", nil).GroupBy(groupby.ColumnGrouping{
 		&expressions.Column{Name: "country"},
 	}).OrderBy(orderby.Sort{
 		Column:    &expressions.Column{Name: "address_count"},
 		Direction: orderby.DESC,
-	}).WriteTo(sb)
+	}).Write(sb)
 	if err != nil {
 		return nil, "", err
 	}

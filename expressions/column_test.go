@@ -1,7 +1,6 @@
 package expressions
 
 import (
-	"io"
 	"strings"
 	"testing"
 )
@@ -63,39 +62,10 @@ func TestColumn_Write(t *testing.T) {
 				From: tt.fields.From,
 				Name: tt.fields.Name,
 			}
-			if err := s.WriteTo(tt.args.sb); (err != nil) != tt.wantErr {
+			if err := s.Write(tt.args.sb); (err != nil) != tt.wantErr {
 				t.Errorf("Column.Write() error = %v, wantErr %v", err, tt.wantErr)
 			} else if tt.want != tt.args.sb.String() {
 				t.Errorf("Column.Write() got = %v, want %v", tt.args.sb.String(), tt.want)
-			}
-		})
-	}
-}
-
-func TestColumn_WriteTo(t *testing.T) {
-	type fields struct {
-		From string
-		Name string
-	}
-	type args struct {
-		sw io.StringWriter
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			s := Column{
-				From: tt.fields.From,
-				Name: tt.fields.Name,
-			}
-			if err := s.WriteTo(tt.args.sw); (err != nil) != tt.wantErr {
-				t.Errorf("Column.WriteTo() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

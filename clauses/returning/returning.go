@@ -27,7 +27,7 @@ func Write(sw io.StringWriter, selectColumns []clauses.Selectable) error {
 	}
 
 	for i, column := range selectColumns {
-		if err := column.WriteTo(sw); err != nil {
+		if err := column.Write(sw); err != nil {
 			return fmt.Errorf("error on writing RETURNING column: %w", err)
 		}
 
@@ -46,8 +46,8 @@ type Clause struct {
 	selectColumns []clauses.Selectable
 }
 
-func (r *Clause) Type() clauses.ClauseType         { return clauses.ReturningType }
-func (r *Clause) WriteTo(sw io.StringWriter) error { return Write(sw, r.selectColumns) }
+func (r *Clause) Type() clauses.ClauseType       { return clauses.ReturningType }
+func (r *Clause) Write(sw io.StringWriter) error { return Write(sw, r.selectColumns) }
 
 func New(selectColumns []clauses.Selectable) *Clause {
 	return &Clause{

@@ -26,7 +26,7 @@ func TestWrite(t *testing.T) {
 			args: args{
 				sw: &strings.Builder{},
 				from: From{
-					Expr: Table("table"),
+					Expr: expressions.String("table"),
 				},
 			},
 			want:    "FROM table",
@@ -37,7 +37,7 @@ func TestWrite(t *testing.T) {
 			args: args{
 				sw: &strings.Builder{},
 				from: From{
-					Expr: Table("table"),
+					Expr: expressions.String("table"),
 					As:   "alias",
 				},
 			},
@@ -73,7 +73,7 @@ func TestFrom_Type(t *testing.T) {
 	})
 }
 
-func TestFrom_WriteTo(t *testing.T) {
+func TestFrom_Write(t *testing.T) {
 	type fields struct {
 		Expression expressions.Expression
 	}
@@ -89,7 +89,7 @@ func TestFrom_WriteTo(t *testing.T) {
 	}{
 		{
 			name:    "should write From",
-			fields:  fields{Expression: Table("table")},
+			fields:  fields{Expression: expressions.String("table")},
 			args:    args{sb: new(strings.Builder)},
 			want:    "FROM table",
 			wantErr: false,
@@ -102,12 +102,12 @@ func TestFrom_WriteTo(t *testing.T) {
 					Expr: tt.fields.Expression,
 				},
 			}
-			if err := f.WriteTo(tt.args.sb); (err != nil) != tt.wantErr {
-				t.Errorf("From.WriteTo() error = %v, wantErr %v", err, tt.wantErr)
+			if err := f.Write(tt.args.sb); (err != nil) != tt.wantErr {
+				t.Errorf("From.Write() error = %v, wantErr %v", err, tt.wantErr)
 			} else {
 				got := tt.args.sb.String()
 				if got != tt.want {
-					t.Errorf("From.WriteTo() = %q, want %q", got, tt.want)
+					t.Errorf("From.Write() = %q, want %q", got, tt.want)
 				}
 			}
 		})
@@ -127,13 +127,13 @@ func TestNewFrom(t *testing.T) {
 			name: "should create new From",
 			args: args{
 				from: From{
-					Expr: Table("table"),
+					Expr: expressions.String("table"),
 					As:   "",
 				},
 			},
 			want: &Clause{
 				from: From{
-					Expr: Table("table"),
+					Expr: expressions.String("table"),
 					As:   "",
 				},
 			},

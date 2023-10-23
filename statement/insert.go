@@ -62,7 +62,7 @@ type Insert struct {
 }
 
 // ToSQL returns the query as a string and it's arguments and an error if any.
-func (i *Insert) WriteTo(sw io.StringWriter) error {
+func (i *Insert) Write(sw io.StringWriter) error {
 	if i.table == "" {
 		return errors.New("no table specified")
 	}
@@ -76,7 +76,7 @@ func (i *Insert) WriteTo(sw io.StringWriter) error {
 			return fmt.Errorf("failed to write space: %v", err)
 		}
 
-		if err := i.ClauseWriter.WriteTo(sw); err != nil {
+		if err := i.ClauseWriter.Write(sw); err != nil {
 			return err
 		}
 	}

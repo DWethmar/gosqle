@@ -15,8 +15,8 @@ type Selectable struct {
 }
 
 // Write writes a SQL select column to the given string writer.
-func (s Selectable) WriteTo(sw io.StringWriter) error {
-	if err := s.Expr.WriteTo(sw); err != nil {
+func (s Selectable) Write(sw io.StringWriter) error {
+	if err := s.Expr.Write(sw); err != nil {
 		return fmt.Errorf("failed to write column: %v", err)
 	}
 

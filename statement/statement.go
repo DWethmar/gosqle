@@ -49,7 +49,7 @@ func (s *ClauseWriter) SetClause(c clauses.Clause) {
 }
 
 // Write writes clauses to the string writer.
-func (s *ClauseWriter) WriteTo(sw io.StringWriter) error {
+func (s *ClauseWriter) Write(sw io.StringWriter) error {
 	clauses := []clauses.Clause{}
 	for _, t := range s.order {
 		if c, ok := s.clauses[t]; ok {
@@ -59,7 +59,7 @@ func (s *ClauseWriter) WriteTo(sw io.StringWriter) error {
 
 	for i, clause := range clauses {
 		// Write clause to the string builder.
-		if err := clause.WriteTo(sw); err != nil {
+		if err := clause.Write(sw); err != nil {
 			return fmt.Errorf("failed to write clause: %s", err)
 		}
 

@@ -10,7 +10,7 @@ import (
 	"github.com/dwethmar/gosqle/predicates"
 )
 
-func TestDelete_WriteTo(t *testing.T) {
+func TestDelete_Write(t *testing.T) {
 	tests := []struct {
 		name    string
 		delete  *Delete
@@ -29,15 +29,15 @@ func TestDelete_WriteTo(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			sb := new(strings.Builder)
-			err := tt.delete.WriteTo(sb)
+			err := tt.delete.Write(sb)
 
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Delete.WriteTo() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Delete.Write() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 
 			if query := sb.String(); query != tt.want {
-				t.Errorf("Delete.WriteTo() query = %q, wantQuery %q", query, tt.want)
+				t.Errorf("Delete.Write() query = %q, wantQuery %q", query, tt.want)
 			}
 		})
 	}

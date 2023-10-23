@@ -14,7 +14,7 @@ func WriteGroupByColumns(sw io.StringWriter, columns []*expressions.Column) erro
 		return fmt.Errorf("unable to write GROUP BY: %v", err)
 	}
 	for i, column := range columns {
-		if err := column.WriteTo(sw); err != nil {
+		if err := column.Write(sw); err != nil {
 			return fmt.Errorf("unable to write GROUP BY column at %d: %v", i, err)
 		}
 
@@ -39,8 +39,8 @@ var _ Grouping = &ColumnGrouping{}
 // ColumnGrouping represents a group by clause with columns
 type ColumnGrouping []*expressions.Column
 
-func (c ColumnGrouping) WriteTo(sw io.StringWriter) error { return WriteGroupByColumns(sw, c) }
-func (ColumnGrouping) g()                                 {}
+func (c ColumnGrouping) Write(sw io.StringWriter) error { return WriteGroupByColumns(sw, c) }
+func (ColumnGrouping) g()                               {}
 
 var (
 	_ clauses.Clause = &Clause{}
@@ -52,8 +52,8 @@ type Clause struct {
 }
 
 func (*Clause) Type() clauses.ClauseType { return clauses.GroupByType }
-func (c *Clause) WriteTo(sw io.StringWriter) error {
-	if err := c.grouping.WriteTo(sw); err != nil {
+func (c *Clause) Write(sw io.StringWriter) error {
+	if err := c.grouping.Write(sw); err != nil {
 		return fmt.Errorf("unable to write GROUP BY columns: %v", err)
 	}
 

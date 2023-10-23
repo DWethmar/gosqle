@@ -20,11 +20,27 @@ import (
 
 // Select is a wrapper for a select query statement.
 type Select struct {
+	// Statement is the select statement.
 	statement.Statement
 }
 
 func (s *Select) From(f from.From) *Select {
 	return s.SetClause(from.New(f))
+}
+
+type FromTableOptions struct {
+	Alias string
+}
+
+func (s *Select) FromTable(table string, opt *FromTableOptions) *Select {
+	var as string
+	if opt != nil {
+		as = opt.Alias
+	}
+
+	return s.SetClause(
+		from.New(from.NewFrom(table, as)),
+	)
 }
 
 // Join adds a join clause to the select statement.
@@ -89,8 +105,8 @@ func (s *Select) SetClause(c clauses.Clause) *Select {
 
 // Write writes the select query to the given writer.
 // It also adds a semicolon to the end of the query.
-func (s *Select) WriteTo(sw io.StringWriter) error {
-	if err := s.Statement.WriteTo(sw); err != nil {
+func (s *Select) Write(sw io.StringWriter) error {
+	if err := s.Statement.Write(sw); err != nil {
 		return fmt.Errorf("failed to write select statement: %v", err)
 	}
 

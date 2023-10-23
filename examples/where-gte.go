@@ -6,7 +6,6 @@ import (
 
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/clauses"
-	"github.com/dwethmar/gosqle/clauses/from"
 	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
@@ -18,12 +17,10 @@ func WhereGTE(db *sql.DB) ([]User, string, error) {
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
 		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
-	).From(from.From{
-		Expr: from.Table("users"),
-	}).Where(predicates.GTE{
+	).FromTable("users", nil).Where(predicates.GTE{
 		Col:  expressions.Column{Name: "id"},
 		Expr: args.NewArgument(10),
-	}).WriteTo(sb)
+	}).Write(sb)
 
 	if err != nil {
 		return nil, "", err

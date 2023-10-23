@@ -57,8 +57,8 @@ func (u *Update) SetClause(c clauses.Clause) *Update {
 }
 
 // WriteTo writes the select statement to the given writer.
-func (u *Update) WriteTo(sw io.StringWriter) error {
-	if err := u.Statement.WriteTo(sw); err != nil {
+func (u *Update) Write(sw io.StringWriter) error {
+	if err := u.Statement.Write(sw); err != nil {
 		return fmt.Errorf("failed to write insert statement: %v", err)
 	}
 

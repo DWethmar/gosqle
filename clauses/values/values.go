@@ -43,7 +43,7 @@ func Write(sw io.StringWriter, exprs []expressions.Expression) error {
 	}
 
 	for i, e := range exprs {
-		if err := e.WriteTo(sw); err != nil {
+		if err := e.Write(sw); err != nil {
 			return fmt.Errorf("failed to write expression %d: %w", i, err)
 		}
 
@@ -67,8 +67,8 @@ type Clause struct {
 }
 
 // Type implements Clause.
-func (*Clause) Type() clauses.ClauseType           { return clauses.ValuesType }
-func (v *Clause) WriteTo(sw io.StringWriter) error { return Write(sw, v.expressions) }
+func (*Clause) Type() clauses.ClauseType         { return clauses.ValuesType }
+func (v *Clause) Write(sw io.StringWriter) error { return Write(sw, v.expressions) }
 
 // New creates a new Values clause.
 func New(expressions []expressions.Expression) *Clause {

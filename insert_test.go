@@ -8,7 +8,7 @@ import (
 	"github.com/dwethmar/gosqle/postgres"
 )
 
-func TestInsert_WriteTo(t *testing.T) {
+func TestInsert_Write(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -45,21 +45,21 @@ func TestInsert_WriteTo(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			sb := new(strings.Builder)
-			err := tt.insert.WriteTo(sb)
+			err := tt.insert.Write(sb)
 
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Insert.WriteTo() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Insert.Write() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 
 			if query := sb.String(); query != tt.want {
-				t.Errorf("Insert.WriteTo() query = %q, wantQuery %q", query, tt.want)
+				t.Errorf("Insert.Write() query = %q, wantQuery %q", query, tt.want)
 			}
 		})
 	}
 }
 
-func BenchmarkInsert_WriteTo(b *testing.B) {
+func BenchmarkInsert_Write(b *testing.B) {
 	insert := NewInsert("users", "id", "username").Values(
 		mysql.NewArgument(1),
 		mysql.NewArgument("test"),
@@ -67,7 +67,7 @@ func BenchmarkInsert_WriteTo(b *testing.B) {
 
 	sb := new(strings.Builder)
 	for i := 0; i < b.N; i++ {
-		if err := insert.WriteTo(sb); err != nil {
+		if err := insert.Write(sb); err != nil {
 			b.Fatal(err)
 		}
 	}

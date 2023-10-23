@@ -17,7 +17,7 @@ func InsertUser(db *sql.DB) (string, error) {
 	err := gosqle.NewInsert("users", "name", "email").Values(
 		args.NewArgument("John"),
 		args.NewArgument(fmt.Sprintf("john%d@%s", time.Now().Unix(), "example.com")),
-	).WriteTo(sb)
+	).Write(sb)
 
 	if err != nil {
 		return "", err

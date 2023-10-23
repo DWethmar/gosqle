@@ -25,7 +25,7 @@ func TestWriteInsert(t *testing.T) {
 	})
 }
 
-func TestInsert_WriteTo(t *testing.T) {
+func TestInsert_Write(t *testing.T) {
 	type fields struct {
 		ClauseWriter ClauseWriter
 		table        string
@@ -71,14 +71,14 @@ func TestInsert_WriteTo(t *testing.T) {
 				table:        tt.fields.table,
 				columns:      tt.fields.columns,
 			}
-			if err := i.WriteTo(tt.args.sw); (err != nil) != tt.wantErr {
-				t.Errorf("Insert.WriteTo() error = %v, wantErr %v", err, tt.wantErr)
+			if err := i.Write(tt.args.sw); (err != nil) != tt.wantErr {
+				t.Errorf("Insert.Write() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
 			if tt.want != "" {
 				if sw, ok := tt.args.sw.(*strings.Builder); ok {
 					if sw.String() != tt.want {
-						t.Errorf("Insert.WriteTo() got = %v, want %v", sw.String(), tt.want)
+						t.Errorf("Insert.Write() got = %v, want %v", sw.String(), tt.want)
 					}
 				} else {
 					t.Errorf("expected string builder")

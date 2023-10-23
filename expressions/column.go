@@ -18,7 +18,7 @@ type Column struct {
 }
 
 // Write writes the column to the given writer
-func (s Column) WriteTo(sw io.StringWriter) error {
+func (s Column) Write(sw io.StringWriter) error {
 	if s.Name == "" {
 		return fmt.Errorf("column name is empty")
 	}

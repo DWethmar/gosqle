@@ -31,7 +31,7 @@ var ( // type check
 // Predicates are conditions that can be evaluated to SQL three-valued logic (3VL) (true/false/unknown)
 type Predicate interface {
 	LogicOp() Logic // LogicOp returns the logic operator: AND or OR.
-	WriteTo(writer io.StringWriter) error
+	Write(writer io.StringWriter) error
 }
 
 // Logic is a logic operator.
@@ -51,7 +51,7 @@ type Wrap struct {
 func (f Wrap) LogicOp() Logic { return f.Logic }
 
 // Write writes the group to the given writer.
-func (f Wrap) WriteTo(sw io.StringWriter) error {
+func (f Wrap) Write(sw io.StringWriter) error {
 	if err := util.WriteStrings(sw, "("); err != nil {
 		return fmt.Errorf("error writing opening parenthesis: %v", err)
 	}
@@ -75,8 +75,8 @@ type EQ struct {
 }
 
 func (f EQ) LogicOp() Logic { return f.Logic }
-func (f EQ) WriteTo(writer io.StringWriter) error {
-	if err := f.Col.WriteTo(writer); err != nil {
+func (f EQ) Write(writer io.StringWriter) error {
+	if err := f.Col.Write(writer); err != nil {
 		return fmt.Errorf("error writing EQ column: %v", err)
 	}
 
@@ -84,7 +84,7 @@ func (f EQ) WriteTo(writer io.StringWriter) error {
 		return fmt.Errorf("error writing EQ operator")
 	}
 
-	if err := f.Expr.WriteTo(writer); err != nil {
+	if err := f.Expr.Write(writer); err != nil {
 		return fmt.Errorf("error writing EQ argument: %v", err)
 	}
 
@@ -99,8 +99,8 @@ type NE struct {
 }
 
 func (f NE) LogicOp() Logic { return f.Logic }
-func (f NE) WriteTo(writer io.StringWriter) error {
-	if err := f.Col.WriteTo(writer); err != nil {
+func (f NE) Write(writer io.StringWriter) error {
+	if err := f.Col.Write(writer); err != nil {
 		return fmt.Errorf("error writing NE column: %v", err)
 	}
 
@@ -108,7 +108,7 @@ func (f NE) WriteTo(writer io.StringWriter) error {
 		return fmt.Errorf("error writing NE operator")
 	}
 
-	if err := f.Expr.WriteTo(writer); err != nil {
+	if err := f.Expr.Write(writer); err != nil {
 		return fmt.Errorf("error writing NE argument: %v", err)
 	}
 
@@ -123,8 +123,8 @@ type GT struct {
 }
 
 func (f GT) LogicOp() Logic { return f.Logic }
-func (f GT) WriteTo(writer io.StringWriter) error {
-	if err := f.Col.WriteTo(writer); err != nil {
+func (f GT) Write(writer io.StringWriter) error {
+	if err := f.Col.Write(writer); err != nil {
 		return fmt.Errorf("error writing GT column: %v", err)
 	}
 
@@ -132,7 +132,7 @@ func (f GT) WriteTo(writer io.StringWriter) error {
 		return fmt.Errorf("error writing GT operator")
 	}
 
-	if err := f.Expr.WriteTo(writer); err != nil {
+	if err := f.Expr.Write(writer); err != nil {
 		return fmt.Errorf("error writing GT argument: %v", err)
 	}
 
@@ -147,8 +147,8 @@ type GTE struct {
 }
 
 func (f GTE) LogicOp() Logic { return f.Logic }
-func (f GTE) WriteTo(writer io.StringWriter) error {
-	if err := f.Col.WriteTo(writer); err != nil {
+func (f GTE) Write(writer io.StringWriter) error {
+	if err := f.Col.Write(writer); err != nil {
 		return fmt.Errorf("error writing GTE column: %v", err)
 	}
 
@@ -156,7 +156,7 @@ func (f GTE) WriteTo(writer io.StringWriter) error {
 		return fmt.Errorf("error writing GTE operator")
 	}
 
-	if err := f.Expr.WriteTo(writer); err != nil {
+	if err := f.Expr.Write(writer); err != nil {
 		return fmt.Errorf("error writing GTE argument: %v", err)
 	}
 
@@ -171,8 +171,8 @@ type LT struct {
 }
 
 func (f LT) LogicOp() Logic { return f.Logic }
-func (f LT) WriteTo(writer io.StringWriter) error {
-	if err := f.Col.WriteTo(writer); err != nil {
+func (f LT) Write(writer io.StringWriter) error {
+	if err := f.Col.Write(writer); err != nil {
 		return fmt.Errorf("error writing LT column: %v", err)
 	}
 
@@ -180,7 +180,7 @@ func (f LT) WriteTo(writer io.StringWriter) error {
 		return fmt.Errorf("error writing LT operator")
 	}
 
-	if err := f.Expr.WriteTo(writer); err != nil {
+	if err := f.Expr.Write(writer); err != nil {
 		return fmt.Errorf("error writing LT argument: %v", err)
 	}
 
@@ -195,8 +195,8 @@ type LTE struct {
 }
 
 func (f LTE) LogicOp() Logic { return f.Logic }
-func (f LTE) WriteTo(writer io.StringWriter) error {
-	if err := f.Col.WriteTo(writer); err != nil {
+func (f LTE) Write(writer io.StringWriter) error {
+	if err := f.Col.Write(writer); err != nil {
 		return fmt.Errorf("error writing LTE column: %v", err)
 	}
 
@@ -204,7 +204,7 @@ func (f LTE) WriteTo(writer io.StringWriter) error {
 		return fmt.Errorf("error writing LTE operator")
 	}
 
-	if err := f.Expr.WriteTo(writer); err != nil {
+	if err := f.Expr.Write(writer); err != nil {
 		return fmt.Errorf("error writing LTE argument: %v", err)
 	}
 
@@ -221,8 +221,8 @@ type In struct {
 }
 
 func (f In) LogicOp() Logic { return f.Logic }
-func (f In) WriteTo(writer io.StringWriter) error {
-	if err := f.Col.WriteTo(writer); err != nil {
+func (f In) Write(writer io.StringWriter) error {
+	if err := f.Col.Write(writer); err != nil {
 		return fmt.Errorf("error writing IN column: %v", err)
 	}
 
@@ -230,7 +230,7 @@ func (f In) WriteTo(writer io.StringWriter) error {
 		return fmt.Errorf("error writing IN operator")
 	}
 
-	if err := f.Expr.WriteTo(writer); err != nil {
+	if err := f.Expr.Write(writer); err != nil {
 		return fmt.Errorf("error writing IN expression: %v", err)
 	}
 
@@ -249,8 +249,8 @@ type Like struct {
 }
 
 func (f Like) LogicOp() Logic { return f.Logic }
-func (f Like) WriteTo(writer io.StringWriter) error {
-	if err := f.Col.WriteTo(writer); err != nil {
+func (f Like) Write(writer io.StringWriter) error {
+	if err := f.Col.Write(writer); err != nil {
 		return fmt.Errorf("error writing LIKE column: %v", err)
 	}
 
@@ -258,7 +258,7 @@ func (f Like) WriteTo(writer io.StringWriter) error {
 		return fmt.Errorf("error writing GT operator")
 	}
 
-	if err := f.Expr.WriteTo(writer); err != nil {
+	if err := f.Expr.Write(writer); err != nil {
 		return fmt.Errorf("error writing LIKE argument: %v", err)
 	}
 	return nil
@@ -271,8 +271,8 @@ type IsNull struct {
 }
 
 func (f IsNull) LogicOp() Logic { return f.Logic }
-func (f IsNull) WriteTo(writer io.StringWriter) error {
-	if err := f.Col.WriteTo(writer); err != nil {
+func (f IsNull) Write(writer io.StringWriter) error {
+	if err := f.Col.Write(writer); err != nil {
 		return fmt.Errorf("error writing IsNull field: %v", err)
 	}
 
@@ -291,8 +291,8 @@ type Between struct {
 }
 
 func (f Between) LogicOp() Logic { return f.Logic }
-func (f Between) WriteTo(writer io.StringWriter) error {
-	if err := f.Col.WriteTo(writer); err != nil {
+func (f Between) Write(writer io.StringWriter) error {
+	if err := f.Col.Write(writer); err != nil {
 		return fmt.Errorf("error writing column: %v", err)
 	}
 
@@ -300,7 +300,7 @@ func (f Between) WriteTo(writer io.StringWriter) error {
 		return fmt.Errorf("error writing BETWEEN operator")
 	}
 
-	if err := f.Low.WriteTo(writer); err != nil {
+	if err := f.Low.Write(writer); err != nil {
 		return fmt.Errorf("error writing BETWEEN low argument: %v", err)
 	}
 
@@ -308,7 +308,7 @@ func (f Between) WriteTo(writer io.StringWriter) error {
 		return fmt.Errorf("error writing BETWEEN operator")
 	}
 
-	if err := f.High.WriteTo(writer); err != nil {
+	if err := f.High.Write(writer); err != nil {
 		return fmt.Errorf("error writing BETWEEN high argument: %v", err)
 	}
 
@@ -321,12 +321,12 @@ type Not struct {
 }
 
 func (f Not) LogicOp() Logic { return f.Predicate.LogicOp() }
-func (f Not) WriteTo(writer io.StringWriter) error {
+func (f Not) Write(writer io.StringWriter) error {
 	if err := util.WriteStrings(writer, "NOT "); err != nil {
 		return fmt.Errorf("error writing NOT opening: %v", err)
 	}
 
-	if err := f.Predicate.WriteTo(writer); err != nil {
+	if err := f.Predicate.Write(writer); err != nil {
 		return fmt.Errorf("error writing predicate after not: %v", err)
 	}
 

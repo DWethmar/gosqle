@@ -17,7 +17,7 @@ func WriteAll(sw io.StringWriter, predicates []Predicate) error {
 			}
 		}
 
-		if err := predicate.WriteTo(sw); err != nil {
+		if err := predicate.Write(sw); err != nil {
 			return fmt.Errorf("writing predicate failed: %w", err)
 		}
 	}

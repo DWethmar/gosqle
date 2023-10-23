@@ -20,7 +20,7 @@ func TestWriteUpdate(t *testing.T) {
 	})
 }
 
-func TestUpdate_WriteTo(t *testing.T) {
+func TestUpdate_Write(t *testing.T) {
 	type fields struct {
 		ClauseWriter ClauseWriter
 		table        string
@@ -42,8 +42,8 @@ func TestUpdate_WriteTo(t *testing.T) {
 				ClauseWriter: tt.fields.ClauseWriter,
 				table:        tt.fields.table,
 			}
-			if err := u.WriteTo(tt.args.sw); (err != nil) != tt.wantErr {
-				t.Errorf("Update.WriteTo() error = %v, wantErr %v", err, tt.wantErr)
+			if err := u.Write(tt.args.sw); (err != nil) != tt.wantErr {
+				t.Errorf("Update.Write() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

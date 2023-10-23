@@ -41,8 +41,8 @@ func NewSort(column *expressions.Column, direction Direction) Sort {
 }
 
 // WriteTo writes a ORDER BY clause to the given string writer.
-func (s Sort) WriteTo(sw io.StringWriter) error {
-	if err := s.Column.WriteTo(sw); err != nil {
+func (s Sort) Write(sw io.StringWriter) error {
+	if err := s.Column.Write(sw); err != nil {
 		return fmt.Errorf("failed to write ORDER BY column: %v", err)
 	}
 
@@ -72,7 +72,7 @@ func Write(sw io.StringWriter, sorting []Sort) error {
 	}
 
 	for i, o := range sorting {
-		if err := o.WriteTo(sw); err != nil {
+		if err := o.Write(sw); err != nil {
 			return fmt.Errorf("failed to write ORDER BY column: %v", err)
 		}
 
@@ -91,8 +91,8 @@ type Clause struct {
 	sorting []Sort
 }
 
-func (o *Clause) Type() clauses.ClauseType         { return clauses.OrderByType }
-func (o *Clause) WriteTo(sw io.StringWriter) error { return Write(sw, o.sorting) }
+func (o *Clause) Type() clauses.ClauseType       { return clauses.OrderByType }
+func (o *Clause) Write(sw io.StringWriter) error { return Write(sw, o.sorting) }
 
 func New(sorting []Sort) *Clause {
 	return &Clause{

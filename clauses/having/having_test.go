@@ -99,7 +99,7 @@ func TestClause_Type(t *testing.T) {
 	})
 }
 
-func TestClause_WriteTo(t *testing.T) {
+func TestClause_Write(t *testing.T) {
 	type fields struct {
 		Predicates []predicates.Predicate
 	}
@@ -166,8 +166,8 @@ func TestClause_WriteTo(t *testing.T) {
 			c := &Clause{
 				Predicates: tt.fields.Predicates,
 			}
-			if err := c.WriteTo(tt.args.sw); (err != nil) != tt.wantErr {
-				t.Errorf("Clause.WriteTo() error = %v, wantErr %v", err, tt.wantErr)
+			if err := c.Write(tt.args.sw); (err != nil) != tt.wantErr {
+				t.Errorf("Clause.Write() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

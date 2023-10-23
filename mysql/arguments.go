@@ -18,7 +18,7 @@ type Argument struct {
 
 func (s *Argument) Value() interface{} { return s.V }
 
-func (s *Argument) WriteTo(sw io.StringWriter) error {
+func (s *Argument) Write(sw io.StringWriter) error {
 	if _, err := sw.WriteString("?"); err != nil {
 		return fmt.Errorf("could not write to io.StringWriter")
 	}

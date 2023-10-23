@@ -19,6 +19,14 @@ type From struct {
 	As   string
 }
 
+// NewFrom is a helper function to create a new From clause.
+func NewFrom(table string, as string) From {
+	return From{
+		Expr: expressions.NewString(table),
+		As:   as,
+	}
+}
+
 // Write writes a SQL Write string to the given string writer.
 //
 // Examples:
@@ -31,7 +39,7 @@ func Write(sw io.StringWriter, from From) error {
 		return fmt.Errorf("from: %v", err)
 	}
 
-	if err := from.Expr.WriteTo(sw); err != nil {
+	if err := from.Expr.Write(sw); err != nil {
 		return fmt.Errorf("from: %v", err)
 	}
 
@@ -49,8 +57,8 @@ type Clause struct {
 	from From
 }
 
-func (c *Clause) Type() clauses.ClauseType         { return clauses.FromType }
-func (c *Clause) WriteTo(sw io.StringWriter) error { return Write(sw, c.from) }
+func (c *Clause) Type() clauses.ClauseType       { return clauses.FromType }
+func (c *Clause) Write(sw io.StringWriter) error { return Write(sw, c.from) }
 
 // New creates a new from clause
 func New(from From) *Clause {

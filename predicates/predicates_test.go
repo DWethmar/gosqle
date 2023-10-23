@@ -39,7 +39,7 @@ func TestWrap(t *testing.T) {
 			},
 		}
 		sb := new(strings.Builder)
-		if err := f.WriteTo(sb); err != nil {
+		if err := f.Write(sb); err != nil {
 			t.Errorf("Group.Write() error = %v", err)
 		}
 		got := sb.String()
@@ -78,7 +78,7 @@ func TestEQ(t *testing.T) {
 		}
 
 		sb := new(strings.Builder)
-		if err := f.WriteTo(sb); err != nil {
+		if err := f.Write(sb); err != nil {
 			t.Errorf("EQ.Write() error = %v", err)
 		}
 		got := sb.String()
@@ -112,7 +112,7 @@ func TestNE(t *testing.T) {
 		}
 
 		sb := new(strings.Builder)
-		if err := f.WriteTo(sb); err != nil {
+		if err := f.Write(sb); err != nil {
 			t.Errorf("NE.Write() error = %v", err)
 		}
 
@@ -148,7 +148,7 @@ func TestGT(t *testing.T) {
 		}
 
 		sb := new(strings.Builder)
-		if err := f.WriteTo(sb); err != nil {
+		if err := f.Write(sb); err != nil {
 			t.Errorf("GT.Write() error = %v", err)
 		}
 		got := sb.String()
@@ -181,7 +181,7 @@ func TestGTE(t *testing.T) {
 			Expr: postgres.NewArgument("123", 1),
 		}
 		sb := new(strings.Builder)
-		if err := f.WriteTo(sb); err != nil {
+		if err := f.Write(sb); err != nil {
 			t.Errorf("GTE.Write() error = %v", err)
 
 		}
@@ -223,7 +223,7 @@ func TestLT(t *testing.T) {
 
 		sb := new(strings.Builder)
 
-		if err := f.WriteTo(sb); err != nil {
+		if err := f.Write(sb); err != nil {
 			t.Errorf("LT.Write() error = %v", err)
 		}
 
@@ -259,7 +259,7 @@ func TestLTE(t *testing.T) {
 		}
 
 		sb := new(strings.Builder)
-		if err := f.WriteTo(sb); err != nil {
+		if err := f.Write(sb); err != nil {
 			t.Errorf("LTE.Write() error = %v", err)
 		}
 
@@ -299,7 +299,7 @@ func TestIn(t *testing.T) {
 		}
 
 		sb := new(strings.Builder)
-		if err := f.WriteTo(sb); err != nil {
+		if err := f.Write(sb); err != nil {
 			t.Errorf("IN.Write() error = %v", err)
 		}
 
@@ -334,13 +334,13 @@ func TestLike(t *testing.T) {
 		}
 
 		sb := new(strings.Builder)
-		if err := f.WriteTo(sb); err != nil {
-			t.Errorf("Like.WriteTo() error = %v", err)
+		if err := f.Write(sb); err != nil {
+			t.Errorf("Like.Write() error = %v", err)
 		}
 		got := sb.String()
 		want := `id LIKE $1`
 		if got != want {
-			t.Errorf("Like.WriteTo() = %v, want %v", got, want)
+			t.Errorf("Like.Write() = %v, want %v", got, want)
 		}
 	})
 }
@@ -367,7 +367,7 @@ func TestIsNull(t *testing.T) {
 
 		sb := new(strings.Builder)
 
-		if err := f.WriteTo(sb); err != nil {
+		if err := f.Write(sb); err != nil {
 			t.Errorf("IsNull.Write() error = %v", err)
 		}
 		got := sb.String()
@@ -401,7 +401,7 @@ func TestBetween(t *testing.T) {
 		}
 
 		sb := new(strings.Builder)
-		if err := f.WriteTo(sb); err != nil {
+		if err := f.Write(sb); err != nil {
 			t.Errorf("Between.Write() error = %v", err)
 		}
 		got := sb.String()
@@ -447,7 +447,7 @@ func TestNot(t *testing.T) {
 		}
 
 		sb := new(strings.Builder)
-		if err := f.WriteTo(sb); err != nil {
+		if err := f.Write(sb); err != nil {
 			t.Errorf("Not.Write() error = %v", err)
 		}
 
@@ -471,7 +471,7 @@ func TestNot(t *testing.T) {
 			return 0, errors.New("error")
 		})
 
-		if err := f.WriteTo(sb); err == nil {
+		if err := f.Write(sb); err == nil {
 			t.Errorf("Not.Write() error = %v", err)
 		}
 	})
