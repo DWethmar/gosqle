@@ -62,7 +62,6 @@ import (
 
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/clauses"
-	"github.com/dwethmar/gosqle/clauses/from"
 	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/postgres"
 )
@@ -75,9 +74,10 @@ func SelectUsers(db *sql.DB) ([]User, string, error) {
 		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
 		clauses.Selectable{Expr: expressions.Column{Name: "name"}},
 		clauses.Selectable{Expr: expressions.Column{Name: "email"}},
-	).From(from.From{
-		Expr: from.Table("users"),
-	}).Limit(args.NewArgument(10)).Write(sb)
+	).
+		FromTable("addresses", nil).
+		Limit(args.NewArgument(10)).
+		Write(sb)
 	if err != nil {
 		return nil, "", err
 	}
@@ -115,7 +115,6 @@ import (
 
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/clauses"
-	"github.com/dwethmar/gosqle/clauses/from"
 	"github.com/dwethmar/gosqle/clauses/groupby"
 	"github.com/dwethmar/gosqle/clauses/orderby"
 	"github.com/dwethmar/gosqle/expressions"
@@ -139,9 +138,7 @@ func SelectAmountOfAddressesPerCountry(db *sql.DB) ([]AmountOfAddressesPerCountr
 			Expr: expressions.NewCount(&expressions.Column{Name: "id"}),
 			As:   "address_count",
 		},
-	).From(from.From{
-		Expr: from.Table("addresses"),
-	}).GroupBy(groupby.ColumnGrouping{
+	).FromTable("addresses", nil).GroupBy(groupby.ColumnGrouping{
 		&expressions.Column{Name: "country"},
 	}).OrderBy(orderby.Sort{
 		Column:    &expressions.Column{Name: "address_count"},
@@ -202,21 +199,19 @@ func PeopleOfAmsterdam(db *sql.DB) ([]User, string, error) {
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
 		clauses.Selectable{Expr: expressions.Column{Name: "name"}},
-	).From(from.From{
-		Expr: from.Table("users"),
-	}).Where(
+	).From(
+		from.NewFrom("users", ""),
+	).Where(
 		predicates.In{
 			Col: expressions.Column{Name: "id"},
 			Expr: gosqle.NewSelect(
 				clauses.Selectable{Expr: expressions.Column{Name: "user_id"}},
-			).From(from.From{
-				Expr: from.Table("addresses"),
-			}).Where(
-				predicates.EQ{
-					Col:  expressions.Column{Name: "city"},
-					Expr: args.NewArgument("Amsterdam"),
-				},
-			).Statement, // <- This is the subquery, so without semicolon.
+			).From(
+				from.NewFrom("addresses", ""),
+			).Where(predicates.EQ{
+				Col:  expressions.Column{Name: "city"},
+				Expr: args.NewArgument("Amsterdam"),
+			}).Statement, // <- This is the subquery, so without semicolon.
 		},
 	).Write(sb)
 
@@ -311,12 +306,10 @@ func DeleteAddress(db *sql.DB) (string, error) {
 	args := postgres.NewArguments()
 
 	// DELETE FROM addresses WHERE user_id = $1
-	err := gosqle.NewDelete("addresses").Where(
-		predicates.EQ{
-			Col:  expressions.Column{Name: "user_id"},
-			Expr: args.NewArgument(111),
-		},
-	).Write(sb)
+	err := gosqle.NewDelete("addresses").Where(predicates.EQ{
+		Col:  expressions.Column{Name: "user_id"},
+		Expr: args.NewArgument(111),
+	}).Write(sb)
 	if err != nil {
 		return "", err
 	}
@@ -386,7 +379,6 @@ import (
 
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/clauses"
-	"github.com/dwethmar/gosqle/clauses/from"
 	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
@@ -398,9 +390,7 @@ func WhereEQ(db *sql.DB) ([]User, string, error) {
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
 		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
-	).From(from.From{
-		Expr: from.Table("users"),
-	}).Where(predicates.EQ{
+	).FromTable("users", nil).Where(predicates.EQ{
 		Col:  expressions.Column{Name: "name"},
 		Expr: args.NewArgument("John"),
 	}).Write(sb)
@@ -441,7 +431,6 @@ import (
 
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/clauses"
-	"github.com/dwethmar/gosqle/clauses/from"
 	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
@@ -453,9 +442,7 @@ func WhereNE(db *sql.DB) ([]User, string, error) {
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
 		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
-	).From(from.From{
-		Expr: from.Table("users"),
-	}).Where(predicates.NE{
+	).FromTable("users", nil).Where(predicates.NE{
 		Col:  expressions.Column{Name: "name"},
 		Expr: args.NewArgument("John"),
 	}).Write(sb)
@@ -496,7 +483,6 @@ import (
 
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/clauses"
-	"github.com/dwethmar/gosqle/clauses/from"
 	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
@@ -508,9 +494,7 @@ func WhereGT(db *sql.DB) ([]User, string, error) {
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
 		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
-	).From(from.From{
-		Expr: from.Table("users"),
-	}).Where(predicates.GT{
+	).FromTable("users", nil).Where(predicates.GT{
 		Col:  expressions.Column{Name: "id"},
 		Expr: args.NewArgument(10),
 	}).Write(sb)
@@ -551,7 +535,6 @@ import (
 
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/clauses"
-	"github.com/dwethmar/gosqle/clauses/from"
 	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
@@ -563,9 +546,7 @@ func WhereGTE(db *sql.DB) ([]User, string, error) {
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
 		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
-	).From(from.From{
-		Expr: from.Table("users"),
-	}).Where(predicates.GTE{
+	).FromTable("users", nil).Where(predicates.GTE{
 		Col:  expressions.Column{Name: "id"},
 		Expr: args.NewArgument(10),
 	}).Write(sb)
@@ -606,7 +587,6 @@ import (
 
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/clauses"
-	"github.com/dwethmar/gosqle/clauses/from"
 	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
@@ -618,9 +598,7 @@ func WhereLT(db *sql.DB) ([]User, string, error) {
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
 		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
-	).From(from.From{
-		Expr: from.Table("users"),
-	}).Where(predicates.LT{
+	).FromTable("users", nil).Where(predicates.LT{
 		Col:  expressions.Column{Name: "id"},
 		Expr: args.NewArgument(10),
 	}).Write(sb)
@@ -661,7 +639,6 @@ import (
 
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/clauses"
-	"github.com/dwethmar/gosqle/clauses/from"
 	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
@@ -673,9 +650,7 @@ func WhereLTE(db *sql.DB) ([]User, string, error) {
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
 		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
-	).From(from.From{
-		Expr: from.Table("users"),
-	}).Where(predicates.LT{
+	).FromTable("users", nil).Where(predicates.LT{
 		Col:  expressions.Column{Name: "id"},
 		Expr: args.NewArgument(10),
 	}).Write(sb)
@@ -716,7 +691,6 @@ import (
 
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/clauses"
-	"github.com/dwethmar/gosqle/clauses/from"
 	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
@@ -728,9 +702,7 @@ func WhereLike(db *sql.DB) ([]User, string, error) {
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
 		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
-	).From(from.From{
-		Expr: from.Table("users"),
-	}).Where(predicates.Like{
+	).FromTable("users", nil).Where(predicates.Like{
 		Col:  expressions.Column{Name: "name"},
 		Expr: args.NewArgument("anna%"),
 	}).Write(sb)
@@ -771,7 +743,6 @@ import (
 
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/clauses"
-	"github.com/dwethmar/gosqle/clauses/from"
 	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
@@ -783,9 +754,7 @@ func WhereIN(db *sql.DB) ([]User, string, error) {
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
 		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
-	).From(from.From{
-		Expr: from.Table("users"),
-	}).Where(predicates.In{
+	).FromTable("users", nil).Where(predicates.In{
 		Col: expressions.Column{Name: "id"},
 		Expr: expressions.List{
 			args.NewArgument("John"),
@@ -830,7 +799,6 @@ import (
 
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/clauses"
-	"github.com/dwethmar/gosqle/clauses/from"
 	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
@@ -842,13 +810,12 @@ func WhereBetween(db *sql.DB) ([]User, string, error) {
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
 		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
-	).From(from.From{
-		Expr: from.Table("users"),
-	}).Where(predicates.Between{
-		Col:  expressions.Column{Name: "id"},
-		Low:  args.NewArgument(10),
-		High: args.NewArgument(20),
-	}).Write(sb)
+	).FromTable("users", nil).
+		Where(predicates.Between{
+			Col:  expressions.Column{Name: "id"},
+			Low:  args.NewArgument(10),
+			High: args.NewArgument(20),
+		}).Write(sb)
 
 	if err != nil {
 		return nil, "", err
@@ -886,7 +853,6 @@ import (
 
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/clauses"
-	"github.com/dwethmar/gosqle/clauses/from"
 	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
@@ -898,9 +864,7 @@ func WhereIsNull(db *sql.DB) ([]User, string, error) {
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
 		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
-	).From(from.From{
-		Expr: from.Table("addresses"),
-	}).Where(predicates.IsNull{
+	).FromTable("users", nil).Where(predicates.IsNull{
 		Col: expressions.Column{Name: "phone"},
 	}).Write(sb)
 
@@ -940,7 +904,6 @@ import (
 
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/clauses"
-	"github.com/dwethmar/gosqle/clauses/from"
 	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
@@ -952,9 +915,7 @@ func WhereWrap(db *sql.DB) ([]User, string, error) {
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
 		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
-	).From(from.From{
-		Expr: from.Table("users"),
-	}).Where(
+	).FromTable("users", nil).Where(
 		predicates.Wrap{
 			Predicates: []predicates.Predicate{
 				predicates.Between{
@@ -1011,7 +972,6 @@ import (
 
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/clauses"
-	"github.com/dwethmar/gosqle/clauses/from"
 	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
@@ -1023,9 +983,7 @@ func WhereNOT(db *sql.DB) ([]User, string, error) {
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
 		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
-	).From(from.From{
-		Expr: from.Table("users"),
-	}).Where(predicates.Not{
+	).FromTable("users", nil).Where(predicates.Not{
 		Predicate: predicates.EQ{
 			Col:  expressions.Column{Name: "name"},
 			Expr: args.NewArgument("John"),
