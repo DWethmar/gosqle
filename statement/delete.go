@@ -54,16 +54,21 @@ func (d *Delete) Write(sw io.StringWriter) error {
 	return nil
 }
 
+// NewDeleteClauseWriter creates a new DeleteClauseWriter.
+func NewDeleteClauseWriter() ClauseWriter {
+	return ClauseWriter{
+		clauses:         map[clauses.ClauseType]clauses.Clause{},
+		order:           deleteClausesOrder,
+		ClauseSeparator: SpaceSeparator,
+	}
+}
+
 // NewDelete creates a new Delete statement.
 func NewDelete(
 	table string,
 ) *Delete {
 	return &Delete{
-		ClauseWriter: ClauseWriter{
-			clauses:         map[clauses.ClauseType]clauses.Clause{},
-			order:           deleteClausesOrder,
-			ClauseSeparator: SpaceSeparator,
-		},
-		table: table,
+		ClauseWriter: NewDeleteClauseWriter(),
+		table:        table,
 	}
 }

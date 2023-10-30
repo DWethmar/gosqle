@@ -99,15 +99,13 @@ func TestSelectable_Write(t *testing.T) {
 			}
 			if err := s.Write(tt.args.sw); (err != nil) != tt.wantErr {
 				t.Errorf("Selectable.Write() error = %v, wantErr %v", err, tt.wantErr)
-			} else {
-				if tt.checkString {
-					if sb, ok := tt.args.sw.(*strings.Builder); ok {
-						if got := sb.String(); got != tt.want {
-							t.Errorf("Selectable.Write() = %q, want %q", got, tt.want)
-						}
-					} else {
-						t.Errorf("expected string builder")
+			} else if tt.checkString {
+				if sb, ok := tt.args.sw.(*strings.Builder); ok {
+					if got := sb.String(); got != tt.want {
+						t.Errorf("Selectable.Write() = %q, want %q", got, tt.want)
 					}
+				} else {
+					t.Errorf("expected string builder")
 				}
 			}
 		})

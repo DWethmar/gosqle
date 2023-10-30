@@ -79,16 +79,21 @@ func (s *Select) Write(sw io.StringWriter) error {
 	return nil
 }
 
+// NewSelectClauseWriter creates a new ClauseWriter for select queries.
+func NewSelectClauseWriter() ClauseWriter {
+	return ClauseWriter{
+		clauses:         map[clauses.ClauseType]clauses.Clause{},
+		order:           selectClausesOrder,
+		ClauseSeparator: SpaceSeparator,
+	}
+}
+
 // NewSelectClause creates a new SelectClause.
 func NewSelect(
 	selectColumns []clauses.Selectable,
 ) *Select {
 	return &Select{
-		ClauseWriter: ClauseWriter{
-			clauses:         map[clauses.ClauseType]clauses.Clause{},
-			order:           selectClausesOrder,
-			ClauseSeparator: SpaceSeparator,
-		},
+		ClauseWriter:  NewSelectClauseWriter(),
 		selectColumns: selectColumns,
 	}
 }

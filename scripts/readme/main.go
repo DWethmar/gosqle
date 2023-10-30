@@ -8,6 +8,7 @@ import (
 	"github.com/dwethmar/gosqle"
 )
 
+// nolint: gosec
 func fetchGoFileContent(fileName string) (template.HTML, error) {
 	content, err := gosqle.GoExampleFiles.ReadFile(fileName)
 	return template.HTML(content), err

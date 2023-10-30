@@ -9,6 +9,7 @@ import (
 
 	"github.com/dwethmar/gosqle/clauses"
 	"github.com/dwethmar/gosqle/expressions"
+	"github.com/dwethmar/gosqle/functions"
 	"github.com/dwethmar/gosqle/mock"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
@@ -42,24 +43,24 @@ func TestWriteHaving(t *testing.T) {
 				sw: &strings.Builder{},
 				preds: []predicates.Predicate{
 					predicates.GT{
-						Col: &expressions.Count{
-							Expr: &expressions.Column{
+						Col: &functions.Count{
+							Col: &expressions.Column{
 								Name: "id",
 							},
 						},
 						Expr: postgres.NewArgument(13, 1),
 					},
 					predicates.LT{
-						Col: &expressions.Max{
-							Expr: &expressions.Column{
+						Col: &functions.Max{
+							Col: &expressions.Column{
 								Name: "kipsate",
 							},
 						},
 						Expr: postgres.NewArgument(9001, 2),
 					},
 					predicates.GTE{
-						Col: &expressions.Avg{
-							Expr: &expressions.Column{
+						Col: &functions.Avg{
+							Col: &expressions.Column{
 								Name: "saus",
 							},
 						},
@@ -125,8 +126,8 @@ func TestClause_Write(t *testing.T) {
 			fields: fields{
 				Predicates: []predicates.Predicate{
 					predicates.GT{
-						Col: &expressions.Count{
-							Expr: &expressions.Column{
+						Col: &functions.Count{
+							Col: &expressions.Column{
 								Name: "id",
 							},
 						},
@@ -144,8 +145,8 @@ func TestClause_Write(t *testing.T) {
 			fields: fields{
 				Predicates: []predicates.Predicate{
 					predicates.GT{
-						Col: &expressions.Count{
-							Expr: &expressions.Column{
+						Col: &functions.Count{
+							Col: &expressions.Column{
 								Name: "id",
 							},
 						},
@@ -182,7 +183,40 @@ func TestNew(t *testing.T) {
 		args args
 		want *Clause
 	}{
-		// TODO: Add test cases.
+		{
+			name: "should create a new clause",
+			args: args{
+				predicates: []predicates.Predicate{},
+			},
+			want: &Clause{
+				Predicates: []predicates.Predicate{},
+			},
+		},
+		{
+			name: "should create a new clause with predicates",
+			args: args{
+				predicates: []predicates.Predicate{
+					predicates.GT{
+						Col: &functions.Count{
+							Col: &expressions.Column{
+								Name: "id",
+							},
+						},
+					},
+				},
+			},
+			want: &Clause{
+				Predicates: []predicates.Predicate{
+					predicates.GT{
+						Col: &functions.Count{
+							Col: &expressions.Column{
+								Name: "id",
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

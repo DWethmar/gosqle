@@ -11,6 +11,19 @@ import (
 	_ "github.com/lib/pq"
 )
 
+func NewDB(dbURL string) (*sql.DB, error) {
+	db, err := sql.Open("postgres", dbURL)
+	if err != nil {
+		return nil, fmt.Errorf("error opening database: %v", err)
+	}
+
+	if err = db.Ping(); err != nil {
+		return nil, fmt.Errorf("error pinging database: %v", err)
+	}
+
+	return db, nil
+}
+
 func main() {
 	// Define the flag. The default value for the database URL is an empty string.
 	var dbURL string
@@ -22,17 +35,13 @@ func main() {
 		return
 	}
 
-	db, err := sql.Open("postgres", dbURL)
+	db, err := NewDB(dbURL)
 	if err != nil {
 		panic(err)
 	}
 
-	if err := db.Ping(); err != nil {
-		panic(err)
-	}
-
 	// truncate the tables
-	if err := truncate(db); err != nil {
+	if err = truncate(db); err != nil {
 		panic(err)
 	}
 
@@ -69,7 +78,7 @@ func main() {
 func truncate(db *sql.DB) error {
 	tx, err := db.Begin()
 	if err != nil {
-		return err
+		return fmt.Errorf("error beginning transaction: %v", err)
 	}
 
 	// truncate the address table
@@ -90,13 +99,17 @@ func truncate(db *sql.DB) error {
 		return fmt.Errorf("error truncating address_types table: %v", err)
 	}
 
-	return tx.Commit()
+	if err = tx.Commit(); err != nil {
+		return fmt.Errorf("error committing transaction: %v", err)
+	}
+
+	return nil
 }
 
 func readLines(path string) ([]string, error) {
 	file, err := os.Open(path)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error opening file: %v", err)
 	}
 	defer file.Close()
 
@@ -106,5 +119,9 @@ func readLines(path string) ([]string, error) {
 		lines = append(lines, scanner.Text())
 	}
 
-	return lines, scanner.Err()
+	if err = scanner.Err(); err != nil {
+		return nil, fmt.Errorf("error scanning file: %v", err)
+	}
+
+	return lines, nil
 }

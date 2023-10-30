@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"strings"
 
 	"github.com/dwethmar/gosqle"
@@ -12,7 +11,7 @@ import (
 )
 
 // WhereNE selects users where name is not equal to 'John'.
-func WhereNE(db *sql.DB) ([]User, string, error) {
+func WhereNE() ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
@@ -26,19 +25,5 @@ func WhereNE(db *sql.DB) ([]User, string, error) {
 		return nil, "", err
 	}
 
-	rows, err := db.Query(sb.String(), args.Args...)
-	if err != nil {
-		return nil, "", err
-	}
-
-	var users []User
-	for rows.Next() {
-		var user User
-		if err = rows.Scan(&user.ID); err != nil {
-			return nil, "", err
-		}
-		users = append(users, user)
-	}
-
-	return users, sb.String(), nil
+	return args.Args, sb.String(), nil
 }

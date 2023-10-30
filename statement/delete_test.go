@@ -97,7 +97,20 @@ func TestNewDelete(t *testing.T) {
 		args args
 		want *Delete
 	}{
-		// TODO: Add test cases.
+		{
+			name: "should create new Delete",
+			args: args{
+				table: "table",
+			},
+			want: &Delete{
+				ClauseWriter: ClauseWriter{
+					clauses:         map[clauses.ClauseType]clauses.Clause{},
+					order:           deleteClausesOrder,
+					ClauseSeparator: SpaceSeparator,
+				},
+				table: "table",
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

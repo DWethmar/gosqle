@@ -12,6 +12,7 @@ var (
 	_ expressions.Expression = &Argument{}
 )
 
+// Argument is a single argument for a mysql statement.
 type Argument struct {
 	V interface{}
 }

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"strings"
 
 	"github.com/dwethmar/gosqle"
@@ -11,38 +10,23 @@ import (
 	"github.com/dwethmar/gosqle/predicates"
 )
 
-// WhereIN selects users where name is in 'John', 'Jane' or 'Joe'.
-func WhereIN(db *sql.DB) ([]User, string, error) {
+// WhereIN selects users where name is in names.
+func WhereIN(names []string) ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
+	list := []expressions.Expression{}
+	for _, name := range names {
+		list = append(list, args.NewArgument(name))
+	}
 	err := gosqle.NewSelect(
 		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
-	).FromTable("users", nil).Where(predicates.In{
-		Col: expressions.Column{Name: "id"},
-		Expr: expressions.List{
-			args.NewArgument("John"),
-			args.NewArgument("Jane"),
-			args.NewArgument("Joe"),
-		},
-	}).Write(sb)
-
+	).FromTable("users", nil).
+		Where(predicates.In{
+			Col:  expressions.Column{Name: "id"},
+			Expr: expressions.List(list),
+		}).Write(sb)
 	if err != nil {
 		return nil, "", err
 	}
-
-	rows, err := db.Query(sb.String(), args.Args...)
-	if err != nil {
-		return nil, "", err
-	}
-
-	var users []User
-	for rows.Next() {
-		var user User
-		if err = rows.Scan(&user.ID); err != nil {
-			return nil, "", err
-		}
-		users = append(users, user)
-	}
-
-	return users, sb.String(), nil
+	return args.Args, sb.String(), nil
 }

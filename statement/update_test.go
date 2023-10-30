@@ -2,7 +2,6 @@ package statement
 
 import (
 	"io"
-	"reflect"
 	"strings"
 	"testing"
 )
@@ -32,9 +31,21 @@ func TestUpdate_Write(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
+		want    string
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "should write UPDATE",
+			fields: fields{
+				table:        "table",
+				ClauseWriter: NewUpdateClauseWriter(),
+			},
+			args: args{
+				sw: new(strings.Builder),
+			},
+			want:    "UPDATE table",
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -42,28 +53,17 @@ func TestUpdate_Write(t *testing.T) {
 				ClauseWriter: tt.fields.ClauseWriter,
 				table:        tt.fields.table,
 			}
+
 			if err := u.Write(tt.args.sw); (err != nil) != tt.wantErr {
 				t.Errorf("Update.Write() error = %v, wantErr %v", err, tt.wantErr)
 			}
-		})
-	}
-}
 
-func TestNewUpdate(t *testing.T) {
-	type args struct {
-		table string
-	}
-	tests := []struct {
-		name string
-		args args
-		want *Update
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := NewUpdate(tt.args.table); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewUpdate() = %v, want %v", got, tt.want)
+			if sb, ok := tt.args.sw.(*strings.Builder); ok {
+				if got := sb.String(); got != tt.want {
+					t.Errorf("Update.Write() = %v, want %v", got, tt.want)
+				}
+			} else if tt.want != "" {
+				t.Errorf("expected string builder")
 			}
 		})
 	}

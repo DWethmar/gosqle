@@ -49,15 +49,13 @@ func TestWrite(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := Write(tt.args.sw, tt.args.from); (err != nil) != tt.wantErr {
 				t.Errorf("Write() error = %v, wantErr %v", err, tt.wantErr)
-			} else {
-				if tt.want != "" {
-					if sb, ok := tt.args.sw.(*strings.Builder); ok {
-						if got := sb.String(); got != tt.want {
-							t.Errorf("Write() = %q, want %q", got, tt.want)
-						}
-					} else {
-						t.Errorf("expected string builder")
+			} else if tt.want != "" {
+				if sb, ok := tt.args.sw.(*strings.Builder); ok {
+					if got := sb.String(); got != tt.want {
+						t.Errorf("Write() = %q, want %q", got, tt.want)
 					}
+				} else {
+					t.Errorf("expected string builder")
 				}
 			}
 		})

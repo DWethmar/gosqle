@@ -1,0 +1,71 @@
+run:
+  # Timeout for analysis, e.g. 30s, 5m.
+  # Default: 1m
+  timeout: 3m
+
+linters-settings:
+  errcheck:
+    check-type-assertions: true
+  exhaustive:
+    check:
+      - switch
+      - map
+  govet:
+    check-shadowing: true
+  gocyclo:
+    min-complexity: 10
+  dupl:
+    threshold: 100
+  goconst:
+    min-len: 2
+    min-occurrences: 2
+  misspell:
+    locale: US
+  interfacebloat:
+    # The maximum number of methods allowed for an interface.
+    # Default: 10
+    max: 5
+  goimports:
+    # A comma-separated list of prefixes, which, if set, checks import paths
+    # with the given prefixes are grouped after 3rd-party packages.
+    # Default: ""
+    local-prefixes: github.com/dwethmar/atemi
+  whitespace:
+    # Enforces newlines (or comments) after every multi-line if statement.
+    # Default: false
+    multi-if: true
+    # Enforces newlines (or comments) after every multi-line function signature.
+    # Default: false
+    multi-func: true
+    
+linters:
+  enable:
+    - misspell
+    - errcheck
+    - govet
+    - unused
+    - ineffassign
+    - goconst
+    - gofmt
+    - gosimple
+    - gosec
+    - bodyclose
+    - staticcheck
+    - gocyclo
+    - misspell
+    - unparam
+    - nakedret
+    - prealloc
+    - exportloopref
+    - gocritic
+    - goimports
+    - revive
+    - gosec
+    - gomnd
+    - decorder # checks declaration order and count of types, constants, variables and functions
+    # - exhaustruct # [highly recommend to enable] checks if all structure fields are initialized
+    - godox # detects FIXME, TODO and other comment keywords
+    - interfacebloat # checks the number of methods inside an interface
+    - ireturn # accept interfaces, return concrete types
+    - prealloc # [premature optimization, but can be used in some cases] finds slice declarations that could potentially be preallocated
+    - wrapcheck # checks that errors returned from external packages are wrapped

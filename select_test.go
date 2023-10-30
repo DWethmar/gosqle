@@ -10,6 +10,7 @@ import (
 	"github.com/dwethmar/gosqle/clauses/join"
 	"github.com/dwethmar/gosqle/clauses/orderby"
 	"github.com/dwethmar/gosqle/expressions"
+	"github.com/dwethmar/gosqle/functions"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
 )
@@ -56,7 +57,7 @@ func TestSelect_ToSQL(t *testing.T) {
 				join.Options{
 					Type: join.LeftJoin,
 					From: "companies",
-					Match: &join.JoinOn{
+					Match: &join.On{
 						Predicates: []predicates.Predicate{
 							predicates.EQ{
 								Col:  expressions.Column{Name: "id", From: "companies"},
@@ -152,11 +153,11 @@ func TestSelect_ToSQL(t *testing.T) {
 				},
 			).Having(
 				predicates.GT{
-					Col:  expressions.NewMax(&expressions.Column{Name: "id"}),
+					Col:  functions.NewMax(&expressions.Column{Name: "id"}),
 					Expr: postgres.NewArgument(12, 1),
 				},
 				predicates.LT{
-					Col:   expressions.NewMax(&expressions.Column{Name: "id"}),
+					Col:   functions.NewMax(&expressions.Column{Name: "id"}),
 					Expr:  postgres.NewArgument(12, 2),
 					Logic: predicates.OR,
 				},

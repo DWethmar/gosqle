@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"strings"
 
 	"github.com/dwethmar/gosqle"
@@ -12,33 +11,18 @@ import (
 )
 
 // WhereEQ selects users where name is equal to 'John'.
-func WhereEQ(db *sql.DB) ([]User, string, error) {
+func WhereEQ(username string) ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
 		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
-	).FromTable("users", nil).Where(predicates.EQ{
-		Col:  expressions.Column{Name: "name"},
-		Expr: args.NewArgument("John"),
-	}).Write(sb)
-
+	).FromTable("users", nil).
+		Where(predicates.EQ{
+			Col:  expressions.Column{Name: "name"},
+			Expr: args.NewArgument(username),
+		}).Write(sb)
 	if err != nil {
 		return nil, "", err
 	}
-
-	rows, err := db.Query(sb.String(), args.Args...)
-	if err != nil {
-		return nil, "", err
-	}
-
-	var users []User
-	for rows.Next() {
-		var user User
-		if err = rows.Scan(&user.ID); err != nil {
-			return nil, "", err
-		}
-		users = append(users, user)
-	}
-
-	return users, sb.String(), nil
+	return args.Args, sb.String(), nil
 }

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"strings"
 	"time"
@@ -11,7 +10,7 @@ import (
 )
 
 // InsertUser inserts a user.
-func InsertUser(db *sql.DB) (string, error) {
+func InsertUser() ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewInsert("users", "name", "email").Values(
@@ -20,12 +19,8 @@ func InsertUser(db *sql.DB) (string, error) {
 	).Write(sb)
 
 	if err != nil {
-		return "", err
+		return nil, "", fmt.Errorf("error writing query: %v", err)
 	}
 
-	if _, err = db.Exec(sb.String(), args.Args...); err != nil {
-		return "", err
-	}
-
-	return sb.String(), nil
+	return args.Args, sb.String(), nil
 }

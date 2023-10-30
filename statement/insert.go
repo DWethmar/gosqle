@@ -84,15 +84,20 @@ func (i *Insert) Write(sw io.StringWriter) error {
 	return nil
 }
 
+// NewInsertClauseWriter creates a new ClauseWriter for insert statements.
+func NewInsertClauseWriter() ClauseWriter {
+	return ClauseWriter{
+		clauses:         map[clauses.ClauseType]clauses.Clause{},
+		order:           insertClausesOrder,
+		ClauseSeparator: SpaceSeparator,
+	}
+}
+
 // NewSelectClause creates a new SelectClause.
 func NewInsert(table string, columns []string) *Insert {
 	return &Insert{
-		ClauseWriter: ClauseWriter{
-			clauses:         map[clauses.ClauseType]clauses.Clause{},
-			order:           insertClausesOrder,
-			ClauseSeparator: SpaceSeparator,
-		},
-		table:   table,
-		columns: columns,
+		ClauseWriter: NewInsertClauseWriter(),
+		table:        table,
+		columns:      columns,
 	}
 }

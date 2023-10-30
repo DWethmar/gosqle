@@ -1,7 +1,6 @@
 package gosqle
 
 import (
-	"reflect"
 	"strings"
 	"testing"
 
@@ -20,10 +19,10 @@ func TestDelete_Write(t *testing.T) {
 		{
 			name: "delete from",
 			delete: NewDelete("users").Where(predicates.EQ{
-				Col:  expressions.Column{Name: "id"},
+				Col:  expressions.Column{Name: "id", From: "users"},
 				Expr: mysql.NewArgument(1),
 			}),
-			want: "DELETE FROM users WHERE id = ?;",
+			want: "DELETE FROM users WHERE users.id = ?;",
 		},
 	}
 	for _, tt := range tests {
@@ -38,26 +37,6 @@ func TestDelete_Write(t *testing.T) {
 
 			if query := sb.String(); query != tt.want {
 				t.Errorf("Delete.Write() query = %q, wantQuery %q", query, tt.want)
-			}
-		})
-	}
-}
-
-func TestNewDelete(t *testing.T) {
-	type args struct {
-		table string
-	}
-	tests := []struct {
-		name string
-		args args
-		want *Update
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := NewDelete(tt.args.table); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewDelete() = %v, want %v", got, tt.want)
 			}
 		})
 	}

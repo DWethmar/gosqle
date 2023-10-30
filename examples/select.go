@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"strings"
 
 	"github.com/dwethmar/gosqle"
@@ -11,7 +10,7 @@ import (
 )
 
 // SelectUsers selects users.
-func SelectUsers(db *sql.DB) ([]User, string, error) {
+func SelectUsers() ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
@@ -19,24 +18,11 @@ func SelectUsers(db *sql.DB) ([]User, string, error) {
 		clauses.Selectable{Expr: expressions.Column{Name: "name"}},
 		clauses.Selectable{Expr: expressions.Column{Name: "email"}},
 	).
-		FromTable("addresses", nil).
+		FromTable("users", nil).
 		Limit(args.NewArgument(10)).
 		Write(sb)
 	if err != nil {
 		return nil, "", err
 	}
-	rows, err := db.Query(sb.String(), args.Args...)
-	if err != nil {
-		return nil, "", err
-	}
-	var users []User
-	for rows.Next() {
-		var user User
-		err = rows.Scan(&user.ID, &user.Name, &user.Email)
-		if err != nil {
-			return nil, "", err
-		}
-		users = append(users, user)
-	}
-	return users, sb.String(), nil
+	return args.Args, sb.String(), nil
 }
