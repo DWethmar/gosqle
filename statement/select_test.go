@@ -98,7 +98,24 @@ func TestNewSelect(t *testing.T) {
 		args args
 		want *Select
 	}{
-		// TODO: Add test cases.
+		{
+			name: "should create new Select",
+			args: args{
+				selectColumns: []clauses.Selectable{{
+					Expr: expressions.Column{Name: "column1"},
+				}},
+			},
+			want: &Select{
+				ClauseWriter: ClauseWriter{
+					clauses:         map[clauses.ClauseType]clauses.Clause{},
+					order:           selectClausesOrder,
+					ClauseSeparator: SpaceSeparator,
+				},
+				selectColumns: []clauses.Selectable{{
+					Expr: expressions.Column{Name: "column1"},
+				}},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

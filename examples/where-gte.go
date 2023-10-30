@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"strings"
 
 	"github.com/dwethmar/gosqle"
@@ -12,33 +11,18 @@ import (
 )
 
 // WhereGTE selects users where id is greater than or equal to 10
-func WhereGTE(db *sql.DB) ([]User, string, error) {
+func WhereGTE(id int) ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
 		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
-	).FromTable("users", nil).Where(predicates.GTE{
-		Col:  expressions.Column{Name: "id"},
-		Expr: args.NewArgument(10),
-	}).Write(sb)
-
+	).FromTable("users", nil).
+		Where(predicates.GTE{
+			Col:  expressions.Column{Name: "id"},
+			Expr: args.NewArgument(id),
+		}).Write(sb)
 	if err != nil {
 		return nil, "", err
 	}
-
-	rows, err := db.Query(sb.String(), args.Args...)
-	if err != nil {
-		return nil, "", err
-	}
-
-	var users []User
-	for rows.Next() {
-		var user User
-		if err = rows.Scan(&user.ID); err != nil {
-			return nil, "", err
-		}
-		users = append(users, user)
-	}
-
-	return users, sb.String(), nil
+	return args.Args, sb.String(), nil
 }

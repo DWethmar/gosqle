@@ -98,7 +98,22 @@ func TestNewInsert(t *testing.T) {
 		args args
 		want *Insert
 	}{
-		// TODO: Add test cases.
+		{
+			name: "should create new Insert",
+			args: args{
+				table:   "table",
+				columns: []string{"column1", "column2"},
+			},
+			want: &Insert{
+				ClauseWriter: ClauseWriter{
+					clauses:         map[clauses.ClauseType]clauses.Clause{},
+					order:           insertClausesOrder,
+					ClauseSeparator: SpaceSeparator,
+				},
+				table:   "table",
+				columns: []string{"column1", "column2"},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

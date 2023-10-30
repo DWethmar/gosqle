@@ -17,9 +17,9 @@ import (
 func TestWriteJoin(t *testing.T) {
 	type args struct {
 		sb       *strings.Builder
-		joinType JoinType
+		joinType Type
 		from     string
-		Match    JoinMatcher
+		Match    Matcher
 	}
 	tests := []struct {
 		name    string
@@ -33,7 +33,7 @@ func TestWriteJoin(t *testing.T) {
 				sb:       new(strings.Builder),
 				joinType: InnerJoin,
 				from:     "table",
-				Match: &JoinOn{
+				Match: &On{
 					Predicates: []predicates.Predicate{
 						predicates.EQ{
 							Col:  expressions.Column{Name: "field_a", From: "table"},
@@ -55,7 +55,7 @@ func TestWriteJoin(t *testing.T) {
 				sb:       new(strings.Builder),
 				joinType: LeftJoin,
 				from:     "table",
-				Match: &JoinOn{
+				Match: &On{
 					Predicates: []predicates.Predicate{
 						predicates.EQ{
 							Col:  expressions.Column{Name: "field_a", From: "table"},
@@ -77,7 +77,7 @@ func TestWriteJoin(t *testing.T) {
 				sb:       new(strings.Builder),
 				joinType: RightJoin,
 				from:     "table",
-				Match: &JoinOn{
+				Match: &On{
 					Predicates: []predicates.Predicate{
 						predicates.EQ{
 							Col:  expressions.Column{Name: "field_a", From: "table"},
@@ -108,7 +108,7 @@ func TestWriteJoin(t *testing.T) {
 				sb:       new(strings.Builder),
 				joinType: FullJoin,
 				from:     "table",
-				Match: &JoinOn{
+				Match: &On{
 					Predicates: []predicates.Predicate{
 						predicates.EQ{
 							Col:  expressions.Column{Name: "field_a", From: "table"},
@@ -169,7 +169,7 @@ func TestJoin_Write(t *testing.T) {
 					{
 						Type: InnerJoin,
 						From: "table",
-						Match: &JoinOn{
+						Match: &On{
 							Predicates: []predicates.Predicate{
 								predicates.EQ{
 									Col:  expressions.Column{Name: "field_a", From: "table"},
@@ -191,7 +191,7 @@ func TestJoin_Write(t *testing.T) {
 					{
 						Type: InnerJoin,
 						From: "table",
-						Match: &JoinUsing{
+						Match: &Using{
 							Uses: []string{"field_a", "field_b"},
 						},
 					},
@@ -208,7 +208,7 @@ func TestJoin_Write(t *testing.T) {
 					{
 						Type: InnerJoin,
 						From: "table",
-						Match: &JoinOn{
+						Match: &On{
 							Predicates: []predicates.Predicate{
 								predicates.EQ{
 									Col:  expressions.Column{Name: "field_a", From: "table"},
@@ -234,7 +234,7 @@ func TestJoin_Write(t *testing.T) {
 					{
 						Type: InnerJoin,
 						From: "table",
-						Match: &JoinOn{
+						Match: &On{
 							Predicates: []predicates.Predicate{
 								predicates.EQ{
 									Col:  expressions.Column{Name: "field_a", From: "table"},
@@ -246,7 +246,7 @@ func TestJoin_Write(t *testing.T) {
 					{
 						Type: LeftJoin,
 						From: "table",
-						Match: &JoinOn{
+						Match: &On{
 							Predicates: []predicates.Predicate{
 								predicates.EQ{
 									Col:  expressions.Column{Name: "field_a", From: "table"},
@@ -295,7 +295,7 @@ func TestNewJoin(t *testing.T) {
 					{
 						Type: InnerJoin,
 						From: "table",
-						Match: &JoinOn{
+						Match: &On{
 							Predicates: []predicates.Predicate{
 								predicates.EQ{
 									Col:  expressions.Column{Name: "field_a", From: "table"},
@@ -311,7 +311,7 @@ func TestNewJoin(t *testing.T) {
 					{
 						Type: InnerJoin,
 						From: "table",
-						Match: &JoinOn{
+						Match: &On{
 							Predicates: []predicates.Predicate{
 								predicates.EQ{
 									Col:  expressions.Column{Name: "field_a", From: "table"},
@@ -400,7 +400,7 @@ func TestJoinOn_Write(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			j := &JoinOn{
+			j := &On{
 				Predicates: tt.fields.Predicates,
 			}
 			if err := j.Write(tt.args.sw); (err != nil) != tt.wantErr {
@@ -422,7 +422,7 @@ func TestJoinOn_Write(t *testing.T) {
 
 func TestJoinUsing_t(t *testing.T) {
 	t.Run("should do nothing", func(t *testing.T) {
-		j := &JoinUsing{}
+		j := &Using{}
 		j.t()
 	})
 }
@@ -471,7 +471,7 @@ func TestJoinUsing_Write(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			j := &JoinUsing{
+			j := &Using{
 				Uses: tt.fields.Uses,
 			}
 			if err := j.Write(tt.args.sw); (err != nil) != tt.wantErr {

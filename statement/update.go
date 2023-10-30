@@ -60,16 +60,21 @@ func (u *Update) Write(sw io.StringWriter) error {
 	return nil
 }
 
+// NewUpdateClauseWriter creates a new ClauseWriter for update statements.
+func NewUpdateClauseWriter() ClauseWriter {
+	return ClauseWriter{
+		clauses:         map[clauses.ClauseType]clauses.Clause{},
+		order:           updateClausesOrder,
+		ClauseSeparator: SpaceSeparator,
+	}
+}
+
 // NewUpdate creates a new update statement.
 func NewUpdate(
 	table string,
 ) *Update {
 	return &Update{
-		ClauseWriter: ClauseWriter{
-			clauses:         map[clauses.ClauseType]clauses.Clause{},
-			order:           updateClausesOrder,
-			ClauseSeparator: SpaceSeparator,
-		},
-		table: table,
+		ClauseWriter: NewUpdateClauseWriter(),
+		table:        table,
 	}
 }

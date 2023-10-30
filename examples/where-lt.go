@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"strings"
 
 	"github.com/dwethmar/gosqle"
@@ -12,7 +11,7 @@ import (
 )
 
 // WhereLT selects users where id is less than 10
-func WhereLT(db *sql.DB) ([]User, string, error) {
+func WhereLT() ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
@@ -21,24 +20,8 @@ func WhereLT(db *sql.DB) ([]User, string, error) {
 		Col:  expressions.Column{Name: "id"},
 		Expr: args.NewArgument(10),
 	}).Write(sb)
-
 	if err != nil {
 		return nil, "", err
 	}
-
-	rows, err := db.Query(sb.String(), args.Args...)
-	if err != nil {
-		return nil, "", err
-	}
-
-	var users []User
-	for rows.Next() {
-		var user User
-		if err = rows.Scan(&user.ID); err != nil {
-			return nil, "", err
-		}
-		users = append(users, user)
-	}
-
-	return users, sb.String(), nil
+	return args.Args, sb.String(), nil
 }

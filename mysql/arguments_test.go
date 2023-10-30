@@ -73,10 +73,8 @@ func TestArgument_Write(t *testing.T) {
 			}
 			if err := s.Write(tt.args.sb); (err != nil) != tt.wantErr {
 				t.Errorf("Argument.Write() error = %v, wantErr %v", err, tt.wantErr)
-			} else {
-				if tt.want != tt.args.sb.String() {
-					t.Errorf("Argument.Write() got = %v, want %v", tt.args.sb.String(), tt.want)
-				}
+			} else if tt.want != tt.args.sb.String() {
+				t.Errorf("Argument.Write() got = %v, want %v", tt.args.sb.String(), tt.want)
 			}
 		})
 	}
@@ -91,7 +89,15 @@ func TestNewArgument(t *testing.T) {
 		args args
 		want *Argument
 	}{
-		// TODO: Add test cases.
+		{
+			name: "should create new Argument",
+			args: args{
+				value: "test",
+			},
+			want: &Argument{
+				V: "test",
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

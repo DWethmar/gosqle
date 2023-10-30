@@ -11,39 +11,40 @@ import (
 	"github.com/dwethmar/gosqle/util"
 )
 
-type JoinType int
+type Type int
 
 const (
-	InnerJoin JoinType = iota
+	InnerJoin Type = iota
 	LeftJoin
 	RightJoin
 	FullJoin
 )
 
-var joinTypes = map[JoinType]string{
+var types = map[Type]string{
 	InnerJoin: "INNER JOIN",
 	LeftJoin:  "LEFT JOIN",
 	RightJoin: "RIGHT JOIN",
 	FullJoin:  "FULL JOIN",
 }
 
-// JoinMatcher is a join clause.
-type JoinMatcher interface {
+// Matcher is the interface that wraps the matching part of a JOIN clause.
+// It can be either an On or Using clause.
+type Matcher interface {
 	expressions.Expression
 }
 
-var _ JoinMatcher = (*JoinOn)(nil)
+var _ Matcher = (*On)(nil)
 
-// JoinOn is a join clause that uses a list of predicates to match.
+// On is a join clause that uses a list of predicates to match.
 //
 // Example:
 //
 //	LEFT JOIN table ON table.field = other_table.field AND table.field2 = other_table.field2
-type JoinOn struct {
+type On struct {
 	Predicates []predicates.Predicate
 }
 
-func (j *JoinOn) Write(sw io.StringWriter) error {
+func (j *On) Write(sw io.StringWriter) error {
 	if _, err := sw.WriteString("ON "); err != nil {
 		return fmt.Errorf("failed to write JOIN: %w", err)
 	}
@@ -55,19 +56,19 @@ func (j *JoinOn) Write(sw io.StringWriter) error {
 	return nil
 }
 
-var _ JoinMatcher = (*JoinUsing)(nil)
+var _ Matcher = (*Using)(nil)
 
-// JoinUsing is a join clause that uses a list of columns to match.
+// Using is a join clause that uses a list of columns to match.
 //
 // Example:
 //
 //	LEFT JOIN table USING (field, field2)
-type JoinUsing struct {
+type Using struct {
 	Uses []string
 }
 
-func (j *JoinUsing) t() {}
-func (j *JoinUsing) Write(sw io.StringWriter) error {
+func (j *Using) t() {}
+func (j *Using) Write(sw io.StringWriter) error {
 	if err := util.WriteStrings(sw, "USING (", strings.Join(j.Uses, ", "), ")"); err != nil {
 		return fmt.Errorf("failed to write JOIN: %w", err)
 	}
@@ -81,8 +82,8 @@ func (j *JoinUsing) Write(sw io.StringWriter) error {
 //
 //	LEFT JOIN table ON table.field = other_table.field AND table.field2 = other_table.field2
 //	LEFT JOIN table USING (field, field2)
-func Write(sw io.StringWriter, joinType JoinType, from string, match JoinMatcher) error {
-	if _, err := sw.WriteString(joinTypes[joinType]); err != nil {
+func Write(sw io.StringWriter, joinType Type, from string, match Matcher) error {
+	if _, err := sw.WriteString(types[joinType]); err != nil {
 		return fmt.Errorf("failed to write JOIN: %w", err)
 	}
 
@@ -98,9 +99,9 @@ func Write(sw io.StringWriter, joinType JoinType, from string, match JoinMatcher
 }
 
 type Options struct {
-	Type  JoinType
+	Type  Type
 	From  string
-	Match JoinMatcher // JoinOn or JoinUsing
+	Match Matcher // On or Using
 }
 
 // Clause represents a JOIN clause.

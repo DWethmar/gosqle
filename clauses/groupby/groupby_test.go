@@ -29,7 +29,7 @@ func TestWriteGroupByColumns(t *testing.T) {
 			args: args{
 				sw: &strings.Builder{},
 				columns: []*expressions.Column{
-					&expressions.Column{Name: "id", From: "users"},
+					{Name: "id", From: "users"},
 				},
 			},
 			checkString: true,
@@ -41,8 +41,8 @@ func TestWriteGroupByColumns(t *testing.T) {
 			args: args{
 				sw: &strings.Builder{},
 				columns: []*expressions.Column{
-					&expressions.Column{Name: "id", From: "users"},
-					&expressions.Column{Name: "email", From: "users"},
+					{Name: "id", From: "users"},
+					{Name: "email", From: "users"},
 				},
 			},
 			checkString: true,
@@ -56,7 +56,7 @@ func TestWriteGroupByColumns(t *testing.T) {
 					return 0, errors.New("some error")
 				}),
 				columns: []*expressions.Column{
-					&expressions.Column{Name: "id", From: "users"},
+					{Name: "id", From: "users"},
 				},
 			},
 			checkString: false,

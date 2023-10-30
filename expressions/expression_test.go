@@ -1,6 +1,7 @@
 package expressions
 
 import (
+	"fmt"
 	"io"
 	"strings"
 	"testing"
@@ -11,8 +12,11 @@ type testExpression struct {
 }
 
 func (e testExpression) Write(writer io.StringWriter) error {
-	_, err := writer.WriteString(e.V)
-	return err
+	if _, err := writer.WriteString(e.V); err != nil {
+		return fmt.Errorf("error writing test expression: %v", err)
+	}
+
+	return nil
 }
 
 func TestList_Write(t *testing.T) {

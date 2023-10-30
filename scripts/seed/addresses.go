@@ -38,7 +38,7 @@ func GetAddressTypes(txn *sql.Tx) ([]AddressType, error) {
 	}
 	defer rows.Close()
 
-	var addressTypes []AddressType
+	var types []AddressType
 	for rows.Next() {
 		var addressType AddressType
 		err := rows.Scan(&addressType.ID, &addressType.Name)
@@ -46,27 +46,13 @@ func GetAddressTypes(txn *sql.Tx) ([]AddressType, error) {
 			return nil, fmt.Errorf("error scanning address_types: %w", err)
 		}
 
-		addressTypes = append(addressTypes, addressType)
+		types = append(types, addressType)
 	}
 
-	return addressTypes, nil
+	return types, nil
 }
 
-func seedAddresses(txn *sql.Tx) error {
-	addressTypes, err := GetAddressTypes(txn)
-	if err != nil {
-		return fmt.Errorf("error getting address types: %w", err)
-	}
-
-	if txn == nil {
-		return fmt.Errorf("transaction is nil")
-	}
-
-	users, err := getUsers(txn)
-	if err != nil {
-		return fmt.Errorf("error getting users: %w", err)
-	}
-
+func newAddressStmt(txn *sql.Tx) (*sql.Stmt, error) {
 	stmt, err := txn.Prepare(pq.CopyIn(
 		"addresses",
 		"user_id",
@@ -81,13 +67,38 @@ func seedAddresses(txn *sql.Tx) error {
 		"phone",
 		"address_type_id",
 	))
+
 	if err != nil {
-		return fmt.Errorf("error preparing statement: %w", err)
+		return nil, fmt.Errorf("error preparing statement: %w", err)
+	}
+
+	return stmt, nil
+}
+
+// nolint:gocyclo
+func seedAddresses(txn *sql.Tx) error {
+	if txn == nil {
+		return fmt.Errorf("transaction is nil")
+	}
+
+	types, err := GetAddressTypes(txn)
+	if err != nil {
+		return fmt.Errorf("error getting address types: %w", err)
+	}
+
+	users, err := getUsers(txn)
+	if err != nil {
+		return fmt.Errorf("error getting users: %w", err)
+	}
+
+	stmt, err := newAddressStmt(txn)
+	if err != nil {
+		return err
 	}
 
 	for i, a := range addresses {
 		var addressTypeID int
-		for _, t := range addressTypes {
+		for _, t := range types {
 			if t.Name == a.Type {
 				addressTypeID = t.ID
 				break
@@ -119,8 +130,7 @@ func seedAddresses(txn *sql.Tx) error {
 		}
 	}
 
-	err = stmt.Close()
-	if err != nil {
+	if err = stmt.Close(); err != nil {
 		return fmt.Errorf("error closing statement: %w", err)
 	}
 
