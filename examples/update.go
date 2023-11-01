@@ -14,7 +14,7 @@ import (
 )
 
 // UpdateUser updates a user.
-func UpdateUser() (string, error) {
+func UpdateUser() ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewUpdate("users").Set(set.Change{
@@ -23,11 +23,13 @@ func UpdateUser() (string, error) {
 	}).Where(
 		logic.And(predicates.EQ(
 			expressions.Column{Name: "id"},
-			args.NewArgument(1),
+			args.NewArgument(193),
 		)),
 	).Write(sb)
+
 	if err != nil {
-		return "", err
+		return nil, "", err
 	}
-	return sb.String(), nil
+
+	return args.Values, sb.String(), nil
 }
