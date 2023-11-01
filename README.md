@@ -60,7 +60,7 @@ import (
 	"strings"
 
 	"github.com/dwethmar/gosqle"
-	"github.com/dwethmar/gosqle/clauses"
+	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/postgres"
 )
@@ -70,9 +70,9 @@ func SelectUsers() ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
-		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
-		clauses.Selectable{Expr: expressions.Column{Name: "name"}},
-		clauses.Selectable{Expr: expressions.Column{Name: "email"}},
+		alias.Alias{Expr: expressions.Column{Name: "id"}},
+		alias.Alias{Expr: expressions.Column{Name: "name"}},
+		alias.Alias{Expr: expressions.Column{Name: "email"}},
 	).
 		FromTable("users", nil).
 		Limit(args.NewArgument(10)).
@@ -99,7 +99,7 @@ import (
 	"strings"
 
 	"github.com/dwethmar/gosqle"
-	"github.com/dwethmar/gosqle/clauses"
+	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/clauses/groupby"
 	"github.com/dwethmar/gosqle/clauses/orderby"
 	"github.com/dwethmar/gosqle/expressions"
@@ -110,10 +110,10 @@ import (
 func SelectAmountOfAddressesPerCountry() (string, error) {
 	sb := new(strings.Builder)
 	err := gosqle.NewSelect(
-		clauses.Selectable{
+		alias.Alias{
 			Expr: &expressions.Column{Name: "country"},
 		},
-		clauses.Selectable{
+		alias.Alias{
 			Expr: functions.NewCount(&expressions.Column{Name: "id"}),
 			As:   "address_count",
 		},
@@ -153,8 +153,7 @@ import (
 	"strings"
 
 	"github.com/dwethmar/gosqle"
-	"github.com/dwethmar/gosqle/clauses"
-	"github.com/dwethmar/gosqle/clauses/from"
+	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
@@ -165,22 +164,22 @@ func PeopleOfAmsterdam() ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
-		clauses.Selectable{Expr: expressions.Column{Name: "name"}},
+		alias.Alias{Expr: expressions.Column{Name: "name"}},
 	).FromTable("users", nil).
 		Where(predicates.In{
 			Col: expressions.Column{Name: "id"},
 			Expr: gosqle.NewSelect(
-				clauses.Selectable{Expr: expressions.Column{Name: "user_id"}},
-			).From(
-				from.NewFrom("addresses", ""),
-			).Where(predicates.EQ{
+				alias.Alias{Expr: expressions.Column{Name: "user_id"}},
+			).FromTable("addresses", nil).Where(predicates.EQ{
 				Col:  expressions.Column{Name: "city"},
 				Expr: args.NewArgument("Amsterdam"),
 			}).Statement, // <- This is the subquery, so without semicolon.
 		}).Write(sb)
+
 	if err != nil {
 		return nil, "", fmt.Errorf("error writing query: %v", err)
 	}
+
 	return args.Args, sb.String(), nil
 }
 
@@ -310,7 +309,7 @@ import (
 	"strings"
 
 	"github.com/dwethmar/gosqle"
-	"github.com/dwethmar/gosqle/clauses"
+	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
@@ -321,7 +320,7 @@ func WhereEQ(username string) ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
-		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
+		alias.Alias{Expr: expressions.Column{Name: "id"}},
 	).FromTable("users", nil).
 		Where(predicates.EQ{
 			Col:  expressions.Column{Name: "name"},
@@ -346,7 +345,7 @@ import (
 	"strings"
 
 	"github.com/dwethmar/gosqle"
-	"github.com/dwethmar/gosqle/clauses"
+	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
@@ -357,7 +356,7 @@ func WhereNE() ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
-		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
+		alias.Alias{Expr: expressions.Column{Name: "id"}},
 	).FromTable("users", nil).Where(predicates.NE{
 		Col:  expressions.Column{Name: "name"},
 		Expr: args.NewArgument("John"),
@@ -383,7 +382,7 @@ import (
 	"strings"
 
 	"github.com/dwethmar/gosqle"
-	"github.com/dwethmar/gosqle/clauses"
+	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
@@ -394,7 +393,7 @@ func WhereGT(id int) ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
-		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
+		alias.Alias{Expr: expressions.Column{Name: "id"}},
 	).FromTable("users", nil).
 		Where(predicates.GT{
 			Col:  expressions.Column{Name: "id"},
@@ -419,7 +418,7 @@ import (
 	"strings"
 
 	"github.com/dwethmar/gosqle"
-	"github.com/dwethmar/gosqle/clauses"
+	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
@@ -430,7 +429,7 @@ func WhereGTE(id int) ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
-		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
+		alias.Alias{Expr: expressions.Column{Name: "id"}},
 	).FromTable("users", nil).
 		Where(predicates.GTE{
 			Col:  expressions.Column{Name: "id"},
@@ -455,7 +454,7 @@ import (
 	"strings"
 
 	"github.com/dwethmar/gosqle"
-	"github.com/dwethmar/gosqle/clauses"
+	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
@@ -466,7 +465,7 @@ func WhereLT() ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
-		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
+		alias.Alias{Expr: expressions.Column{Name: "id"}},
 	).FromTable("users", nil).Where(predicates.LT{
 		Col:  expressions.Column{Name: "id"},
 		Expr: args.NewArgument(10),
@@ -490,7 +489,7 @@ import (
 	"strings"
 
 	"github.com/dwethmar/gosqle"
-	"github.com/dwethmar/gosqle/clauses"
+	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
@@ -501,7 +500,7 @@ func WhereLTE() ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
-		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
+		alias.Alias{Expr: expressions.Column{Name: "id"}},
 	).FromTable("users", nil).Where(predicates.LT{
 		Col:  expressions.Column{Name: "id"},
 		Expr: args.NewArgument(10),
@@ -527,7 +526,7 @@ import (
 	"strings"
 
 	"github.com/dwethmar/gosqle"
-	"github.com/dwethmar/gosqle/clauses"
+	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
@@ -538,7 +537,7 @@ func WhereLike() ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
-		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
+		alias.Alias{Expr: expressions.Column{Name: "id"}},
 	).FromTable("users", nil).
 		Where(predicates.Like{
 			Col:  expressions.Column{Name: "name"},
@@ -563,7 +562,7 @@ import (
 	"strings"
 
 	"github.com/dwethmar/gosqle"
-	"github.com/dwethmar/gosqle/clauses"
+	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
@@ -578,7 +577,7 @@ func WhereIN(names []string) ([]interface{}, string, error) {
 		list = append(list, args.NewArgument(name))
 	}
 	err := gosqle.NewSelect(
-		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
+		alias.Alias{Expr: expressions.Column{Name: "id"}},
 	).FromTable("users", nil).
 		Where(predicates.In{
 			Col:  expressions.Column{Name: "id"},
@@ -603,7 +602,7 @@ import (
 	"strings"
 
 	"github.com/dwethmar/gosqle"
-	"github.com/dwethmar/gosqle/clauses"
+	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
@@ -614,7 +613,7 @@ func WhereBetween(low, high int) ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
-		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
+		alias.Alias{Expr: expressions.Column{Name: "id"}},
 	).FromTable("users", nil).
 		Where(predicates.Between{
 			Col:  expressions.Column{Name: "id"},
@@ -640,7 +639,7 @@ import (
 	"strings"
 
 	"github.com/dwethmar/gosqle"
-	"github.com/dwethmar/gosqle/clauses"
+	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/predicates"
 )
@@ -649,7 +648,7 @@ import (
 func WhereIsNull() (string, error) {
 	sb := new(strings.Builder)
 	err := gosqle.NewSelect(
-		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
+		alias.Alias{Expr: expressions.Column{Name: "id"}},
 	).FromTable("users", nil).
 		Where(predicates.IsNull{
 			Col: expressions.Column{Name: "phone"},
@@ -674,7 +673,7 @@ import (
 	"strings"
 
 	"github.com/dwethmar/gosqle"
-	"github.com/dwethmar/gosqle/clauses"
+	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
@@ -685,7 +684,7 @@ func WhereWrap(db *sql.DB) ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
-		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
+		alias.Alias{Expr: expressions.Column{Name: "id"}},
 	).FromTable("users", nil).
 		Where(
 			predicates.Wrap{
@@ -730,7 +729,7 @@ import (
 	"strings"
 
 	"github.com/dwethmar/gosqle"
-	"github.com/dwethmar/gosqle/clauses"
+	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
@@ -741,7 +740,7 @@ func WhereNOT(db *sql.DB) ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
-		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
+		alias.Alias{Expr: expressions.Column{Name: "id"}},
 	).FromTable("users", nil).
 		Where(predicates.Not{
 			Predicate: predicates.EQ{
