@@ -64,9 +64,7 @@ func NewDeleteClauseWriter() ClauseWriter {
 }
 
 // NewDelete creates a new Delete statement.
-func NewDelete(
-	table string,
-) *Delete {
+func NewDelete(table string) *Delete {
 	return &Delete{
 		ClauseWriter: NewDeleteClauseWriter(),
 		table:        table,

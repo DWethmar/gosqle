@@ -43,10 +43,7 @@ func (i *Insert) Write(sw io.StringWriter) error {
 }
 
 // NewInsert creates a new insert query.
-func NewInsert(
-	into string,
-	columns ...string,
-) *Insert {
+func NewInsert(into string, columns ...string) *Insert {
 	return &Insert{
 		Statement: statement.NewInsert(into, columns),
 	}

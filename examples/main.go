@@ -44,17 +44,27 @@ var examples = map[string]func(*sql.DB) error{
 		}
 		return nil
 	},
-	"subquery": func(d *sql.DB) error {
+	"subquery": func(db *sql.DB) error {
 		args, query, err := PeopleOfAmsterdam()
 		if err != nil {
 			fmt.Printf("error selecting users: %v\n", err)
 		}
 		fmt.Printf("Query: %q\n", query)
-		result, err := QueryUsers(d, args, query)
+
+		rows, err := db.Query(query, args...)
 		if err != nil {
-			fmt.Printf("error executing query: %v\n", err)
+			return fmt.Errorf("error executing query: %v", err)
 		}
-		PrintUsers(result)
+		defer rows.Close()
+
+		for rows.Next() {
+			var u string
+			if err := rows.Scan(&u); err != nil {
+				return fmt.Errorf("error scanning row: %v", err)
+			}
+			fmt.Println(u)
+		}
+
 		return nil
 	},
 	"insert": func(d *sql.DB) error {
@@ -111,9 +121,10 @@ func main() {
 		return
 	}
 
+	var runAll bool
 	if example == "" {
-		fmt.Println("Please provide an example to run using the -example flag.")
-		return
+		runAll = true
+		fmt.Println("Running all examples")
 	}
 
 	db, err := sql.Open("postgres", dbURL)
@@ -125,18 +136,30 @@ func main() {
 		panic(err)
 	}
 
-	if f, ok := examples[example]; ok {
-		fmt.Printf("Running example %q:\n", example)
-		if err := f(db); err != nil {
-			fmt.Printf("Error running example %q: %v\n", example, err)
+	exampleNames := make([]string, 0, len(examples))
+	for k := range examples {
+		exampleNames = append(exampleNames, k)
+	}
+	sort.Strings(exampleNames)
+
+	if runAll {
+		for _, k := range exampleNames {
+			if f, ok := examples[k]; ok {
+				fmt.Printf("Running example %q:\n", k)
+				if err := f(db); err != nil {
+					fmt.Printf("Error running example %q: %v\n", k, err)
+				}
+			}
 		}
 	} else {
-		exampleNames := make([]string, 0, len(examples))
-		for k := range examples {
-			exampleNames = append(exampleNames, k)
+		if f, ok := examples[example]; ok {
+			fmt.Printf("Running example %q:\n", example)
+			if err := f(db); err != nil {
+				fmt.Printf("Error running example %q: %v\n", example, err)
+			}
+		} else {
+			fmt.Printf("Example %s not found, available examples: %v\n", example, strings.Join(exampleNames, ", "))
 		}
-		sort.Strings(exampleNames)
-		fmt.Printf("Example %s not found, available examples: %v\n", example, strings.Join(exampleNames, ", "))
 	}
 }
 

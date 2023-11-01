@@ -89,9 +89,7 @@ func NewSelectClauseWriter() ClauseWriter {
 }
 
 // NewSelectClause creates a new SelectClause.
-func NewSelect(
-	selectColumns []clauses.Selectable,
-) *Select {
+func NewSelect(selectColumns []clauses.Selectable) *Select {
 	return &Select{
 		ClauseWriter:  NewSelectClauseWriter(),
 		selectColumns: selectColumns,

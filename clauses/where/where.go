@@ -17,6 +17,7 @@ func WriteWhere(
 	sw io.StringWriter,
 	p []predicates.Predicate,
 ) error {
+
 	if len(p) == 0 {
 		return fmt.Errorf("no conditions given")
 	}
