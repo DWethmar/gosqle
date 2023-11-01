@@ -81,12 +81,12 @@ var examples = map[string]func(*sql.DB) error{
 		return nil
 	},
 	"update": func(d *sql.DB) error {
-		query, err := UpdateUser()
+		args, query, err := UpdateUser()
 		if err != nil {
 			fmt.Printf("error updating user: %v\n", err)
 		}
 		fmt.Printf("Query: %q\n", query)
-		result, err := Exec(d, []interface{}{}, query)
+		result, err := Exec(d, args, query)
 		if err != nil {
 			fmt.Printf("error executing query: %v\n", err)
 		}
@@ -185,13 +185,10 @@ func QueryUsers(db *sql.DB, args []interface{}, query string) ([]User, error) {
 func Exec(db *sql.DB, args []interface{}, query string) ([]interface{}, error) {
 	result, err := db.Exec(query, args...)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error executing query: %v", err)
 	}
 
 	var r []interface{}
-	if id, err := result.LastInsertId(); err == nil {
-		r = append(r, id)
-	}
 	if rows, err := result.RowsAffected(); err == nil {
 		r = append(r, rows)
 	}

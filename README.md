@@ -105,6 +105,7 @@ import (
 	"github.com/dwethmar/gosqle/clauses/groupby"
 	"github.com/dwethmar/gosqle/clauses/orderby"
 	"github.com/dwethmar/gosqle/expressions"
+	"github.com/dwethmar/gosqle/functions"
 )
 
 // SelectAmountOfAddressesPerCountry select amount of addresses per country
@@ -112,7 +113,7 @@ func SelectAmountOfAddressesPerCountry() (string, error) {
 	sb := new(strings.Builder)
 	err := gosqle.NewSelect(
 		alias.New(expressions.Column{Name: "country"}),
-		alias.New(expressions.Column{Name: "address_count"}).SetAs("address_count"),
+		alias.New(functions.NewCount(&expressions.Column{Name: "id"})).SetAs("address_count"),
 	).FromTable("addresses", nil).
 		GroupBy(groupby.ColumnGrouping{
 			&expressions.Column{Name: "country"},
@@ -120,7 +121,8 @@ func SelectAmountOfAddressesPerCountry() (string, error) {
 		OrderBy(orderby.Sort{
 			Column:    &expressions.Column{Name: "address_count"},
 			Direction: orderby.DESC,
-		}).Write(sb)
+		}).
+		Write(sb)
 
 	if err != nil {
 		return "", err
@@ -164,16 +166,19 @@ func PeopleOfAmsterdam() ([]interface{}, string, error) {
 		alias.New(expressions.Column{Name: "name"}),
 	).FromTable("users", nil).
 		Where(
-			logic.And(
-				predicates.IN(
-					expressions.Column{Name: "city"},
-					gosqle.NewSelect(
-						alias.New(expressions.Column{Name: "id"}),
-					).Where(
-						logic.And(predicates.EQ(expressions.Column{Name: "id", From: "users"}, args.NewArgument(1))),
+			logic.And(predicates.IN(
+				expressions.Column{Name: "id"},
+				gosqle.NewSelect(
+					alias.New(expressions.Column{Name: "user_id"}),
+				).
+					FromTable("addresses", nil).
+					Where(
+						logic.And(predicates.EQ(
+							expressions.Column{Name: "city"},
+							args.NewArgument("Amsterdam"),
+						)),
 					).Statement, // <-- This is the sub-query without semicolon
-				),
-			),
+			)),
 		).Write(sb)
 
 	if err != nil {
@@ -247,7 +252,10 @@ func DeleteAddress() ([]interface{}, string, error) {
 	args := postgres.NewArguments()
 	err := gosqle.NewDelete("addresses").
 		Where(
-			logic.And(predicates.EQ(expressions.Column{Name: "id", From: "addresses"}, args.NewArgument(1))),
+			logic.And(predicates.EQ(
+				expressions.Column{Name: "id", From: "addresses"},
+				args.NewArgument(1),
+			)),
 		).Write(sb)
 
 	if err != nil {
@@ -281,7 +289,7 @@ import (
 )
 
 // UpdateUser updates a user.
-func UpdateUser() (string, error) {
+func UpdateUser() ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewUpdate("users").Set(set.Change{
@@ -290,13 +298,15 @@ func UpdateUser() (string, error) {
 	}).Where(
 		logic.And(predicates.EQ(
 			expressions.Column{Name: "id"},
-			args.NewArgument(1),
+			args.NewArgument(193),
 		)),
 	).Write(sb)
+
 	if err != nil {
-		return "", err
+		return nil, "", err
 	}
-	return sb.String(), nil
+
+	return args.Values, sb.String(), nil
 }
 
 ```

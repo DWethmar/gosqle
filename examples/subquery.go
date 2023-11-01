@@ -20,16 +20,19 @@ func PeopleOfAmsterdam() ([]interface{}, string, error) {
 		alias.New(expressions.Column{Name: "name"}),
 	).FromTable("users", nil).
 		Where(
-			logic.And(
-				predicates.IN(
-					expressions.Column{Name: "city"},
-					gosqle.NewSelect(
-						alias.New(expressions.Column{Name: "id"}),
-					).Where(
-						logic.And(predicates.EQ(expressions.Column{Name: "id", From: "users"}, args.NewArgument(1))),
+			logic.And(predicates.IN(
+				expressions.Column{Name: "id"},
+				gosqle.NewSelect(
+					alias.New(expressions.Column{Name: "user_id"}),
+				).
+					FromTable("addresses", nil).
+					Where(
+						logic.And(predicates.EQ(
+							expressions.Column{Name: "city"},
+							args.NewArgument("Amsterdam"),
+						)),
 					).Statement, // <-- This is the sub-query without semicolon
-				),
-			),
+			)),
 		).Write(sb)
 
 	if err != nil {
