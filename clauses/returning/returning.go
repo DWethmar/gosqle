@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/clauses"
 )
 
@@ -17,7 +18,7 @@ var (
 // Example:
 //
 //	RETURNING field1, field2, field3
-func Write(sw io.StringWriter, selectColumns []clauses.Selectable) error {
+func Write(sw io.StringWriter, selectColumns []alias.Alias) error {
 	if len(selectColumns) == 0 {
 		return errors.New("no columns to return")
 	}
@@ -43,13 +44,13 @@ func Write(sw io.StringWriter, selectColumns []clauses.Selectable) error {
 
 // Clause represents a RETURNING clause.
 type Clause struct {
-	selectColumns []clauses.Selectable
+	selectColumns []alias.Alias
 }
 
 func (r *Clause) Type() clauses.ClauseType       { return clauses.ReturningType }
 func (r *Clause) Write(sw io.StringWriter) error { return Write(sw, r.selectColumns) }
 
-func New(selectColumns []clauses.Selectable) *Clause {
+func New(selectColumns []alias.Alias) *Clause {
 	return &Clause{
 		selectColumns: selectColumns,
 	}

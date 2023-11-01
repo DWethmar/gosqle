@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/dwethmar/gosqle"
-	"github.com/dwethmar/gosqle/clauses"
+	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
@@ -19,7 +19,7 @@ func WhereIN(names []string) ([]interface{}, string, error) {
 		list = append(list, args.NewArgument(name))
 	}
 	err := gosqle.NewSelect(
-		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
+		alias.Alias{Expr: expressions.Column{Name: "id"}},
 	).FromTable("users", nil).
 		Where(predicates.In{
 			Col:  expressions.Column{Name: "id"},

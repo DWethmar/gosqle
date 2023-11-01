@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/clauses"
 	"github.com/dwethmar/gosqle/expressions"
 )
@@ -13,7 +14,7 @@ import (
 func TestWrite(t *testing.T) {
 	type args struct {
 		sw   io.StringWriter
-		from From
+		from alias.Alias
 	}
 	tests := []struct {
 		name    string
@@ -25,7 +26,7 @@ func TestWrite(t *testing.T) {
 			name: "should write From",
 			args: args{
 				sw: &strings.Builder{},
-				from: From{
+				from: alias.Alias{
 					Expr: expressions.String("table"),
 				},
 			},
@@ -36,7 +37,7 @@ func TestWrite(t *testing.T) {
 			name: "should write From with alias",
 			args: args{
 				sw: &strings.Builder{},
-				from: From{
+				from: alias.Alias{
 					Expr: expressions.String("table"),
 					As:   "alias",
 				},
@@ -96,7 +97,7 @@ func TestFrom_Write(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			f := &Clause{
-				from: From{
+				from: alias.Alias{
 					Expr: tt.fields.Expression,
 				},
 			}
@@ -114,7 +115,7 @@ func TestFrom_Write(t *testing.T) {
 
 func TestNewFrom(t *testing.T) {
 	type args struct {
-		from From
+		from alias.Alias
 	}
 	tests := []struct {
 		name string
@@ -124,15 +125,30 @@ func TestNewFrom(t *testing.T) {
 		{
 			name: "should create new From",
 			args: args{
-				from: From{
+				from: alias.Alias{
 					Expr: expressions.String("table"),
 					As:   "",
 				},
 			},
 			want: &Clause{
-				from: From{
+				from: alias.Alias{
 					Expr: expressions.String("table"),
 					As:   "",
+				},
+			},
+		},
+		{
+			name: "should create new From with alias",
+			args: args{
+				from: alias.Alias{
+					Expr: expressions.String("table"),
+					As:   "alias",
+				},
+			},
+			want: &Clause{
+				from: alias.Alias{
+					Expr: expressions.String("table"),
+					As:   "alias",
 				},
 			},
 		},

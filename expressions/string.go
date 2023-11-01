@@ -14,7 +14,3 @@ func (e String) Write(writer io.StringWriter) error {
 
 	return nil
 }
-
-func NewString(s string) String {
-	return String(s)
-}

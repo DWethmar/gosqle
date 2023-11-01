@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/dwethmar/gosqle"
-	"github.com/dwethmar/gosqle/clauses"
+	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/clauses/groupby"
 	"github.com/dwethmar/gosqle/clauses/orderby"
 	"github.com/dwethmar/gosqle/expressions"
@@ -15,10 +15,10 @@ import (
 func SelectAmountOfAddressesPerCountry() (string, error) {
 	sb := new(strings.Builder)
 	err := gosqle.NewSelect(
-		clauses.Selectable{
+		alias.Alias{
 			Expr: &expressions.Column{Name: "country"},
 		},
-		clauses.Selectable{
+		alias.Alias{
 			Expr: functions.NewCount(&expressions.Column{Name: "id"}),
 			As:   "address_count",
 		},
