@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/dwethmar/gosqle"
-	"github.com/dwethmar/gosqle/clauses"
+	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/predicates"
 )
@@ -13,7 +13,7 @@ import (
 func WhereIsNull() (string, error) {
 	sb := new(strings.Builder)
 	err := gosqle.NewSelect(
-		clauses.Selectable{Expr: expressions.Column{Name: "id"}},
+		alias.Alias{Expr: expressions.Column{Name: "id"}},
 	).FromTable("users", nil).
 		Where(predicates.IsNull{
 			Col: expressions.Column{Name: "phone"},

@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/clauses"
 	"github.com/dwethmar/gosqle/clauses/from"
 	"github.com/dwethmar/gosqle/expressions"
@@ -14,7 +15,7 @@ import (
 func TestWriteSelect(t *testing.T) {
 	t.Run("should write SELECT", func(t *testing.T) {
 		sb := new(strings.Builder)
-		if err := WriteSelect(sb, []clauses.Selectable{
+		if err := WriteSelect(sb, []alias.Alias{
 			{
 				Expr: expressions.Column{Name: "column1"},
 			},
@@ -30,8 +31,8 @@ func TestWriteSelect(t *testing.T) {
 
 func TestSelect_Write(t *testing.T) {
 	type fields struct {
-		ClauseWriter  ClauseWriter
-		selectColumns []clauses.Selectable
+		ClauseWriter ClauseWriter
+		columns      []alias.Alias
 	}
 	type args struct {
 		sw io.StringWriter
@@ -48,14 +49,14 @@ func TestSelect_Write(t *testing.T) {
 			fields: fields{
 				ClauseWriter: ClauseWriter{
 					clauses: map[clauses.ClauseType]clauses.Clause{
-						clauses.FromType: from.New(from.From{
+						clauses.FromType: from.New(alias.Alias{
 							Expr: expressions.String("table"),
 						}),
 					},
 					order:           selectClausesOrder,
 					ClauseSeparator: SpaceSeparator,
 				},
-				selectColumns: []clauses.Selectable{{
+				columns: []alias.Alias{{
 					Expr: expressions.Column{Name: "column1"},
 				}},
 			},
@@ -69,8 +70,8 @@ func TestSelect_Write(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := &Select{
-				ClauseWriter:  tt.fields.ClauseWriter,
-				selectColumns: tt.fields.selectColumns,
+				ClauseWriter: tt.fields.ClauseWriter,
+				columns:      tt.fields.columns,
 			}
 			if err := s.Write(tt.args.sw); (err != nil) != tt.wantErr {
 				t.Errorf("Select.Write() error = %v, wantErr %v", err, tt.wantErr)
@@ -91,7 +92,7 @@ func TestSelect_Write(t *testing.T) {
 
 func TestNewSelect(t *testing.T) {
 	type args struct {
-		selectColumns []clauses.Selectable
+		columns []alias.Alias
 	}
 	tests := []struct {
 		name string
@@ -101,7 +102,7 @@ func TestNewSelect(t *testing.T) {
 		{
 			name: "should create new Select",
 			args: args{
-				selectColumns: []clauses.Selectable{{
+				columns: []alias.Alias{{
 					Expr: expressions.Column{Name: "column1"},
 				}},
 			},
@@ -111,7 +112,7 @@ func TestNewSelect(t *testing.T) {
 					order:           selectClausesOrder,
 					ClauseSeparator: SpaceSeparator,
 				},
-				selectColumns: []clauses.Selectable{{
+				columns: []alias.Alias{{
 					Expr: expressions.Column{Name: "column1"},
 				}},
 			},
@@ -119,7 +120,7 @@ func TestNewSelect(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewSelect(tt.args.selectColumns); !reflect.DeepEqual(got, tt.want) {
+			if got := NewSelect(tt.args.columns); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewSelect() = %v, want %v", got, tt.want)
 			}
 		})

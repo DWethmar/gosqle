@@ -4,28 +4,14 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/clauses"
-	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/util"
 )
 
 var (
 	_ clauses.Clause = &Clause{}
 )
-
-// From represents a FROM.
-type From struct {
-	Expr expressions.Expression
-	As   string
-}
-
-// NewFrom is a helper function to create a new From clause.
-func NewFrom(table string, as string) From {
-	return From{
-		Expr: expressions.NewString(table),
-		As:   as,
-	}
-}
 
 // Write writes a SQL Write string to the given string writer.
 //
@@ -34,19 +20,13 @@ func NewFrom(table string, as string) From {
 //	FROM table AS alias
 //	FROM table
 //	FROM (SELECT * FROM table) AS alias
-func Write(sw io.StringWriter, from From) error {
+func Write(sw io.StringWriter, from alias.Alias) error {
 	if err := util.WriteStrings(sw, "FROM "); err != nil {
 		return fmt.Errorf("from: %v", err)
 	}
 
-	if err := from.Expr.Write(sw); err != nil {
+	if err := from.Write(sw); err != nil {
 		return fmt.Errorf("from: %v", err)
-	}
-
-	if from.As != "" {
-		if err := util.WriteStrings(sw, " AS ", from.As); err != nil {
-			return fmt.Errorf("from: %v", err)
-		}
 	}
 
 	return nil
@@ -54,14 +34,14 @@ func Write(sw io.StringWriter, from From) error {
 
 // Clause represents a FROM clause.
 type Clause struct {
-	from From
+	from alias.Alias
 }
 
 func (c *Clause) Type() clauses.ClauseType       { return clauses.FromType }
 func (c *Clause) Write(sw io.StringWriter) error { return Write(sw, c.from) }
 
 // New creates a new from clause
-func New(from From) *Clause {
+func New(from alias.Alias) *Clause {
 	return &Clause{
 		from: from,
 	}

@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/dwethmar/gosqle/clauses"
+	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/mock"
 )
@@ -13,7 +13,7 @@ import (
 func TestWrite(t *testing.T) {
 	type args struct {
 		sb      *strings.Builder
-		columns []clauses.Selectable
+		columns []alias.Alias
 	}
 	tests := []struct {
 		name    string
@@ -25,7 +25,7 @@ func TestWrite(t *testing.T) {
 			name: "should return error when no fields are supplied",
 			args: args{
 				sb:      new(strings.Builder),
-				columns: []clauses.Selectable{},
+				columns: []alias.Alias{},
 			},
 			want:    "",
 			wantErr: true,
@@ -34,7 +34,7 @@ func TestWrite(t *testing.T) {
 			name: "should render returning clause",
 			args: args{
 				sb: new(strings.Builder),
-				columns: []clauses.Selectable{
+				columns: []alias.Alias{
 					{
 						Expr: expressions.Column{Name: "field_a", From: "table_a"},
 					},
@@ -50,7 +50,7 @@ func TestWrite(t *testing.T) {
 			name: "should render returning clause with has alias",
 			args: args{
 				sb: new(strings.Builder),
-				columns: []clauses.Selectable{
+				columns: []alias.Alias{
 					{
 						Expr: expressions.Column{Name: "column_a", From: "table_a"},
 						As:   "alias_a",
@@ -83,7 +83,7 @@ func TestWrite(t *testing.T) {
 			return 0, errors.New("error")
 		})
 
-		if err := Write(writer, []clauses.Selectable{
+		if err := Write(writer, []alias.Alias{
 			{
 				Expr: expressions.Column{Name: "column_a"},
 			},

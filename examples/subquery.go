@@ -5,8 +5,7 @@ import (
 	"strings"
 
 	"github.com/dwethmar/gosqle"
-	"github.com/dwethmar/gosqle/clauses"
-	"github.com/dwethmar/gosqle/clauses/from"
+	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
@@ -17,15 +16,13 @@ func PeopleOfAmsterdam() ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
-		clauses.Selectable{Expr: expressions.Column{Name: "name"}},
+		alias.Alias{Expr: expressions.Column{Name: "name"}},
 	).FromTable("users", nil).
 		Where(predicates.In{
 			Col: expressions.Column{Name: "id"},
 			Expr: gosqle.NewSelect(
-				clauses.Selectable{Expr: expressions.Column{Name: "user_id"}},
-			).From(
-				from.NewFrom("addresses", ""),
-			).Where(predicates.EQ{
+				alias.Alias{Expr: expressions.Column{Name: "user_id"}},
+			).FromTable("addresses", nil).Where(predicates.EQ{
 				Col:  expressions.Column{Name: "city"},
 				Expr: args.NewArgument("Amsterdam"),
 			}).Statement, // <- This is the subquery, so without semicolon.

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/clauses"
 )
 
@@ -30,8 +31,8 @@ var selectClausesOrder = []clauses.ClauseType{
 // Example:
 //
 //	SELECT field1, field2, field3
-func WriteSelect(sw io.StringWriter, selectColumns []clauses.Selectable) error {
-	if len(selectColumns) == 0 {
+func WriteSelect(sw io.StringWriter, columns []alias.Alias) error {
+	if len(columns) == 0 {
 		return errors.New("no select columns specified")
 	}
 
@@ -39,12 +40,12 @@ func WriteSelect(sw io.StringWriter, selectColumns []clauses.Selectable) error {
 		return fmt.Errorf("failed to write SELECT: %v", err)
 	}
 
-	for i, e := range selectColumns {
+	for i, e := range columns {
 		if err := e.Write(sw); err != nil {
 			return fmt.Errorf("failed to write expression: %v", err)
 		}
 
-		if i != len(selectColumns)-1 {
+		if i != len(columns)-1 {
 			if _, err := sw.WriteString(CommaSeparator); err != nil {
 				return fmt.Errorf("failed to write separator: %v", err)
 			}
@@ -57,12 +58,12 @@ func WriteSelect(sw io.StringWriter, selectColumns []clauses.Selectable) error {
 // SelectWriter writes a SQL From string to the given string writer.
 type Select struct {
 	ClauseWriter
-	selectColumns []clauses.Selectable
+	columns []alias.Alias
 }
 
 // ToSQL returns the query as a string and it's arguments and an error if any.
 func (s *Select) Write(sw io.StringWriter) error {
-	if err := WriteSelect(sw, s.selectColumns); err != nil {
+	if err := WriteSelect(sw, s.columns); err != nil {
 		return err
 	}
 
@@ -89,9 +90,9 @@ func NewSelectClauseWriter() ClauseWriter {
 }
 
 // NewSelectClause creates a new SelectClause.
-func NewSelect(selectColumns []clauses.Selectable) *Select {
+func NewSelect(columns []alias.Alias) *Select {
 	return &Select{
-		ClauseWriter:  NewSelectClauseWriter(),
-		selectColumns: selectColumns,
+		ClauseWriter: NewSelectClauseWriter(),
+		columns:      columns,
 	}
 }

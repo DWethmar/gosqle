@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/clauses"
 	"github.com/dwethmar/gosqle/clauses/from"
 	"github.com/dwethmar/gosqle/clauses/groupby"
@@ -24,23 +25,26 @@ type Select struct {
 	statement.Statement
 }
 
-func (s *Select) From(f from.From) *Select {
-	return s.SetClause(from.New(f))
+func (s *Select) From(a alias.Alias) *Select {
+	return s.SetClause(from.New(a))
 }
 
 type FromTableOptions struct {
 	Alias string
 }
 
+// FromTable adds a from clause to the select statement with the given table.
+// Its shorthand for From(alias.Alias{Expr: expressions.String(table)}).
 func (s *Select) FromTable(table string, opt *FromTableOptions) *Select {
 	var as string
 	if opt != nil {
 		as = opt.Alias
 	}
 
-	return s.SetClause(
-		from.New(from.NewFrom(table, as)),
-	)
+	return s.From(alias.Alias{
+		Expr: expressions.String(table),
+		As:   as,
+	})
 }
 
 // Join adds a join clause to the select statement.
@@ -119,8 +123,8 @@ func (s *Select) Write(sw io.StringWriter) error {
 }
 
 // NewSelect creates a new select query.
-func NewSelect(selectables ...clauses.Selectable) *Select {
+func NewSelect(columns ...alias.Alias) *Select {
 	return &Select{
-		Statement: statement.NewSelect(selectables),
+		Statement: statement.NewSelect(columns),
 	}
 }
