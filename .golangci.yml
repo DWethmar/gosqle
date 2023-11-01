@@ -69,3 +69,4 @@ linters:
     - ireturn # accept interfaces, return concrete types
     - prealloc # [premature optimization, but can be used in some cases] finds slice declarations that could potentially be preallocated
     - wrapcheck # checks that errors returned from external packages are wrapped
+    - whitespace

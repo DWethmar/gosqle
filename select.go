@@ -119,9 +119,7 @@ func (s *Select) Write(sw io.StringWriter) error {
 }
 
 // NewSelect creates a new select query.
-func NewSelect(
-	selectables ...clauses.Selectable,
-) *Select {
+func NewSelect(selectables ...clauses.Selectable) *Select {
 	return &Select{
 		Statement: statement.NewSelect(selectables),
 	}

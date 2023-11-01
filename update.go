@@ -71,9 +71,7 @@ func (u *Update) Write(sw io.StringWriter) error {
 }
 
 // NewUpdate creates a new update query.
-func NewUpdate(
-	table string,
-) *Update {
+func NewUpdate(table string) *Update {
 	return &Update{
 		Statement: statement.NewUpdate(table),
 	}

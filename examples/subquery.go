@@ -30,8 +30,10 @@ func PeopleOfAmsterdam() ([]interface{}, string, error) {
 				Expr: args.NewArgument("Amsterdam"),
 			}).Statement, // <- This is the subquery, so without semicolon.
 		}).Write(sb)
+
 	if err != nil {
 		return nil, "", fmt.Errorf("error writing query: %v", err)
 	}
+
 	return args.Args, sb.String(), nil
 }

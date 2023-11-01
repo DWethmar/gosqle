@@ -183,7 +183,6 @@ func TestGTE(t *testing.T) {
 		sb := new(strings.Builder)
 		if err := f.Write(sb); err != nil {
 			t.Errorf("GTE.Write() error = %v", err)
-
 		}
 		got := sb.String()
 		want := `id >= $1`

@@ -70,9 +70,7 @@ func NewUpdateClauseWriter() ClauseWriter {
 }
 
 // NewUpdate creates a new update statement.
-func NewUpdate(
-	table string,
-) *Update {
+func NewUpdate(table string) *Update {
 	return &Update{
 		ClauseWriter: NewUpdateClauseWriter(),
 		table:        table,

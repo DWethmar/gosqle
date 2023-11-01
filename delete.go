@@ -45,9 +45,7 @@ func (d *Delete) Write(sw io.StringWriter) error {
 }
 
 // NewDelete creates a new delete query.
-func NewDelete(
-	table string,
-) *Delete {
+func NewDelete(table string) *Delete {
 	return &Delete{
 		Statement: statement.NewDelete(table),
 	}
