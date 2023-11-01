@@ -35,13 +35,13 @@ func NewArgument(value interface{}) *Argument {
 
 // Arguments is a list of arguments.
 type Arguments struct {
-	mutex sync.Mutex
-	Args  []interface{}
+	mutex  sync.Mutex
+	Values []interface{}
 }
 
 func NewArguments() *Arguments {
 	return &Arguments{
-		Args: []interface{}{},
+		Values: []interface{}{},
 	}
 }
 
@@ -49,7 +49,7 @@ func (a *Arguments) NewArgument(value interface{}) *Argument {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
-	a.Args = append(a.Args, value)
+	a.Values = append(a.Values, value)
 
 	return NewArgument(value)
 }

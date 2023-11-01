@@ -1,7 +1,6 @@
 package having
 
 import (
-	"errors"
 	"io"
 	"reflect"
 	"strings"
@@ -9,16 +8,15 @@ import (
 
 	"github.com/dwethmar/gosqle/clauses"
 	"github.com/dwethmar/gosqle/expressions"
-	"github.com/dwethmar/gosqle/functions"
-	"github.com/dwethmar/gosqle/mock"
+	"github.com/dwethmar/gosqle/logic"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
 )
 
 func TestWriteHaving(t *testing.T) {
 	type args struct {
-		sw    io.StringWriter
-		preds []predicates.Predicate
+		sw         io.StringWriter
+		conditions []logic.Logic
 	}
 	tests := []struct {
 		name        string
@@ -28,55 +26,29 @@ func TestWriteHaving(t *testing.T) {
 		wantErr     bool
 	}{
 		{
-			name: "should write HAVING",
+			name: "should return error when writer is nil",
 			args: args{
-				sw:    &strings.Builder{},
-				preds: []predicates.Predicate{},
-			},
-			checkString: true,
-			want:        "HAVING ",
-			wantErr:     false,
-		},
-		{
-			name: "should write HAVING with aggregate functions",
-			args: args{
-				sw: &strings.Builder{},
-				preds: []predicates.Predicate{
-					predicates.GT{
-						Col: &functions.Count{
-							Col: &expressions.Column{
-								Name: "id",
-							},
-						},
-						Expr: postgres.NewArgument(13, 1),
-					},
-					predicates.LT{
-						Col: &functions.Max{
-							Col: &expressions.Column{
-								Name: "kipsate",
-							},
-						},
-						Expr: postgres.NewArgument(9001, 2),
-					},
-					predicates.GTE{
-						Col: &functions.Avg{
-							Col: &expressions.Column{
-								Name: "saus",
-							},
-						},
-						Expr:  postgres.NewArgument(10000, 3),
-						Logic: predicates.OR,
-					},
+				sw: nil,
+				conditions: []logic.Logic{
+					logic.And(predicates.EQ(expressions.Column{Name: "id"}, postgres.NewArgument(1, 1))),
 				},
 			},
-			checkString: true,
-			want:        "HAVING COUNT(id) > $1 AND MAX(kipsate) < $2 OR AVG(saus) >= $3",
-			wantErr:     false,
+			want:    "",
+			wantErr: true,
+		},
+		{
+			name: "should return error when conditions is nil",
+			args: args{
+				sw:         new(strings.Builder),
+				conditions: nil,
+			},
+			want:    "",
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := WriteHaving(tt.args.sw, tt.args.preds); (err != nil) != tt.wantErr {
+			if err := WriteHaving(tt.args.sw, tt.args.conditions); (err != nil) != tt.wantErr {
 				t.Errorf("WriteHaving() error = %v, wantErr %v", err, tt.wantErr)
 			} else if tt.checkString {
 				if sb, ok := tt.args.sw.(*strings.Builder); ok {
@@ -102,7 +74,7 @@ func TestClause_Type(t *testing.T) {
 
 func TestClause_Write(t *testing.T) {
 	type fields struct {
-		Predicates []predicates.Predicate
+		conditions []logic.Logic
 	}
 	type args struct {
 		sw io.StringWriter
@@ -114,58 +86,44 @@ func TestClause_Write(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:   "should write HAVING",
-			fields: fields{},
-			args: args{
-				sw: &strings.Builder{},
-			},
-			wantErr: false,
-		},
-		{
-			name: "should write HAVING with aggregate functions",
+			name: "should return error when writer is nil",
 			fields: fields{
-				Predicates: []predicates.Predicate{
-					predicates.GT{
-						Col: &functions.Count{
-							Col: &expressions.Column{
-								Name: "id",
-							},
-						},
-						Expr: postgres.NewArgument(13, 1),
-					},
+				conditions: []logic.Logic{
+					logic.And(predicates.EQ(expressions.Column{Name: "id"}, postgres.NewArgument(1, 1))),
 				},
 			},
 			args: args{
-				sw: &strings.Builder{},
-			},
-			wantErr: false,
-		},
-		{
-			name: "should return error when writing fails",
-			fields: fields{
-				Predicates: []predicates.Predicate{
-					predicates.GT{
-						Col: &functions.Count{
-							Col: &expressions.Column{
-								Name: "id",
-							},
-						},
-						Expr: postgres.NewArgument(13, 1),
-					},
-				},
-			},
-			args: args{
-				sw: mock.StringWriterFn(func(s string) (n int, err error) {
-					return 0, errors.New("error")
-				}),
+				sw: nil,
 			},
 			wantErr: true,
+		},
+		{
+			name: "should return error when conditions is nil",
+			fields: fields{
+				conditions: nil,
+			},
+			args: args{
+				sw: new(strings.Builder),
+			},
+			wantErr: true,
+		},
+		{
+			name: "should write",
+			fields: fields{
+				conditions: []logic.Logic{
+					logic.And(predicates.EQ(expressions.Column{Name: "id"}, postgres.NewArgument(1, 1))),
+				},
+			},
+			args: args{
+				sw: new(strings.Builder),
+			},
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Clause{
-				Predicates: tt.fields.Predicates,
+				conditions: tt.fields.conditions,
 			}
 			if err := c.Write(tt.args.sw); (err != nil) != tt.wantErr {
 				t.Errorf("Clause.Write() error = %v, wantErr %v", err, tt.wantErr)
@@ -176,7 +134,7 @@ func TestClause_Write(t *testing.T) {
 
 func TestNew(t *testing.T) {
 	type args struct {
-		predicates []predicates.Predicate
+		conditions []logic.Logic
 	}
 	tests := []struct {
 		name string
@@ -184,43 +142,22 @@ func TestNew(t *testing.T) {
 		want *Clause
 	}{
 		{
-			name: "should create a new clause",
+			name: "should create new clause",
 			args: args{
-				predicates: []predicates.Predicate{},
-			},
-			want: &Clause{
-				Predicates: []predicates.Predicate{},
-			},
-		},
-		{
-			name: "should create a new clause with predicates",
-			args: args{
-				predicates: []predicates.Predicate{
-					predicates.GT{
-						Col: &functions.Count{
-							Col: &expressions.Column{
-								Name: "id",
-							},
-						},
-					},
+				conditions: []logic.Logic{
+					logic.And(predicates.EQ(expressions.Column{Name: "id"}, postgres.NewArgument(1, 1))),
 				},
 			},
 			want: &Clause{
-				Predicates: []predicates.Predicate{
-					predicates.GT{
-						Col: &functions.Count{
-							Col: &expressions.Column{
-								Name: "id",
-							},
-						},
-					},
+				conditions: []logic.Logic{
+					logic.And(predicates.EQ(expressions.Column{Name: "id"}, postgres.NewArgument(1, 1))),
 				},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := New(tt.args.predicates); !reflect.DeepEqual(got, tt.want) {
+			if got := New(tt.args.conditions); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("New() = %v, want %v", got, tt.want)
 			}
 		})

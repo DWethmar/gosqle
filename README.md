@@ -70,17 +70,19 @@ func SelectUsers() ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
-		alias.Alias{Expr: expressions.Column{Name: "id"}},
-		alias.Alias{Expr: expressions.Column{Name: "name"}},
-		alias.Alias{Expr: expressions.Column{Name: "email"}},
+		alias.New(expressions.Column{Name: "id"}),
+		alias.New(expressions.Column{Name: "name"}),
+		alias.New(expressions.Column{Name: "email"}),
 	).
 		FromTable("users", nil).
 		Limit(args.NewArgument(10)).
 		Write(sb)
+
 	if err != nil {
 		return nil, "", err
 	}
-	return args.Args, sb.String(), nil
+
+	return args.Values, sb.String(), nil
 }
 
 ```
@@ -103,20 +105,14 @@ import (
 	"github.com/dwethmar/gosqle/clauses/groupby"
 	"github.com/dwethmar/gosqle/clauses/orderby"
 	"github.com/dwethmar/gosqle/expressions"
-	"github.com/dwethmar/gosqle/functions"
 )
 
 // SelectAmountOfAddressesPerCountry select amount of addresses per country
 func SelectAmountOfAddressesPerCountry() (string, error) {
 	sb := new(strings.Builder)
 	err := gosqle.NewSelect(
-		alias.Alias{
-			Expr: &expressions.Column{Name: "country"},
-		},
-		alias.Alias{
-			Expr: functions.NewCount(&expressions.Column{Name: "id"}),
-			As:   "address_count",
-		},
+		alias.New(expressions.Column{Name: "country"}),
+		alias.New(expressions.Column{Name: "address_count"}).SetAs("address_count"),
 	).FromTable("addresses", nil).
 		GroupBy(groupby.ColumnGrouping{
 			&expressions.Column{Name: "country"},
@@ -155,6 +151,7 @@ import (
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/expressions"
+	"github.com/dwethmar/gosqle/logic"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
 )
@@ -164,23 +161,26 @@ func PeopleOfAmsterdam() ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
-		alias.Alias{Expr: expressions.Column{Name: "name"}},
+		alias.New(expressions.Column{Name: "name"}),
 	).FromTable("users", nil).
-		Where(predicates.In{
-			Col: expressions.Column{Name: "id"},
-			Expr: gosqle.NewSelect(
-				alias.Alias{Expr: expressions.Column{Name: "user_id"}},
-			).FromTable("addresses", nil).Where(predicates.EQ{
-				Col:  expressions.Column{Name: "city"},
-				Expr: args.NewArgument("Amsterdam"),
-			}).Statement, // <- This is the subquery, so without semicolon.
-		}).Write(sb)
+		Where(
+			logic.And(
+				predicates.IN(
+					expressions.Column{Name: "city"},
+					gosqle.NewSelect(
+						alias.New(expressions.Column{Name: "id"}),
+					).Where(
+						logic.And(predicates.EQ(expressions.Column{Name: "id", From: "users"}, args.NewArgument(1))),
+					).Statement, // <-- This is the sub-query without semicolon
+				),
+			),
+		).Write(sb)
 
 	if err != nil {
 		return nil, "", fmt.Errorf("error writing query: %v", err)
 	}
 
-	return args.Args, sb.String(), nil
+	return args.Values, sb.String(), nil
 }
 
 ```
@@ -218,7 +218,7 @@ func InsertUser() ([]interface{}, string, error) {
 		return nil, "", fmt.Errorf("error writing query: %v", err)
 	}
 
-	return args.Args, sb.String(), nil
+	return args.Values, sb.String(), nil
 }
 
 ```
@@ -236,6 +236,7 @@ import (
 
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/expressions"
+	"github.com/dwethmar/gosqle/logic"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
 )
@@ -244,16 +245,16 @@ import (
 func DeleteAddress() ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
-	err := gosqle.NewDelete("addresses").Where(predicates.EQ{
-		Col:  expressions.Column{Name: "user_id"},
-		Expr: args.NewArgument(111),
-	}).Write(sb)
+	err := gosqle.NewDelete("addresses").
+		Where(
+			logic.And(predicates.EQ(expressions.Column{Name: "id", From: "addresses"}, args.NewArgument(1))),
+		).Write(sb)
 
 	if err != nil {
 		return nil, "", err
 	}
 
-	return args.Args, sb.String(), nil
+	return args.Values, sb.String(), nil
 }
 
 ```
@@ -274,6 +275,7 @@ import (
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/clauses/set"
 	"github.com/dwethmar/gosqle/expressions"
+	"github.com/dwethmar/gosqle/logic"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
 )
@@ -285,10 +287,12 @@ func UpdateUser() (string, error) {
 	err := gosqle.NewUpdate("users").Set(set.Change{
 		Col:  "name",
 		Expr: args.NewArgument(fmt.Sprintf("new name %d", time.Now().Unix())),
-	}).Where(predicates.EQ{
-		Col:  expressions.Column{Name: "id"},
-		Expr: args.NewArgument(1),
-	}).Write(sb)
+	}).Where(
+		logic.And(predicates.EQ(
+			expressions.Column{Name: "id"},
+			args.NewArgument(1),
+		)),
+	).Write(sb)
 	if err != nil {
 		return "", err
 	}
@@ -311,6 +315,7 @@ import (
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/expressions"
+	"github.com/dwethmar/gosqle/logic"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
 )
@@ -320,16 +325,20 @@ func WhereEQ(username string) ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
-		alias.Alias{Expr: expressions.Column{Name: "id"}},
+		alias.New(expressions.Column{Name: "id"}),
 	).FromTable("users", nil).
-		Where(predicates.EQ{
-			Col:  expressions.Column{Name: "name"},
-			Expr: args.NewArgument(username),
-		}).Write(sb)
+		Where(
+			logic.And(predicates.EQ(
+				expressions.Column{Name: "name"},
+				args.NewArgument(username),
+			)),
+		).Write(sb)
+
 	if err != nil {
 		return nil, "", err
 	}
-	return args.Args, sb.String(), nil
+
+	return args.Values, sb.String(), nil
 }
 
 ```
@@ -347,6 +356,7 @@ import (
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/expressions"
+	"github.com/dwethmar/gosqle/logic"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
 )
@@ -356,17 +366,21 @@ func WhereNE() ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
-		alias.Alias{Expr: expressions.Column{Name: "id"}},
-	).FromTable("users", nil).Where(predicates.NE{
-		Col:  expressions.Column{Name: "name"},
-		Expr: args.NewArgument("John"),
-	}).Write(sb)
+		alias.New(expressions.Column{Name: "id"}),
+	).FromTable("users", nil).
+		Where(
+			logic.And(predicates.NE(
+				expressions.Column{Name: "name"},
+				args.NewArgument("John"),
+			)),
+		).
+		Write(sb)
 
 	if err != nil {
 		return nil, "", err
 	}
 
-	return args.Args, sb.String(), nil
+	return args.Values, sb.String(), nil
 }
 
 ```
@@ -384,6 +398,7 @@ import (
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/expressions"
+	"github.com/dwethmar/gosqle/logic"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
 )
@@ -393,16 +408,20 @@ func WhereGT(id int) ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
-		alias.Alias{Expr: expressions.Column{Name: "id"}},
+		alias.New(expressions.Column{Name: "id"}),
 	).FromTable("users", nil).
-		Where(predicates.GT{
-			Col:  expressions.Column{Name: "id"},
-			Expr: args.NewArgument(id),
-		}).Write(sb)
+		Where(
+			logic.And(predicates.GT(
+				expressions.Column{Name: "id"},
+				args.NewArgument(id),
+			)),
+		).Write(sb)
+
 	if err != nil {
 		return nil, "", err
 	}
-	return args.Args, sb.String(), nil
+
+	return args.Values, sb.String(), nil
 }
 
 ```
@@ -420,6 +439,7 @@ import (
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/expressions"
+	"github.com/dwethmar/gosqle/logic"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
 )
@@ -429,16 +449,20 @@ func WhereGTE(id int) ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
-		alias.Alias{Expr: expressions.Column{Name: "id"}},
+		alias.New(expressions.Column{Name: "id"}),
 	).FromTable("users", nil).
-		Where(predicates.GTE{
-			Col:  expressions.Column{Name: "id"},
-			Expr: args.NewArgument(id),
-		}).Write(sb)
+		Where(
+			logic.And(predicates.GTE(
+				expressions.Column{Name: "id"},
+				args.NewArgument(id),
+			)),
+		).Write(sb)
+
 	if err != nil {
 		return nil, "", err
 	}
-	return args.Args, sb.String(), nil
+
+	return args.Values, sb.String(), nil
 }
 
 ```
@@ -456,6 +480,7 @@ import (
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/expressions"
+	"github.com/dwethmar/gosqle/logic"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
 )
@@ -465,15 +490,21 @@ func WhereLT() ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
-		alias.Alias{Expr: expressions.Column{Name: "id"}},
-	).FromTable("users", nil).Where(predicates.LT{
-		Col:  expressions.Column{Name: "id"},
-		Expr: args.NewArgument(10),
-	}).Write(sb)
+		alias.New(expressions.Column{Name: "id"}),
+	).FromTable("users", nil).
+		Where(
+			logic.And(predicates.LT(
+				expressions.Column{Name: "id"},
+				args.NewArgument(10),
+			)),
+		).
+		Write(sb)
+
 	if err != nil {
 		return nil, "", err
 	}
-	return args.Args, sb.String(), nil
+
+	return args.Values, sb.String(), nil
 }
 
 ```
@@ -491,6 +522,7 @@ import (
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/expressions"
+	"github.com/dwethmar/gosqle/logic"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
 )
@@ -500,17 +532,21 @@ func WhereLTE() ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
-		alias.Alias{Expr: expressions.Column{Name: "id"}},
-	).FromTable("users", nil).Where(predicates.LT{
-		Col:  expressions.Column{Name: "id"},
-		Expr: args.NewArgument(10),
-	}).Write(sb)
+		alias.New(expressions.Column{Name: "id"}),
+	).FromTable("users", nil).
+		Where(
+			logic.And(predicates.LTE(
+				expressions.Column{Name: "id"},
+				args.NewArgument(10),
+			)),
+		).
+		Write(sb)
 
 	if err != nil {
 		return nil, "", err
 	}
 
-	return args.Args, sb.String(), nil
+	return args.Values, sb.String(), nil
 }
 
 ```
@@ -528,6 +564,7 @@ import (
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/expressions"
+	"github.com/dwethmar/gosqle/logic"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
 )
@@ -537,16 +574,18 @@ func WhereLike() ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
-		alias.Alias{Expr: expressions.Column{Name: "id"}},
+		alias.New(expressions.Column{Name: "id"}),
 	).FromTable("users", nil).
-		Where(predicates.Like{
-			Col:  expressions.Column{Name: "name"},
-			Expr: args.NewArgument("anna%"),
-		}).Write(sb)
+		Where(logic.And(predicates.Like(
+			expressions.Column{Name: "name"},
+			args.NewArgument("anna%"),
+		))).Write(sb)
+
 	if err != nil {
 		return nil, "", err
 	}
-	return args.Args, sb.String(), nil
+
+	return args.Values, sb.String(), nil
 }
 
 ```
@@ -564,6 +603,7 @@ import (
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/expressions"
+	"github.com/dwethmar/gosqle/logic"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
 )
@@ -572,21 +612,27 @@ import (
 func WhereIN(names []string) ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
+
 	list := []expressions.Expression{}
 	for _, name := range names {
 		list = append(list, args.NewArgument(name))
 	}
+
 	err := gosqle.NewSelect(
-		alias.Alias{Expr: expressions.Column{Name: "id"}},
+		alias.New(expressions.Column{Name: "id"}),
 	).FromTable("users", nil).
-		Where(predicates.In{
-			Col:  expressions.Column{Name: "id"},
-			Expr: expressions.List(list),
-		}).Write(sb)
+		Where(
+			logic.And(predicates.IN(
+				expressions.Column{Name: "name"},
+				list...,
+			)),
+		).Write(sb)
+
 	if err != nil {
 		return nil, "", err
 	}
-	return args.Args, sb.String(), nil
+
+	return args.Values, sb.String(), nil
 }
 
 ```
@@ -604,6 +650,7 @@ import (
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/expressions"
+	"github.com/dwethmar/gosqle/logic"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
 )
@@ -613,17 +660,21 @@ func WhereBetween(low, high int) ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
-		alias.Alias{Expr: expressions.Column{Name: "id"}},
+		alias.New(expressions.Column{Name: "id"}),
 	).FromTable("users", nil).
-		Where(predicates.Between{
-			Col:  expressions.Column{Name: "id"},
-			Low:  args.NewArgument(low),
-			High: args.NewArgument(high),
-		}).Write(sb)
+		Where(
+			logic.And(predicates.Between(
+				expressions.Column{Name: "id"},
+				args.NewArgument(low),
+				args.NewArgument(high),
+			)),
+		).Write(sb)
+
 	if err != nil {
 		return nil, "", err
 	}
-	return args.Args, sb.String(), nil
+
+	return args.Values, sb.String(), nil
 }
 
 ```
@@ -641,6 +692,7 @@ import (
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/expressions"
+	"github.com/dwethmar/gosqle/logic"
 	"github.com/dwethmar/gosqle/predicates"
 )
 
@@ -648,14 +700,16 @@ import (
 func WhereIsNull() (string, error) {
 	sb := new(strings.Builder)
 	err := gosqle.NewSelect(
-		alias.Alias{Expr: expressions.Column{Name: "id"}},
+		alias.New(expressions.Column{Name: "id"}),
 	).FromTable("users", nil).
-		Where(predicates.IsNull{
-			Col: expressions.Column{Name: "phone"},
-		}).Write(sb)
+		Where(
+			logic.And(predicates.IsNull(expressions.Column{Name: "phone"})),
+		).Write(sb)
+
 	if err != nil {
 		return "", err
 	}
+
 	return sb.String(), nil
 }
 
@@ -675,6 +729,7 @@ import (
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/expressions"
+	"github.com/dwethmar/gosqle/logic"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
 )
@@ -684,35 +739,35 @@ func WhereWrap(db *sql.DB) ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
-		alias.Alias{Expr: expressions.Column{Name: "id"}},
+		alias.New(expressions.Column{Name: "id"}),
 	).FromTable("users", nil).
 		Where(
-			predicates.Wrap{
-				Predicates: []predicates.Predicate{
-					predicates.Between{
-						Col:  expressions.Column{Name: "id"},
-						Low:  args.NewArgument(10),
-						High: args.NewArgument(20),
-					},
-					predicates.Between{
-						Col:  expressions.Column{Name: "id"},
-						Low:  args.NewArgument(30),
-						High: args.NewArgument(40),
-					},
-				},
-			},
-			predicates.EQ{
-				Col:   expressions.Column{Name: "name"},
-				Expr:  args.NewArgument("John"),
-				Logic: predicates.OR,
-			},
-		).Write(sb)
+			logic.And(predicates.Between(
+				expressions.Column{Name: "id"},
+				args.NewArgument(10),
+				args.NewArgument(20),
+			)),
+			logic.Or(
+				logic.Group([]logic.Logic{
+					logic.And(predicates.Between(
+						expressions.Column{Name: "id"},
+						args.NewArgument(30),
+						args.NewArgument(40),
+					)),
+					logic.Or(predicates.EQ(
+						expressions.Column{Name: "name"},
+						args.NewArgument("John"),
+					)),
+				}),
+			),
+		).
+		Write(sb)
 
 	if err != nil {
 		return nil, "", err
 	}
 
-	return args.Args, sb.String(), nil
+	return args.Values, sb.String(), nil
 }
 
 ```
@@ -731,6 +786,7 @@ import (
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/expressions"
+	"github.com/dwethmar/gosqle/logic"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
 )
@@ -740,20 +796,21 @@ func WhereNOT(db *sql.DB) ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
-		alias.Alias{Expr: expressions.Column{Name: "id"}},
+		alias.New(expressions.Column{Name: "id"}),
 	).FromTable("users", nil).
-		Where(predicates.Not{
-			Predicate: predicates.EQ{
-				Col:  expressions.Column{Name: "name"},
-				Expr: args.NewArgument("John"),
-			},
-		}).Write(sb)
+		Where(
+			logic.And(predicates.Not(predicates.EQ(
+				expressions.Column{Name: "name"},
+				args.NewArgument("John"),
+			))),
+		).
+		Write(sb)
 
 	if err != nil {
 		return nil, "", err
 	}
 
-	return args.Args, sb.String(), nil
+	return args.Values, sb.String(), nil
 }
 
 ```

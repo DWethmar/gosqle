@@ -9,6 +9,7 @@ import (
 	"github.com/dwethmar/gosqle/clauses"
 	"github.com/dwethmar/gosqle/clauses/where"
 	"github.com/dwethmar/gosqle/expressions"
+	"github.com/dwethmar/gosqle/logic"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
 )
@@ -46,11 +47,8 @@ func TestDelete_Write(t *testing.T) {
 			fields: fields{
 				ClauseWriter: ClauseWriter{
 					clauses: map[clauses.ClauseType]clauses.Clause{
-						clauses.WhereType: where.New([]predicates.Predicate{
-							predicates.EQ{
-								Col:  expressions.Column{Name: "id"},
-								Expr: postgres.NewArgument(1, 1),
-							},
+						clauses.WhereType: where.New([]logic.Logic{
+							logic.And(predicates.EQ(expressions.Column{Name: "id"}, postgres.NewArgument(1, 1))),
 						}),
 					},
 					order:           deleteClausesOrder,

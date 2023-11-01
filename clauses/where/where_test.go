@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/dwethmar/gosqle/expressions"
+	"github.com/dwethmar/gosqle/logic"
 	"github.com/dwethmar/gosqle/mock"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
@@ -13,9 +14,8 @@ import (
 
 func TestWhere(t *testing.T) {
 	type args struct {
-		sb          *strings.Builder
-		predicates  []predicates.Predicate
-		paramOffset int
+		sb         *strings.Builder
+		conditions []logic.Logic
 	}
 	tests := []struct {
 		name    string
@@ -24,11 +24,19 @@ func TestWhere(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "empty filter",
+			name: "empty conditions should return error",
 			args: args{
-				sb:          &strings.Builder{},
-				predicates:  []predicates.Predicate{},
-				paramOffset: 0,
+				sb:         &strings.Builder{},
+				conditions: []logic.Logic{},
+			},
+			want:    "",
+			wantErr: true,
+		},
+		{
+			name: "nil conditions should return error",
+			args: args{
+				sb:         &strings.Builder{},
+				conditions: nil,
 			},
 			want:    "",
 			wantErr: true,
@@ -37,21 +45,29 @@ func TestWhere(t *testing.T) {
 			name: "where clause with one condition",
 			args: args{
 				sb: &strings.Builder{},
-				predicates: []predicates.Predicate{
-					predicates.EQ{
-						Col:  expressions.Column{Name: "id"},
-						Expr: postgres.NewArgument(1, 1),
-					},
+				conditions: []logic.Logic{
+					logic.And(predicates.EQ(expressions.Column{Name: "id"}, postgres.NewArgument(1, 1))),
 				},
-				paramOffset: 0,
 			},
 			want:    `WHERE id = $1`,
+			wantErr: false,
+		},
+		{
+			name: "where clause with multiple conditions",
+			args: args{
+				sb: &strings.Builder{},
+				conditions: []logic.Logic{
+					logic.And(predicates.EQ(expressions.Column{Name: "id"}, postgres.NewArgument(1, 1))),
+					logic.And(predicates.EQ(expressions.Column{Name: "name"}, postgres.NewArgument("piet", 2))),
+				},
+			},
+			want:    `WHERE id = $1 AND name = $2`,
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := WriteWhere(tt.args.sb, tt.args.predicates); (err != nil) != tt.wantErr {
+			if err := WriteWhere(tt.args.sb, tt.args.conditions); (err != nil) != tt.wantErr {
 				t.Errorf("Where() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
@@ -68,7 +84,10 @@ func TestWhere(t *testing.T) {
 			return 0, errors.New("error")
 		})
 
-		if err := WriteWhere(writer, []predicates.Predicate{predicates.EQ{}}); err == nil {
+		if err := WriteWhere(writer, []logic.Logic{
+			logic.And(predicates.EQ(expressions.Column{Name: "id"}, postgres.NewArgument(1, 1))),
+			logic.And(predicates.EQ(expressions.Column{Name: "name"}, postgres.NewArgument("piet", 2))),
+		}); err == nil {
 			t.Error("expected error")
 		}
 	})

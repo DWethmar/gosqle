@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/dwethmar/gosqle/expressions"
+	"github.com/dwethmar/gosqle/logic"
 	"github.com/dwethmar/gosqle/mysql"
 	"github.com/dwethmar/gosqle/predicates"
 )
@@ -18,10 +19,9 @@ func TestDelete_Write(t *testing.T) {
 	}{
 		{
 			name: "delete from",
-			delete: NewDelete("users").Where(predicates.EQ{
-				Col:  expressions.Column{Name: "id", From: "users"},
-				Expr: mysql.NewArgument(1),
-			}),
+			delete: NewDelete("users").Where(
+				logic.And(predicates.EQ(expressions.Column{Name: "id", From: "users"}, mysql.NewArgument(1))),
+			),
 			want: "DELETE FROM users WHERE users.id = ?;",
 		},
 	}

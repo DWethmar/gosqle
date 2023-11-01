@@ -6,6 +6,7 @@ import (
 
 	"github.com/dwethmar/gosqle/clauses/set"
 	"github.com/dwethmar/gosqle/expressions"
+	"github.com/dwethmar/gosqle/logic"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
 )
@@ -25,12 +26,12 @@ func TestUpdate_Write(t *testing.T) {
 				set.Change{Col: "name", Expr: postgres.NewArgument("John", 1)},
 				set.Change{Col: "age", Expr: postgres.NewArgument(25, 2)},
 			).Where(
-				predicates.EQ{
-					Col:  expressions.Column{Name: "id", From: "users"},
-					Expr: postgres.NewArgument(1, 3),
-				},
+				logic.And(predicates.EQ(
+					expressions.Column{Name: "id"},
+					postgres.NewArgument(1, 3),
+				)),
 			),
-			want: "UPDATE users SET name = $1, age = $2 WHERE users.id = $3;",
+			want: "UPDATE users SET name = $1, age = $2 WHERE id = $3;",
 		},
 	}
 	for _, tt := range tests {

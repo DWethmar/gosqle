@@ -15,7 +15,7 @@ import (
 func TestWriteSelect(t *testing.T) {
 	t.Run("should write SELECT", func(t *testing.T) {
 		sb := new(strings.Builder)
-		if err := WriteSelect(sb, []alias.Alias{
+		if err := WriteSelect(sb, []*alias.Alias{
 			{
 				Expr: expressions.Column{Name: "column1"},
 			},
@@ -32,7 +32,7 @@ func TestWriteSelect(t *testing.T) {
 func TestSelect_Write(t *testing.T) {
 	type fields struct {
 		ClauseWriter ClauseWriter
-		columns      []alias.Alias
+		columns      []*alias.Alias
 	}
 	type args struct {
 		sw io.StringWriter
@@ -49,16 +49,18 @@ func TestSelect_Write(t *testing.T) {
 			fields: fields{
 				ClauseWriter: ClauseWriter{
 					clauses: map[clauses.ClauseType]clauses.Clause{
-						clauses.FromType: from.New(alias.Alias{
+						clauses.FromType: from.New(&alias.Alias{
 							Expr: expressions.String("table"),
 						}),
 					},
 					order:           selectClausesOrder,
 					ClauseSeparator: SpaceSeparator,
 				},
-				columns: []alias.Alias{{
-					Expr: expressions.Column{Name: "column1"},
-				}},
+				columns: []*alias.Alias{
+					{
+						Expr: expressions.Column{Name: "column1"},
+					},
+				},
 			},
 			args: args{
 				sw: new(strings.Builder),
@@ -92,7 +94,7 @@ func TestSelect_Write(t *testing.T) {
 
 func TestNewSelect(t *testing.T) {
 	type args struct {
-		columns []alias.Alias
+		columns []*alias.Alias
 	}
 	tests := []struct {
 		name string
@@ -102,9 +104,11 @@ func TestNewSelect(t *testing.T) {
 		{
 			name: "should create new Select",
 			args: args{
-				columns: []alias.Alias{{
-					Expr: expressions.Column{Name: "column1"},
-				}},
+				columns: []*alias.Alias{
+					{
+						Expr: expressions.Column{Name: "column1"},
+					},
+				},
 			},
 			want: &Select{
 				ClauseWriter: ClauseWriter{
@@ -112,9 +116,11 @@ func TestNewSelect(t *testing.T) {
 					order:           selectClausesOrder,
 					ClauseSeparator: SpaceSeparator,
 				},
-				columns: []alias.Alias{{
-					Expr: expressions.Column{Name: "column1"},
-				}},
+				columns: []*alias.Alias{
+					{
+						Expr: expressions.Column{Name: "column1"},
+					},
+				},
 			},
 		},
 	}

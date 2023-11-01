@@ -97,7 +97,7 @@ func TestFrom_Write(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			f := &Clause{
-				from: alias.Alias{
+				from: &alias.Alias{
 					Expr: tt.fields.Expression,
 				},
 			}
@@ -115,7 +115,7 @@ func TestFrom_Write(t *testing.T) {
 
 func TestNewFrom(t *testing.T) {
 	type args struct {
-		from alias.Alias
+		from *alias.Alias
 	}
 	tests := []struct {
 		name string
@@ -125,13 +125,13 @@ func TestNewFrom(t *testing.T) {
 		{
 			name: "should create new From",
 			args: args{
-				from: alias.Alias{
+				from: &alias.Alias{
 					Expr: expressions.String("table"),
 					As:   "",
 				},
 			},
 			want: &Clause{
-				from: alias.Alias{
+				from: &alias.Alias{
 					Expr: expressions.String("table"),
 					As:   "",
 				},
@@ -140,13 +140,13 @@ func TestNewFrom(t *testing.T) {
 		{
 			name: "should create new From with alias",
 			args: args{
-				from: alias.Alias{
+				from: &alias.Alias{
 					Expr: expressions.String("table"),
 					As:   "alias",
 				},
 			},
 			want: &Clause{
-				from: alias.Alias{
+				from: &alias.Alias{
 					Expr: expressions.String("table"),
 					As:   "alias",
 				},

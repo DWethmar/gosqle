@@ -7,6 +7,7 @@ import (
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/expressions"
+	"github.com/dwethmar/gosqle/logic"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
 )
@@ -16,33 +17,33 @@ func WhereWrap(db *sql.DB) ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
-		alias.Alias{Expr: expressions.Column{Name: "id"}},
+		alias.New(expressions.Column{Name: "id"}),
 	).FromTable("users", nil).
 		Where(
-			predicates.Wrap{
-				Predicates: []predicates.Predicate{
-					predicates.Between{
-						Col:  expressions.Column{Name: "id"},
-						Low:  args.NewArgument(10),
-						High: args.NewArgument(20),
-					},
-					predicates.Between{
-						Col:  expressions.Column{Name: "id"},
-						Low:  args.NewArgument(30),
-						High: args.NewArgument(40),
-					},
-				},
-			},
-			predicates.EQ{
-				Col:   expressions.Column{Name: "name"},
-				Expr:  args.NewArgument("John"),
-				Logic: predicates.OR,
-			},
-		).Write(sb)
+			logic.And(predicates.Between(
+				expressions.Column{Name: "id"},
+				args.NewArgument(10),
+				args.NewArgument(20),
+			)),
+			logic.Or(
+				logic.Group([]logic.Logic{
+					logic.And(predicates.Between(
+						expressions.Column{Name: "id"},
+						args.NewArgument(30),
+						args.NewArgument(40),
+					)),
+					logic.Or(predicates.EQ(
+						expressions.Column{Name: "name"},
+						args.NewArgument("John"),
+					)),
+				}),
+			),
+		).
+		Write(sb)
 
 	if err != nil {
 		return nil, "", err
 	}
 
-	return args.Args, sb.String(), nil
+	return args.Values, sb.String(), nil
 }

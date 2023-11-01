@@ -7,7 +7,7 @@ import (
 
 	"github.com/dwethmar/gosqle/clauses"
 	"github.com/dwethmar/gosqle/expressions"
-	"github.com/dwethmar/gosqle/predicates"
+	"github.com/dwethmar/gosqle/logic"
 	"github.com/dwethmar/gosqle/util"
 )
 
@@ -41,16 +41,24 @@ var _ Matcher = (*On)(nil)
 //
 //	LEFT JOIN table ON table.field = other_table.field AND table.field2 = other_table.field2
 type On struct {
-	Predicates []predicates.Predicate
+	Conditions []logic.Logic
 }
 
 func (j *On) Write(sw io.StringWriter) error {
+	if sw == nil {
+		return fmt.Errorf("string writer is nil")
+	}
+
+	if len(j.Conditions) == 0 {
+		return fmt.Errorf("conditions is empty")
+	}
+
 	if _, err := sw.WriteString("ON "); err != nil {
 		return fmt.Errorf("failed to write JOIN: %w", err)
 	}
 
-	if err := predicates.WriteAll(sw, j.Predicates); err != nil {
-		return fmt.Errorf("failed to write JOIN: %w", err)
+	if err := logic.Where(sw, j.Conditions); err != nil {
+		return fmt.Errorf("failed to write JOIN conditions: %w", err)
 	}
 
 	return nil
@@ -67,7 +75,6 @@ type Using struct {
 	Uses []string
 }
 
-func (j *Using) t() {}
 func (j *Using) Write(sw io.StringWriter) error {
 	if err := util.WriteStrings(sw, "USING (", strings.Join(j.Uses, ", "), ")"); err != nil {
 		return fmt.Errorf("failed to write JOIN: %w", err)

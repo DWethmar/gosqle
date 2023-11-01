@@ -34,14 +34,14 @@ func Write(sw io.StringWriter, from alias.Alias) error {
 
 // Clause represents a FROM clause.
 type Clause struct {
-	from alias.Alias
+	from *alias.Alias
 }
 
 func (c *Clause) Type() clauses.ClauseType       { return clauses.FromType }
-func (c *Clause) Write(sw io.StringWriter) error { return Write(sw, c.from) }
+func (c *Clause) Write(sw io.StringWriter) error { return Write(sw, *c.from) }
 
 // New creates a new from clause
-func New(from alias.Alias) *Clause {
+func New(from *alias.Alias) *Clause {
 	return &Clause{
 		from: from,
 	}

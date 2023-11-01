@@ -5,7 +5,7 @@ import (
 	"io"
 
 	"github.com/dwethmar/gosqle/clauses"
-	"github.com/dwethmar/gosqle/predicates"
+	"github.com/dwethmar/gosqle/logic"
 )
 
 var (
@@ -13,21 +13,17 @@ var (
 )
 
 // WriteWhere writes a where clause to the given string writer and returns the args.
-func WriteWhere(
-	sw io.StringWriter,
-	p []predicates.Predicate,
-) error {
-
-	if len(p) == 0 {
-		return fmt.Errorf("no conditions given")
+func WriteWhere(sw io.StringWriter, conditions []logic.Logic) error {
+	if len(conditions) == 0 {
+		return fmt.Errorf("conditions is empty")
 	}
 
-	if _, err := sw.WriteString(`WHERE `); err != nil {
+	if _, err := sw.WriteString("WHERE "); err != nil {
 		return fmt.Errorf("failed to write WHERE: %w", err)
 	}
 
-	if err := predicates.WriteAll(sw, p); err != nil {
-		return fmt.Errorf("error writing predicates: %v", err)
+	if err := logic.Where(sw, conditions); err != nil {
+		return fmt.Errorf("failed to write WHERE logic: %w", err)
 	}
 
 	return nil
@@ -35,15 +31,15 @@ func WriteWhere(
 
 // UpdateWriter writes a SQL Update string.
 type Where struct {
-	predicates []predicates.Predicate
+	conditions []logic.Logic
 }
 
 func (w *Where) Type() clauses.ClauseType       { return clauses.WhereType }
-func (w *Where) Write(sw io.StringWriter) error { return WriteWhere(sw, w.predicates) }
+func (w *Where) Write(sw io.StringWriter) error { return WriteWhere(sw, w.conditions) }
 
 // New
-func New(predicates []predicates.Predicate) *Where {
+func New(conditions []logic.Logic) *Where {
 	return &Where{
-		predicates: predicates,
+		conditions: conditions,
 	}
 }

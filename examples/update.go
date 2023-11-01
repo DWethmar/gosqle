@@ -8,6 +8,7 @@ import (
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/clauses/set"
 	"github.com/dwethmar/gosqle/expressions"
+	"github.com/dwethmar/gosqle/logic"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
 )
@@ -19,10 +20,12 @@ func UpdateUser() (string, error) {
 	err := gosqle.NewUpdate("users").Set(set.Change{
 		Col:  "name",
 		Expr: args.NewArgument(fmt.Sprintf("new name %d", time.Now().Unix())),
-	}).Where(predicates.EQ{
-		Col:  expressions.Column{Name: "id"},
-		Expr: args.NewArgument(1),
-	}).Write(sb)
+	}).Where(
+		logic.And(predicates.EQ(
+			expressions.Column{Name: "id"},
+			args.NewArgument(1),
+		)),
+	).Write(sb)
 	if err != nil {
 		return "", err
 	}

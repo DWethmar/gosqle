@@ -9,7 +9,7 @@ import (
 	"github.com/dwethmar/gosqle/clauses/orderby"
 	"github.com/dwethmar/gosqle/clauses/set"
 	"github.com/dwethmar/gosqle/clauses/where"
-	"github.com/dwethmar/gosqle/predicates"
+	"github.com/dwethmar/gosqle/logic"
 	"github.com/dwethmar/gosqle/statement"
 )
 
@@ -33,12 +33,12 @@ func (u *Update) Set(changes ...set.Change) *Update {
 }
 
 // Where adds a where clause to the select statement.
-func (u *Update) Where(predicates ...predicates.Predicate) *Update {
-	if len(predicates) == 0 {
+func (u *Update) Where(conditions ...logic.Logic) *Update {
+	if len(conditions) == 0 {
 		return u
 	}
 
-	return u.SetClause(where.New(predicates))
+	return u.SetClause(where.New(conditions))
 }
 
 // OrderBy adds a order by clause to the select statement.

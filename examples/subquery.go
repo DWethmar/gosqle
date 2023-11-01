@@ -7,6 +7,7 @@ import (
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/alias"
 	"github.com/dwethmar/gosqle/expressions"
+	"github.com/dwethmar/gosqle/logic"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
 )
@@ -16,21 +17,24 @@ func PeopleOfAmsterdam() ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
-		alias.Alias{Expr: expressions.Column{Name: "name"}},
+		alias.New(expressions.Column{Name: "name"}),
 	).FromTable("users", nil).
-		Where(predicates.In{
-			Col: expressions.Column{Name: "id"},
-			Expr: gosqle.NewSelect(
-				alias.Alias{Expr: expressions.Column{Name: "user_id"}},
-			).FromTable("addresses", nil).Where(predicates.EQ{
-				Col:  expressions.Column{Name: "city"},
-				Expr: args.NewArgument("Amsterdam"),
-			}).Statement, // <- This is the subquery, so without semicolon.
-		}).Write(sb)
+		Where(
+			logic.And(
+				predicates.IN(
+					expressions.Column{Name: "city"},
+					gosqle.NewSelect(
+						alias.New(expressions.Column{Name: "id"}),
+					).Where(
+						logic.And(predicates.EQ(expressions.Column{Name: "id", From: "users"}, args.NewArgument(1))),
+					).Statement, // <-- This is the sub-query without semicolon
+				),
+			),
+		).Write(sb)
 
 	if err != nil {
 		return nil, "", fmt.Errorf("error writing query: %v", err)
 	}
 
-	return args.Args, sb.String(), nil
+	return args.Values, sb.String(), nil
 }

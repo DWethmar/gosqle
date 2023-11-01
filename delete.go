@@ -6,7 +6,7 @@ import (
 
 	"github.com/dwethmar/gosqle/clauses"
 	"github.com/dwethmar/gosqle/clauses/where"
-	"github.com/dwethmar/gosqle/predicates"
+	"github.com/dwethmar/gosqle/logic"
 	"github.com/dwethmar/gosqle/statement"
 )
 
@@ -16,12 +16,12 @@ type Delete struct {
 }
 
 // Where adds a where clause to the query.
-func (d *Delete) Where(predicates ...predicates.Predicate) *Delete {
-	if len(predicates) == 0 {
+func (d *Delete) Where(logic ...logic.Logic) *Delete {
+	if len(logic) == 0 {
 		return d
 	}
 
-	return d.SetClause(where.New(predicates))
+	return d.SetClause(where.New(logic))
 }
 
 // SetClause sets the clause for the query.

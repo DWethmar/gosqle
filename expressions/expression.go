@@ -28,3 +28,40 @@ func (e List) Write(writer io.StringWriter) error {
 
 	return nil
 }
+
+var _ Expression = ExpressionFunc(nil)
+
+type ExpressionFunc func(io.StringWriter) error
+
+func (e ExpressionFunc) Write(writer io.StringWriter) error {
+	return e(writer)
+}
+
+func WrapInParenthesis(sw io.StringWriter, e Expression) error {
+	if _, err := sw.WriteString("("); err != nil {
+		return fmt.Errorf("failed to write (")
+	}
+
+	if err := e.Write(sw); err != nil {
+		return fmt.Errorf("failed to write expression: %w", err)
+	}
+
+	if _, err := sw.WriteString(")"); err != nil {
+		return fmt.Errorf("failed to write )")
+	}
+
+	return nil
+}
+
+// Prepend writes a string and then an expression.
+func Prepend(sw io.StringWriter, str string, e Expression) error {
+	if _, err := sw.WriteString(str); err != nil {
+		return fmt.Errorf("failed to write %s", str)
+	}
+
+	if err := e.Write(sw); err != nil {
+		return fmt.Errorf("failed to write expression: %w", err)
+	}
+
+	return nil
+}

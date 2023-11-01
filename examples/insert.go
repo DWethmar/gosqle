@@ -22,5 +22,5 @@ func InsertUser() ([]interface{}, string, error) {
 		return nil, "", fmt.Errorf("error writing query: %v", err)
 	}
 
-	return args.Args, sb.String(), nil
+	return args.Values, sb.String(), nil
 }

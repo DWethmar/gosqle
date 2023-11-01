@@ -94,8 +94,8 @@ func TestArguments_NewArgument(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			a := &Arguments{
-				Index: tt.fields.Index,
-				Args:  tt.fields.Args,
+				Index:  tt.fields.Index,
+				Values: tt.fields.Args,
 			}
 			if got := a.NewArgument(tt.args.value); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Arguments.NewArgument() = %v, want %v", got, tt.want)

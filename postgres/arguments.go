@@ -29,15 +29,15 @@ func (s *Argument) Write(sw io.StringWriter) error {
 
 // Arguments is a list of arguments. It keeps track of the index of the arguments.
 type Arguments struct {
-	mut   sync.Mutex
-	Index int
-	Args  []interface{}
+	mut    sync.Mutex
+	Index  int
+	Values []interface{} // Values is a list of values that are used in the query.
 }
 
 func NewArguments() *Arguments {
 	return &Arguments{
-		Index: 0,
-		Args:  []interface{}{},
+		Index:  0,
+		Values: []interface{}{},
 	}
 }
 
@@ -46,7 +46,7 @@ func (a *Arguments) NewArgument(value interface{}) *Argument {
 	defer a.mut.Unlock()
 
 	a.Index++
-	a.Args = append(a.Args, value)
+	a.Values = append(a.Values, value)
 
 	return NewArgument(value, a.Index)
 }

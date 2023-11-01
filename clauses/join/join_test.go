@@ -9,8 +9,8 @@ import (
 
 	"github.com/dwethmar/gosqle/clauses"
 	"github.com/dwethmar/gosqle/expressions"
+	"github.com/dwethmar/gosqle/logic"
 	"github.com/dwethmar/gosqle/mock"
-	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
 )
 
@@ -34,15 +34,9 @@ func TestWriteJoin(t *testing.T) {
 				joinType: InnerJoin,
 				from:     "table",
 				Match: &On{
-					Predicates: []predicates.Predicate{
-						predicates.EQ{
-							Col:  expressions.Column{Name: "field_a", From: "table"},
-							Expr: expressions.Column{Name: "field_b", From: "other_table"},
-						},
-						predicates.LT{
-							Col:  expressions.Column{Name: "field_c", From: "table"},
-							Expr: expressions.Column{Name: "field_d", From: "other_table"},
-						},
+					Conditions: []logic.Logic{
+						logic.And(predicates.EQ(expressions.Column{Name: "field_a", From: "table"}, expressions.Column{Name: "field_b", From: "other_table"})),
+						logic.And(predicates.LT(expressions.Column{Name: "field_c", From: "table"}, expressions.Column{Name: "field_d", From: "other_table"})),
 					},
 				},
 			},
@@ -56,15 +50,9 @@ func TestWriteJoin(t *testing.T) {
 				joinType: LeftJoin,
 				from:     "table",
 				Match: &On{
-					Predicates: []predicates.Predicate{
-						predicates.EQ{
-							Col:  expressions.Column{Name: "field_a", From: "table"},
-							Expr: expressions.Column{Name: "field_b", From: "other_table"},
-						},
-						predicates.LT{
-							Col:  expressions.Column{Name: "field_c", From: "table"},
-							Expr: expressions.Column{Name: "field_d", From: "other_table"},
-						},
+					Conditions: []logic.Logic{
+						logic.And(predicates.EQ(expressions.Column{Name: "field_a", From: "table"}, expressions.Column{Name: "field_b", From: "other_table"})),
+						logic.And(predicates.LT(expressions.Column{Name: "field_c", From: "table"}, expressions.Column{Name: "field_d", From: "other_table"})),
 					},
 				},
 			},
@@ -78,28 +66,13 @@ func TestWriteJoin(t *testing.T) {
 				joinType: RightJoin,
 				from:     "table",
 				Match: &On{
-					Predicates: []predicates.Predicate{
-						predicates.EQ{
-							Col:  expressions.Column{Name: "field_a", From: "table"},
-							Expr: expressions.Column{Name: "field_b", From: "other_table"},
-						},
-						predicates.Wrap{
-							Predicates: []predicates.Predicate{
-								predicates.LT{
-									Col:  expressions.Column{Name: "field_c", From: "table"},
-									Expr: expressions.Column{Name: "field_d", From: "other_table"},
-								},
-								predicates.EQ{
-									Col:   expressions.Column{Name: "field_a", From: "table"},
-									Expr:  expressions.Column{Name: "field_b", From: "other_table"},
-									Logic: predicates.OR,
-								},
-							},
-						},
+					Conditions: []logic.Logic{
+						logic.And(predicates.EQ(expressions.Column{Name: "field_a", From: "table"}, expressions.Column{Name: "field_b", From: "other_table"})),
+						logic.And(predicates.LT(expressions.Column{Name: "field_c", From: "table"}, expressions.Column{Name: "field_d", From: "other_table"})),
 					},
 				},
 			},
-			want:    "RIGHT JOIN table ON table.field_a = other_table.field_b AND (table.field_c < other_table.field_d OR table.field_a = other_table.field_b)",
+			want:    "RIGHT JOIN table ON table.field_a = other_table.field_b AND table.field_c < other_table.field_d",
 			wantErr: false,
 		},
 		{
@@ -109,15 +82,9 @@ func TestWriteJoin(t *testing.T) {
 				joinType: FullJoin,
 				from:     "table",
 				Match: &On{
-					Predicates: []predicates.Predicate{
-						predicates.EQ{
-							Col:  expressions.Column{Name: "field_a", From: "table"},
-							Expr: expressions.Column{Name: "field_b", From: "other_table"},
-						},
-						predicates.LT{
-							Col:  expressions.Column{Name: "field_c", From: "table"},
-							Expr: expressions.Column{Name: "field_d", From: "other_table"},
-						},
+					Conditions: []logic.Logic{
+						logic.And(predicates.EQ(expressions.Column{Name: "field_a", From: "table"}, expressions.Column{Name: "field_b", From: "other_table"})),
+						logic.And(predicates.LT(expressions.Column{Name: "field_c", From: "table"}, expressions.Column{Name: "field_d", From: "other_table"})),
 					},
 				},
 			},
@@ -170,11 +137,8 @@ func TestJoin_Write(t *testing.T) {
 						Type: InnerJoin,
 						From: "table",
 						Match: &On{
-							Predicates: []predicates.Predicate{
-								predicates.EQ{
-									Col:  expressions.Column{Name: "field_a", From: "table"},
-									Expr: expressions.Column{Name: "field_b", From: "other_table"},
-								},
+							Conditions: []logic.Logic{
+								logic.And(predicates.EQ(expressions.Column{Name: "field_a", From: "table"}, expressions.Column{Name: "field_b", From: "other_table"})),
 							},
 						},
 					},
@@ -202,63 +166,31 @@ func TestJoin_Write(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "should write join with arguments",
-			fields: fields{
-				joins: []Options{
-					{
-						Type: InnerJoin,
-						From: "table",
-						Match: &On{
-							Predicates: []predicates.Predicate{
-								predicates.EQ{
-									Col:  expressions.Column{Name: "field_a", From: "table"},
-									Expr: expressions.Column{Name: "field_b", From: "other_table"},
-								},
-								predicates.LT{
-									Col:  expressions.Column{Name: "field_c", From: "table"},
-									Expr: postgres.NewArgument("value", 1),
-								},
-							},
-						},
-					},
-				},
-			},
-			args:    args{sb: new(strings.Builder)},
-			want:    "INNER JOIN table ON table.field_a = other_table.field_b AND table.field_c < $1",
-			wantErr: false,
-		},
-		{
 			name: "should write multiple joins",
 			fields: fields{
 				joins: []Options{
 					{
 						Type: InnerJoin,
-						From: "table",
+						From: "table_b",
 						Match: &On{
-							Predicates: []predicates.Predicate{
-								predicates.EQ{
-									Col:  expressions.Column{Name: "field_a", From: "table"},
-									Expr: expressions.Column{Name: "field_b", From: "other_table"},
-								},
+							Conditions: []logic.Logic{
+								logic.And(predicates.EQ(expressions.Column{Name: "field_a", From: "table_a"}, expressions.Column{Name: "field_b", From: "table_b"})),
 							},
 						},
 					},
 					{
 						Type: LeftJoin,
-						From: "table",
+						From: "table_c",
 						Match: &On{
-							Predicates: []predicates.Predicate{
-								predicates.EQ{
-									Col:  expressions.Column{Name: "field_a", From: "table"},
-									Expr: expressions.Column{Name: "field_b", From: "other_table"},
-								},
+							Conditions: []logic.Logic{
+								logic.And(predicates.EQ(expressions.Column{Name: "field_a", From: "table_a"}, expressions.Column{Name: "field_b", From: "table_c"})),
 							},
 						},
 					},
 				},
 			},
 			args:    args{sb: new(strings.Builder)},
-			want:    "INNER JOIN table ON table.field_a = other_table.field_b LEFT JOIN table ON table.field_a = other_table.field_b",
+			want:    "INNER JOIN table_b ON table_a.field_a = table_b.field_b LEFT JOIN table_c ON table_a.field_a = table_c.field_b",
 			wantErr: false,
 		},
 	}
@@ -296,11 +228,8 @@ func TestNewJoin(t *testing.T) {
 						Type: InnerJoin,
 						From: "table",
 						Match: &On{
-							Predicates: []predicates.Predicate{
-								predicates.EQ{
-									Col:  expressions.Column{Name: "field_a", From: "table"},
-									Expr: expressions.Column{Name: "field_b", From: "other_table"},
-								},
+							Conditions: []logic.Logic{
+								logic.And(predicates.EQ(expressions.Column{Name: "field_a", From: "table"}, expressions.Column{Name: "field_b", From: "other_table"})),
 							},
 						},
 					},
@@ -312,11 +241,8 @@ func TestNewJoin(t *testing.T) {
 						Type: InnerJoin,
 						From: "table",
 						Match: &On{
-							Predicates: []predicates.Predicate{
-								predicates.EQ{
-									Col:  expressions.Column{Name: "field_a", From: "table"},
-									Expr: expressions.Column{Name: "field_b", From: "other_table"},
-								},
+							Conditions: []logic.Logic{
+								logic.And(predicates.EQ(expressions.Column{Name: "field_a", From: "table"}, expressions.Column{Name: "field_b", From: "other_table"})),
 							},
 						},
 					},
@@ -335,7 +261,7 @@ func TestNewJoin(t *testing.T) {
 
 func TestJoinOn_Write(t *testing.T) {
 	type fields struct {
-		Predicates []predicates.Predicate
+		conditions []logic.Logic
 	}
 	type args struct {
 		sw io.StringWriter
@@ -349,13 +275,31 @@ func TestJoinOn_Write(t *testing.T) {
 		wantErr     bool
 	}{
 		{
+			name: "should return error when writer is nil",
+			fields: fields{
+				conditions: []logic.Logic{
+					logic.And(predicates.EQ(expressions.Column{Name: "field_a", From: "table"}, expressions.Column{Name: "field_b", From: "other_table"})),
+				},
+			},
+			args:    args{sw: nil},
+			want:    "",
+			wantErr: true,
+		},
+		{
+			name: "should return error when no conditions",
+			fields: fields{
+				conditions: []logic.Logic{},
+			},
+			args:        args{sw: new(strings.Builder)},
+			checkString: false,
+			want:        "",
+			wantErr:     true,
+		},
+		{
 			name: "should write join with ON match",
 			fields: fields{
-				Predicates: []predicates.Predicate{
-					predicates.EQ{
-						Col:  expressions.Column{Name: "field_a", From: "table"},
-						Expr: expressions.Column{Name: "field_b", From: "other_table"},
-					},
+				conditions: []logic.Logic{
+					logic.And(predicates.EQ(expressions.Column{Name: "field_a", From: "table"}, expressions.Column{Name: "field_b", From: "other_table"})),
 				},
 			},
 			args:        args{sw: new(strings.Builder)},
@@ -364,28 +308,10 @@ func TestJoinOn_Write(t *testing.T) {
 			wantErr:     false,
 		},
 		{
-			name: "should write join with ON match and arguments",
-			fields: fields{
-				Predicates: []predicates.Predicate{
-					predicates.EQ{
-						Col:  expressions.Column{Name: "field_a", From: "table"},
-						Expr: postgres.NewArgument("value", 1),
-					},
-				},
-			},
-			args:        args{sw: new(strings.Builder)},
-			checkString: true,
-			want:        "ON table.field_a = $1",
-			wantErr:     false,
-		},
-		{
 			name: "should return error when string writer returns error",
 			fields: fields{
-				Predicates: []predicates.Predicate{
-					predicates.EQ{
-						Col:  expressions.Column{Name: "field_a", From: "table"},
-						Expr: postgres.NewArgument("value", 1),
-					},
+				conditions: []logic.Logic{
+					logic.And(predicates.EQ(expressions.Column{Name: "field_a", From: "table"}, expressions.Column{Name: "field_b", From: "other_table"})),
 				},
 			},
 			args: args{
@@ -401,7 +327,7 @@ func TestJoinOn_Write(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			j := &On{
-				Predicates: tt.fields.Predicates,
+				Conditions: tt.fields.conditions,
 			}
 			if err := j.Write(tt.args.sw); (err != nil) != tt.wantErr {
 				t.Errorf("JoinOn.Write() error = %v, wantErr %v", err, tt.wantErr)
@@ -418,13 +344,6 @@ func TestJoinOn_Write(t *testing.T) {
 			}
 		})
 	}
-}
-
-func TestJoinUsing_t(t *testing.T) {
-	t.Run("should do nothing", func(t *testing.T) {
-		j := &Using{}
-		j.t()
-	})
 }
 
 func TestJoinUsing_Write(t *testing.T) {

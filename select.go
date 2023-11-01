@@ -15,7 +15,7 @@ import (
 	"github.com/dwethmar/gosqle/clauses/orderby"
 	"github.com/dwethmar/gosqle/clauses/where"
 	"github.com/dwethmar/gosqle/expressions"
-	"github.com/dwethmar/gosqle/predicates"
+	"github.com/dwethmar/gosqle/logic"
 	"github.com/dwethmar/gosqle/statement"
 )
 
@@ -25,7 +25,7 @@ type Select struct {
 	statement.Statement
 }
 
-func (s *Select) From(a alias.Alias) *Select {
+func (s *Select) From(a *alias.Alias) *Select {
 	return s.SetClause(from.New(a))
 }
 
@@ -41,7 +41,7 @@ func (s *Select) FromTable(table string, opt *FromTableOptions) *Select {
 		as = opt.Alias
 	}
 
-	return s.From(alias.Alias{
+	return s.From(&alias.Alias{
 		Expr: expressions.String(table),
 		As:   as,
 	})
@@ -59,12 +59,12 @@ func (s *Select) Join(j ...join.Options) *Select {
 
 // Where adds a where clause to the select statement.
 // If no predicates are given, the where clause will be ignored.
-func (s *Select) Where(predicates ...predicates.Predicate) *Select {
-	if len(predicates) == 0 {
+func (s *Select) Where(conditions ...logic.Logic) *Select {
+	if len(conditions) == 0 {
 		return s
 	}
 
-	return s.SetClause(where.New(predicates))
+	return s.SetClause(where.New(conditions))
 }
 
 // GroupBy adds a group by clause to the select statement.
@@ -77,8 +77,8 @@ func (s *Select) GroupBy(grouping groupby.Grouping) *Select {
 }
 
 // Having adds a having clause to the select statement.
-func (s *Select) Having(p ...predicates.Predicate) *Select {
-	return s.SetClause(having.New(p))
+func (s *Select) Having(conditions ...logic.Logic) *Select {
+	return s.SetClause(having.New(conditions))
 }
 
 // OrderBy adds a order by clause to the select statement.
@@ -123,7 +123,7 @@ func (s *Select) Write(sw io.StringWriter) error {
 }
 
 // NewSelect creates a new select query.
-func NewSelect(columns ...alias.Alias) *Select {
+func NewSelect(columns ...*alias.Alias) *Select {
 	return &Select{
 		Statement: statement.NewSelect(columns),
 	}

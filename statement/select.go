@@ -31,7 +31,7 @@ var selectClausesOrder = []clauses.ClauseType{
 // Example:
 //
 //	SELECT field1, field2, field3
-func WriteSelect(sw io.StringWriter, columns []alias.Alias) error {
+func WriteSelect(sw io.StringWriter, columns []*alias.Alias) error {
 	if len(columns) == 0 {
 		return errors.New("no select columns specified")
 	}
@@ -58,7 +58,7 @@ func WriteSelect(sw io.StringWriter, columns []alias.Alias) error {
 // SelectWriter writes a SQL From string to the given string writer.
 type Select struct {
 	ClauseWriter
-	columns []alias.Alias
+	columns []*alias.Alias
 }
 
 // ToSQL returns the query as a string and it's arguments and an error if any.
@@ -90,7 +90,7 @@ func NewSelectClauseWriter() ClauseWriter {
 }
 
 // NewSelectClause creates a new SelectClause.
-func NewSelect(columns []alias.Alias) *Select {
+func NewSelect(columns []*alias.Alias) *Select {
 	return &Select{
 		ClauseWriter: NewSelectClauseWriter(),
 		columns:      columns,

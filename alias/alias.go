@@ -19,6 +19,11 @@ type Alias struct {
 	As   string // optional
 }
 
+func (a *Alias) SetAs(as string) *Alias {
+	a.As = as
+	return a
+}
+
 // Write implements expressions.Expression.
 func (a *Alias) Write(sw io.StringWriter) error {
 	if err := a.Expr.Write(sw); err != nil {
@@ -34,4 +39,10 @@ func (a *Alias) Write(sw io.StringWriter) error {
 	}
 
 	return nil
+}
+
+func New(expr expressions.Expression) *Alias {
+	return &Alias{
+		Expr: expr,
+	}
 }

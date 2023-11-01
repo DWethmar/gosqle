@@ -10,6 +10,7 @@ import (
 	"github.com/dwethmar/gosqle/clauses/orderby"
 	"github.com/dwethmar/gosqle/expressions"
 	"github.com/dwethmar/gosqle/functions"
+	"github.com/dwethmar/gosqle/logic"
 	"github.com/dwethmar/gosqle/postgres"
 	"github.com/dwethmar/gosqle/predicates"
 )
@@ -26,9 +27,9 @@ func TestSelect_ToSQL(t *testing.T) {
 		{
 			name: "select columns",
 			sel: NewSelect(
-				alias.Alias{Expr: expressions.Column{Name: "username", From: "u"}},
-				alias.Alias{Expr: expressions.Column{Name: "country", From: "u"}, As: "c"},
-			).From(alias.Alias{
+				&alias.Alias{Expr: expressions.Column{Name: "username", From: "u"}},
+				&alias.Alias{Expr: expressions.Column{Name: "country", From: "u"}, As: "c"},
+			).From(&alias.Alias{
 				Expr: expressions.String("users"),
 				As:   "u",
 			}),
@@ -38,8 +39,8 @@ func TestSelect_ToSQL(t *testing.T) {
 		{
 			name: "select all",
 			sel: NewSelect(
-				alias.Alias{Expr: expressions.Column{Name: "*"}},
-			).From(alias.Alias{
+				&alias.Alias{Expr: expressions.Column{Name: "*"}},
+			).From(&alias.Alias{
 				Expr: expressions.String("users"),
 			}),
 			want:    "SELECT * FROM users;",
@@ -48,20 +49,22 @@ func TestSelect_ToSQL(t *testing.T) {
 		{
 			name: "select with joins",
 			sel: NewSelect(
-				alias.Alias{Expr: expressions.Column{Name: "*", From: "users"}},
-				alias.Alias{Expr: expressions.Column{Name: "*", From: "companies"}},
-			).From(alias.Alias{
+				&alias.Alias{Expr: expressions.Column{Name: "*", From: "users"}},
+				&alias.Alias{Expr: expressions.Column{Name: "*", From: "companies"}},
+			).From(&alias.Alias{
 				Expr: expressions.String("users"),
 			}).Join(
 				join.Options{
 					Type: join.LeftJoin,
 					From: "companies",
 					Match: &join.On{
-						Predicates: []predicates.Predicate{
-							predicates.EQ{
-								Col:  expressions.Column{Name: "id", From: "companies"},
-								Expr: expressions.Column{Name: "company_id", From: "users"},
-							},
+						Conditions: []logic.Logic{
+							logic.And(
+								predicates.EQ(
+									expressions.Column{Name: "id", From: "companies"},
+									expressions.Column{Name: "company_id", From: "users"},
+								),
+							),
 						},
 					},
 				},
@@ -72,19 +75,16 @@ func TestSelect_ToSQL(t *testing.T) {
 		{
 			name: "select where",
 			sel: NewSelect(
-				alias.Alias{Expr: expressions.Column{Name: "*"}},
-			).From(alias.Alias{
+				&alias.Alias{Expr: expressions.Column{Name: "*"}},
+			).From(&alias.Alias{
 				Expr: expressions.String("users"),
 			}).Where(
-				predicates.EQ{
-					Col:  expressions.Column{Name: "username"},
-					Expr: postgres.NewArgument("david", 1),
-				},
-				predicates.EQ{
-					Col:   expressions.Column{Name: "email"},
-					Expr:  postgres.NewArgument("test@test.com", 2),
-					Logic: predicates.OR,
-				},
+				logic.And(
+					predicates.EQ(expressions.Column{Name: "username"}, postgres.NewArgument(1, 1)),
+				),
+				logic.Or(
+					predicates.EQ(expressions.Column{Name: "email"}, postgres.NewArgument(2, 2)),
+				),
 			),
 			want:    "SELECT * FROM users WHERE username = $1 OR email = $2;",
 			wantErr: false,
@@ -92,8 +92,8 @@ func TestSelect_ToSQL(t *testing.T) {
 		{
 			name: "select order by",
 			sel: NewSelect(
-				alias.Alias{Expr: expressions.Column{Name: "*"}},
-			).From(alias.Alias{
+				&alias.Alias{Expr: expressions.Column{Name: "*"}},
+			).From(&alias.Alias{
 				Expr: expressions.String("users"),
 			}).OrderBy(
 				orderby.Sort{Column: &expressions.Column{Name: "username"}, Direction: orderby.ASC},
@@ -105,8 +105,8 @@ func TestSelect_ToSQL(t *testing.T) {
 		{
 			name: "select limit",
 			sel: NewSelect(
-				alias.Alias{Expr: expressions.Column{Name: "*"}},
-			).From(alias.Alias{
+				&alias.Alias{Expr: expressions.Column{Name: "*"}},
+			).From(&alias.Alias{
 				Expr: expressions.String("users"),
 			}).Limit(postgres.NewArgument(12, 1)),
 			want:    "SELECT * FROM users LIMIT $1;",
@@ -115,8 +115,8 @@ func TestSelect_ToSQL(t *testing.T) {
 		{
 			name: "select offset",
 			sel: NewSelect(
-				alias.Alias{Expr: expressions.Column{Name: "*"}},
-			).From(alias.Alias{
+				&alias.Alias{Expr: expressions.Column{Name: "*"}},
+			).From(&alias.Alias{
 				Expr: expressions.String("users"),
 			}).Offset(postgres.NewArgument(100, 1)),
 			want:    "SELECT * FROM users OFFSET $1;",
@@ -125,8 +125,8 @@ func TestSelect_ToSQL(t *testing.T) {
 		{
 			name: "select group by columns",
 			sel: NewSelect(
-				alias.Alias{Expr: expressions.Column{Name: "username"}},
-			).From(alias.Alias{
+				&alias.Alias{Expr: expressions.Column{Name: "username"}},
+			).From(&alias.Alias{
 				Expr: expressions.String("users"),
 			}).GroupBy(
 				&groupby.ColumnGrouping{
@@ -140,10 +140,8 @@ func TestSelect_ToSQL(t *testing.T) {
 		{
 			name: "select group by columns with having",
 			sel: NewSelect(
-				alias.Alias{
-					Expr: expressions.Column{Name: "username"},
-				},
-			).From(alias.Alias{
+				alias.New(expressions.Column{Name: "username"}),
+			).From(&alias.Alias{
 				Expr: expressions.String("users"),
 			}).GroupBy(
 				&groupby.ColumnGrouping{
@@ -151,15 +149,12 @@ func TestSelect_ToSQL(t *testing.T) {
 					&expressions.Column{Name: "email"},
 				},
 			).Having(
-				predicates.GT{
-					Col:  functions.NewMax(&expressions.Column{Name: "id"}),
-					Expr: postgres.NewArgument(12, 1),
-				},
-				predicates.LT{
-					Col:   functions.NewMax(&expressions.Column{Name: "id"}),
-					Expr:  postgres.NewArgument(12, 2),
-					Logic: predicates.OR,
-				},
+				logic.And(
+					predicates.GT(functions.NewMax(&expressions.Column{Name: "id"}), postgres.NewArgument(1, 1)),
+				),
+				logic.Or(
+					predicates.LT(functions.NewMax(&expressions.Column{Name: "id"}), postgres.NewArgument(2, 2)),
+				),
 			),
 			want:    "SELECT username FROM users GROUP BY username, email HAVING MAX(id) > $1 OR MAX(id) < $2;",
 			wantErr: false,
