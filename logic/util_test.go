@@ -84,7 +84,7 @@ func TestWhere(t *testing.T) {
 						Condition: &predicates.Comparison{
 							Left:     expressions.Column{Name: "name"},
 							Operator: "=",
-							Right:    postgres.NewArgument("test", 2),
+							Right:    postgres.NewArgument(2, "test"),
 						},
 					},
 				},
@@ -110,7 +110,7 @@ func TestWhere(t *testing.T) {
 						Condition: &predicates.Comparison{
 							Left:     expressions.Column{Name: "name"},
 							Operator: "=",
-							Right:    postgres.NewArgument("test", 2),
+							Right:    postgres.NewArgument(2, "test"),
 						},
 					},
 				},
@@ -136,7 +136,7 @@ func TestWhere(t *testing.T) {
 						Condition: &predicates.Comparison{
 							Left:     expressions.Column{Name: "name"},
 							Operator: "=",
-							Right:    postgres.NewArgument("test", 2),
+							Right:    postgres.NewArgument(2, "test"),
 						},
 					},
 					{
@@ -144,12 +144,12 @@ func TestWhere(t *testing.T) {
 						Condition: &predicates.Comparison{
 							Left:     expressions.Column{Name: "age"},
 							Operator: "=",
-							Right:    postgres.NewArgument(85, 2),
+							Right:    postgres.NewArgument(3, 85),
 						},
 					},
 				},
 			},
-			want:    "id = $1 OR name = $2 AND age = $2",
+			want:    "id = $1 OR name = $2 AND age = $3",
 			wantErr: false,
 		},
 	}
@@ -162,7 +162,7 @@ func TestWhere(t *testing.T) {
 			if tt.want != "" {
 				if sb, ok := tt.args.sw.(*strings.Builder); ok {
 					if s := sb.String(); s != tt.want {
-						t.Errorf("Where() = %v, want %v", s, tt.want)
+						t.Errorf("Where() = %q, want %q", s, tt.want)
 					}
 				} else {
 					t.Errorf("expected a strings.Builder")

@@ -1,4 +1,4 @@
-package main
+package examples
 
 import (
 	"strings"
@@ -11,14 +11,14 @@ import (
 )
 
 // Delete deletes a user.
-func DeleteAddress() ([]interface{}, string, error) {
+func DeleteAddress(id int64) ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewDelete("addresses").
 		Where(
 			logic.And(predicates.EQ(
 				expressions.Column{Name: "id", From: "addresses"},
-				args.NewArgument(1),
+				args.Create(id),
 			)),
 		).Write(sb)
 
@@ -26,5 +26,5 @@ func DeleteAddress() ([]interface{}, string, error) {
 		return nil, "", err
 	}
 
-	return args.Values, sb.String(), nil
+	return args.Values(), sb.String(), nil
 }

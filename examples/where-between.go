@@ -1,4 +1,4 @@
-package main
+package examples
 
 import (
 	"strings"
@@ -17,12 +17,12 @@ func WhereBetween(low, high int) ([]interface{}, string, error) {
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
 		alias.New(expressions.Column{Name: "id"}),
-	).FromTable("users", nil).
+	).From(alias.NewStr("users")).
 		Where(
 			logic.And(predicates.Between(
 				expressions.Column{Name: "id"},
-				args.NewArgument(low),
-				args.NewArgument(high),
+				args.Create(low),
+				args.Create(high),
 			)),
 		).Write(sb)
 
@@ -30,5 +30,5 @@ func WhereBetween(low, high int) ([]interface{}, string, error) {
 		return nil, "", err
 	}
 
-	return args.Values, sb.String(), nil
+	return args.Values(), sb.String(), nil
 }

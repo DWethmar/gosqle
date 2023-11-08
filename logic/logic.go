@@ -45,11 +45,12 @@ func (l *Logic) Write(sw io.StringWriter) error {
 	return nil
 }
 
+// Group is a group of logic
 type Group []Logic
 
 func (c Group) Write(sw io.StringWriter) error {
 	if len(c) == 0 {
-		return errors.New("Group is empty")
+		return errors.New("group is empty")
 	}
 
 	return Where(sw, c)
@@ -68,5 +69,21 @@ func Or(condition expressions.Expression) Logic {
 	return Logic{
 		Operator:  OrOperator,
 		Condition: condition,
+	}
+}
+
+// AndGroup creates a group of logic
+func AndGroup(logic ...Logic) Logic {
+	return Logic{
+		Operator:  AndOperator,
+		Condition: Group(logic),
+	}
+}
+
+// OrGroup creates a group of logic
+func OrGroup(logic ...Logic) Logic {
+	return Logic{
+		Operator:  OrOperator,
+		Condition: Group(logic),
 	}
 }

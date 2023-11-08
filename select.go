@@ -33,20 +33,6 @@ type FromTableOptions struct {
 	Alias string
 }
 
-// FromTable adds a from clause to the select statement with the given table.
-// Its shorthand for From(alias.Alias{Expr: expressions.String(table)}).
-func (s *Select) FromTable(table string, opt *FromTableOptions) *Select {
-	var as string
-	if opt != nil {
-		as = opt.Alias
-	}
-
-	return s.From(&alias.Alias{
-		Expr: expressions.String(table),
-		As:   as,
-	})
-}
-
 // Join adds a join clause to the select statement.
 // If no join options are given, the join clause will be ignored.
 func (s *Select) Join(j ...join.Options) *Select {

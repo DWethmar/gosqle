@@ -1,4 +1,4 @@
-package main
+package examples
 
 import (
 	"fmt"
@@ -13,23 +13,25 @@ import (
 )
 
 // SelectUsers selects users.
-func PeopleOfAmsterdam() ([]interface{}, string, error) {
+func PeopleOfCity(city string) ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
+		alias.New(expressions.Column{Name: "id"}),
 		alias.New(expressions.Column{Name: "name"}),
-	).FromTable("users", nil).
+		alias.New(expressions.Column{Name: "email"}),
+	).From(alias.NewStr("users")).
 		Where(
 			logic.And(predicates.IN(
 				expressions.Column{Name: "id"},
 				gosqle.NewSelect(
 					alias.New(expressions.Column{Name: "user_id"}),
 				).
-					FromTable("addresses", nil).
+					From(alias.NewStr("addresses")).
 					Where(
 						logic.And(predicates.EQ(
 							expressions.Column{Name: "city"},
-							args.NewArgument("Amsterdam"),
+							args.Create(city),
 						)),
 					).Statement, // <-- This is the sub-query without semicolon
 			)),
@@ -39,5 +41,5 @@ func PeopleOfAmsterdam() ([]interface{}, string, error) {
 		return nil, "", fmt.Errorf("error writing query: %v", err)
 	}
 
-	return args.Values, sb.String(), nil
+	return args.Values(), sb.String(), nil
 }

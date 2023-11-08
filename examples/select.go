@@ -1,4 +1,4 @@
-package main
+package examples
 
 import (
 	"strings"
@@ -10,7 +10,7 @@ import (
 )
 
 // SelectUsers selects users.
-func SelectUsers() ([]interface{}, string, error) {
+func SelectUsers(limit int64) ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
@@ -18,13 +18,13 @@ func SelectUsers() ([]interface{}, string, error) {
 		alias.New(expressions.Column{Name: "name"}),
 		alias.New(expressions.Column{Name: "email"}),
 	).
-		FromTable("users", nil).
-		Limit(args.NewArgument(10)).
+		From(alias.NewStr("users")).
+		Limit(args.Create(limit)).
 		Write(sb)
 
 	if err != nil {
 		return nil, "", err
 	}
 
-	return args.Values, sb.String(), nil
+	return args.Values(), sb.String(), nil
 }

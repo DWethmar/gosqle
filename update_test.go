@@ -23,12 +23,12 @@ func TestUpdate_Write(t *testing.T) {
 		{
 			name: "update",
 			update: NewUpdate("users").Set(
-				set.Change{Col: "name", Expr: postgres.NewArgument("John", 1)},
-				set.Change{Col: "age", Expr: postgres.NewArgument(25, 2)},
+				set.Change{Col: "name", Expr: postgres.NewArgument(1, "John")},
+				set.Change{Col: "age", Expr: postgres.NewArgument(2, 25)},
 			).Where(
 				logic.And(predicates.EQ(
 					expressions.Column{Name: "id"},
-					postgres.NewArgument(1, 3),
+					postgres.NewArgument(3, 1),
 				)),
 			),
 			want: "UPDATE users SET name = $1, age = $2 WHERE id = $3;",

@@ -7,31 +7,19 @@ import (
 	"github.com/dwethmar/gosqle/expressions"
 )
 
+// Range is a range of values.
 type Range struct {
-	Target expressions.Expression
-	Low    expressions.Expression
-	High   expressions.Expression
+	Low  expressions.Expression
+	High expressions.Expression
 }
 
 func (r *Range) Write(writer io.StringWriter) error {
-	if r.Target == nil {
-		return fmt.Errorf("range target is nil")
-	}
-
 	if r.Low == nil {
 		return fmt.Errorf("range low is nil")
 	}
 
 	if r.High == nil {
 		return fmt.Errorf("range high is nil")
-	}
-
-	if err := r.Target.Write(writer); err != nil {
-		return fmt.Errorf("error writing range target: %v", err)
-	}
-
-	if _, err := writer.WriteString(" BETWEEN "); err != nil {
-		return fmt.Errorf("error writing BETWEEN: %v", err)
 	}
 
 	if err := r.Low.Write(writer); err != nil {
@@ -49,10 +37,13 @@ func (r *Range) Write(writer io.StringWriter) error {
 	return nil
 }
 
-func Between(target expressions.Expression, low expressions.Expression, high expressions.Expression) *Range {
-	return &Range{
-		Target: target,
-		Low:    low,
-		High:   high,
+func Between(target expressions.Expression, low expressions.Expression, high expressions.Expression) *Comparison {
+	return &Comparison{
+		Left:     target,
+		Operator: "BETWEEN",
+		Right: &Range{
+			Low:  low,
+			High: high,
+		},
 	}
 }

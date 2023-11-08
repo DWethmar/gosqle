@@ -1,4 +1,4 @@
-package main
+package examples
 
 import (
 	"strings"
@@ -17,11 +17,11 @@ func WhereGT(id int) ([]interface{}, string, error) {
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
 		alias.New(expressions.Column{Name: "id"}),
-	).FromTable("users", nil).
+	).From(alias.NewStr("users")).
 		Where(
 			logic.And(predicates.GT(
 				expressions.Column{Name: "id"},
-				args.NewArgument(id),
+				args.Create(id),
 			)),
 		).Write(sb)
 
@@ -29,5 +29,5 @@ func WhereGT(id int) ([]interface{}, string, error) {
 		return nil, "", err
 	}
 
-	return args.Values, sb.String(), nil
+	return args.Values(), sb.String(), nil
 }

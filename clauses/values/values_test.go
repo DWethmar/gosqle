@@ -33,9 +33,9 @@ func TestWriteValues(t *testing.T) {
 			args: args{
 				sb: &strings.Builder{},
 				values: []expressions.Expression{
-					postgres.NewArgument("a", 1),
-					postgres.NewArgument("b", 2),
-					postgres.NewArgument("c", 3),
+					postgres.NewArgument(1, "a"),
+					postgres.NewArgument(2, "b"),
+					postgres.NewArgument(3, "c"),
 				},
 			},
 			want:    "VALUES ($1, $2, $3)",

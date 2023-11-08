@@ -30,21 +30,20 @@ func TestRange_Write(t *testing.T) {
 			name: "should write",
 			fields: fields{
 				Target: expressions.Column{Name: "target", From: "table"},
-				Low:    postgres.NewArgument(100, 1),
-				High:   postgres.NewArgument(200, 2),
+				Low:    postgres.NewArgument(1, 100),
+				High:   postgres.NewArgument(2, 200),
 			},
 			args: args{
 				writer: new(strings.Builder),
 			},
-			want: "table.target BETWEEN $1 AND $2",
+			want: "$1 AND $2",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Range{
-				Target: tt.fields.Target,
-				Low:    tt.fields.Low,
-				High:   tt.fields.High,
+				Low:  tt.fields.Low,
+				High: tt.fields.High,
 			}
 
 			if err := r.Write(tt.args.writer); (err != nil) != tt.wantErr {
@@ -73,7 +72,7 @@ func TestBetween(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want *Range
+		want *Comparison
 	}{
 		{
 			name: "should create range",
@@ -82,10 +81,13 @@ func TestBetween(t *testing.T) {
 				low:    postgres.NewArgument(100, 1),
 				high:   postgres.NewArgument(200, 2),
 			},
-			want: &Range{
-				Target: expressions.Column{Name: "target", From: "table"},
-				Low:    postgres.NewArgument(100, 1),
-				High:   postgres.NewArgument(200, 2),
+			want: &Comparison{
+				Left:     expressions.Column{Name: "target", From: "table"},
+				Operator: "BETWEEN",
+				Right: &Range{
+					Low:  postgres.NewArgument(100, 1),
+					High: postgres.NewArgument(200, 2),
+				},
 			},
 		},
 	}

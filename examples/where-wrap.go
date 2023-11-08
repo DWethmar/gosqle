@@ -1,4 +1,4 @@
-package main
+package examples
 
 import (
 	"database/sql"
@@ -18,25 +18,23 @@ func WhereWrap(db *sql.DB) ([]interface{}, string, error) {
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
 		alias.New(expressions.Column{Name: "id"}),
-	).FromTable("users", nil).
+	).From(alias.NewStr("users")).
 		Where(
 			logic.And(predicates.Between(
 				expressions.Column{Name: "id"},
-				args.NewArgument(10),
-				args.NewArgument(20),
+				args.Create(10),
+				args.Create(20),
 			)),
-			logic.Or(
-				logic.Group([]logic.Logic{
-					logic.And(predicates.Between(
-						expressions.Column{Name: "id"},
-						args.NewArgument(30),
-						args.NewArgument(40),
-					)),
-					logic.Or(predicates.EQ(
-						expressions.Column{Name: "name"},
-						args.NewArgument("John"),
-					)),
-				}),
+			logic.AndGroup(
+				logic.And(predicates.Between(
+					expressions.Column{Name: "id"},
+					args.Create(30),
+					args.Create(40),
+				)),
+				logic.Or(predicates.EQ(
+					expressions.Column{Name: "name"},
+					args.Create("John"),
+				)),
 			),
 		).
 		Write(sb)
@@ -45,5 +43,5 @@ func WhereWrap(db *sql.DB) ([]interface{}, string, error) {
 		return nil, "", err
 	}
 
-	return args.Values, sb.String(), nil
+	return args.Values(), sb.String(), nil
 }

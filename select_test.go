@@ -15,7 +15,7 @@ import (
 	"github.com/dwethmar/gosqle/predicates"
 )
 
-func TestSelect_ToSQL(t *testing.T) {
+func TestSelect_Write(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -108,7 +108,7 @@ func TestSelect_ToSQL(t *testing.T) {
 				&alias.Alias{Expr: expressions.Column{Name: "*"}},
 			).From(&alias.Alias{
 				Expr: expressions.String("users"),
-			}).Limit(postgres.NewArgument(12, 1)),
+			}).Limit(postgres.NewArgument(1, 12)),
 			want:    "SELECT * FROM users LIMIT $1;",
 			wantErr: false,
 		},
@@ -118,7 +118,7 @@ func TestSelect_ToSQL(t *testing.T) {
 				&alias.Alias{Expr: expressions.Column{Name: "*"}},
 			).From(&alias.Alias{
 				Expr: expressions.String("users"),
-			}).Offset(postgres.NewArgument(100, 1)),
+			}).Offset(postgres.NewArgument(1, 100)),
 			want:    "SELECT * FROM users OFFSET $1;",
 			wantErr: false,
 		},

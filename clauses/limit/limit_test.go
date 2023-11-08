@@ -35,7 +35,7 @@ func TestWrite(t *testing.T) {
 			name: "should write limit postgres",
 			args: args{
 				sb:  &strings.Builder{},
-				arg: postgres.NewArgument(100, 1),
+				arg: postgres.NewArgument(1, 999),
 			},
 			want:    "LIMIT $1",
 			wantErr: false,
@@ -44,7 +44,7 @@ func TestWrite(t *testing.T) {
 			name: "should write limit at index 13",
 			args: args{
 				sb:  &strings.Builder{},
-				arg: postgres.NewArgument(100, 13),
+				arg: postgres.NewArgument(13, 777),
 			},
 			want:    "LIMIT $13",
 			wantErr: false,

@@ -1,4 +1,4 @@
-package main
+package examples
 
 import (
 	"strings"
@@ -18,12 +18,12 @@ func WhereIN(names []string) ([]interface{}, string, error) {
 
 	list := []expressions.Expression{}
 	for _, name := range names {
-		list = append(list, args.NewArgument(name))
+		list = append(list, args.Create(name))
 	}
 
 	err := gosqle.NewSelect(
 		alias.New(expressions.Column{Name: "id"}),
-	).FromTable("users", nil).
+	).From(alias.NewStr("users")).
 		Where(
 			logic.And(predicates.IN(
 				expressions.Column{Name: "name"},
@@ -35,5 +35,5 @@ func WhereIN(names []string) ([]interface{}, string, error) {
 		return nil, "", err
 	}
 
-	return args.Values, sb.String(), nil
+	return args.Values(), sb.String(), nil
 }

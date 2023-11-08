@@ -47,8 +47,8 @@ func TestInsert_Write(t *testing.T) {
 				ClauseWriter: ClauseWriter{
 					clauses: map[clauses.ClauseType]clauses.Clause{
 						clauses.ValuesType: values.New([]expressions.Expression{
-							postgres.NewArgument("a", 1),
-							postgres.NewArgument("b", 2),
+							postgres.NewArgument(1, "a"),
+							postgres.NewArgument(2, "b"),
 						}),
 					},
 					order:           insertClausesOrder,

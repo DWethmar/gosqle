@@ -44,7 +44,7 @@ func TestWrite(t *testing.T) {
 			name: "should write limit at offset 13",
 			args: args{
 				sb:   &strings.Builder{},
-				expr: postgres.NewArgument(1, 13),
+				expr: postgres.NewArgument(13, 1),
 			},
 			want:    "OFFSET $13",
 			wantErr: false,

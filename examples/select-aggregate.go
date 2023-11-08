@@ -1,4 +1,4 @@
-package main
+package examples
 
 import (
 	"strings"
@@ -17,7 +17,7 @@ func SelectAmountOfAddressesPerCountry() (string, error) {
 	err := gosqle.NewSelect(
 		alias.New(expressions.Column{Name: "country"}),
 		alias.New(functions.NewCount(&expressions.Column{Name: "id"})).SetAs("address_count"),
-	).FromTable("addresses", nil).
+	).From(alias.NewStr("addresses")).
 		GroupBy(groupby.ColumnGrouping{
 			&expressions.Column{Name: "country"},
 		}).

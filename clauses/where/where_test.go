@@ -58,7 +58,7 @@ func TestWhere(t *testing.T) {
 				sb: &strings.Builder{},
 				conditions: []logic.Logic{
 					logic.And(predicates.EQ(expressions.Column{Name: "id"}, postgres.NewArgument(1, 1))),
-					logic.And(predicates.EQ(expressions.Column{Name: "name"}, postgres.NewArgument("piet", 2))),
+					logic.And(predicates.EQ(expressions.Column{Name: "name"}, postgres.NewArgument(2, "piet"))),
 				},
 			},
 			want:    `WHERE id = $1 AND name = $2`,
@@ -86,7 +86,7 @@ func TestWhere(t *testing.T) {
 
 		if err := WriteWhere(writer, []logic.Logic{
 			logic.And(predicates.EQ(expressions.Column{Name: "id"}, postgres.NewArgument(1, 1))),
-			logic.And(predicates.EQ(expressions.Column{Name: "name"}, postgres.NewArgument("piet", 2))),
+			logic.And(predicates.EQ(expressions.Column{Name: "name"}, postgres.NewArgument(2, "piet"))),
 		}); err == nil {
 			t.Error("expected error")
 		}

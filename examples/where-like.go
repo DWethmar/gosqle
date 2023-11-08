@@ -1,4 +1,4 @@
-package main
+package examples
 
 import (
 	"strings"
@@ -17,15 +17,15 @@ func WhereLike() ([]interface{}, string, error) {
 	args := postgres.NewArguments()
 	err := gosqle.NewSelect(
 		alias.New(expressions.Column{Name: "id"}),
-	).FromTable("users", nil).
+	).From(alias.NewStr("users")).
 		Where(logic.And(predicates.Like(
 			expressions.Column{Name: "name"},
-			args.NewArgument("anna%"),
+			args.Create("anna%"),
 		))).Write(sb)
 
 	if err != nil {
 		return nil, "", err
 	}
 
-	return args.Values, sb.String(), nil
+	return args.Values(), sb.String(), nil
 }

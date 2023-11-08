@@ -30,7 +30,7 @@ func TestInsert_Write(t *testing.T) {
 			name: "select columns postgres",
 			insert: NewInsert("users", "id", "username").Values(
 				postgres.NewArgument(1, 1),
-				postgres.NewArgument("test", 2),
+				postgres.NewArgument(2, "test"),
 			),
 			want:    "INSERT INTO users (id, username) VALUES ($1, $2);",
 			wantErr: false,

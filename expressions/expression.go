@@ -56,11 +56,24 @@ func WrapInParenthesis(sw io.StringWriter, e Expression) error {
 // Prepend writes a string and then an expression.
 func Prepend(sw io.StringWriter, str string, e Expression) error {
 	if _, err := sw.WriteString(str); err != nil {
-		return fmt.Errorf("failed to write %s", str)
+		return fmt.Errorf("failed to prepend string: %w", err)
 	}
 
 	if err := e.Write(sw); err != nil {
 		return fmt.Errorf("failed to write expression: %w", err)
+	}
+
+	return nil
+}
+
+// Append writes an expression and then a string.
+func Append(sw io.StringWriter, e Expression, str string) error {
+	if err := e.Write(sw); err != nil {
+		return fmt.Errorf("failed to append string expression: %w", err)
+	}
+
+	if _, err := sw.WriteString(str); err != nil {
+		return fmt.Errorf("failed to write %s", str)
 	}
 
 	return nil

@@ -1,4 +1,4 @@
-package main
+package examples
 
 import (
 	"strings"
@@ -15,7 +15,7 @@ func WhereIsNull() (string, error) {
 	sb := new(strings.Builder)
 	err := gosqle.NewSelect(
 		alias.New(expressions.Column{Name: "id"}),
-	).FromTable("users", nil).
+	).From(alias.NewStr("users")).
 		Where(
 			logic.And(predicates.IsNull(expressions.Column{Name: "phone"})),
 		).Write(sb)

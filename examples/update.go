@@ -1,9 +1,7 @@
-package main
+package examples
 
 import (
-	"fmt"
 	"strings"
-	"time"
 
 	"github.com/dwethmar/gosqle"
 	"github.com/dwethmar/gosqle/clauses/set"
@@ -14,22 +12,20 @@ import (
 )
 
 // UpdateUser updates a user.
-func UpdateUser() ([]interface{}, string, error) {
+func UpdateUser(userID int64, name string) ([]interface{}, string, error) {
 	sb := new(strings.Builder)
 	args := postgres.NewArguments()
 	err := gosqle.NewUpdate("users").Set(set.Change{
 		Col:  "name",
-		Expr: args.NewArgument(fmt.Sprintf("new name %d", time.Now().Unix())),
+		Expr: args.Create(name),
 	}).Where(
 		logic.And(predicates.EQ(
 			expressions.Column{Name: "id"},
-			args.NewArgument(193),
+			args.Create(userID),
 		)),
 	).Write(sb)
-
 	if err != nil {
 		return nil, "", err
 	}
-
-	return args.Values, sb.String(), nil
+	return args.Values(), sb.String(), nil
 }

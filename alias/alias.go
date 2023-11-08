@@ -10,15 +10,17 @@ import (
 
 var _ expressions.Expression = &Alias{}
 
-// Alias represents an alias.
+// Alias represents an alias for column or table.
 // example:
 //
-//	expressions AS a
+//	select expressions AS a
+//	select expressions FROM table AS a
 type Alias struct {
 	Expr expressions.Expression
 	As   string // optional
 }
 
+// SetAs sets the alias.
 func (a *Alias) SetAs(as string) *Alias {
 	a.As = as
 	return a
@@ -44,5 +46,11 @@ func (a *Alias) Write(sw io.StringWriter) error {
 func New(expr expressions.Expression) *Alias {
 	return &Alias{
 		Expr: expr,
+	}
+}
+
+func NewStr(str string) *Alias {
+	return &Alias{
+		Expr: expressions.String(str),
 	}
 }

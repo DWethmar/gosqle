@@ -38,11 +38,11 @@ func TestWriteSet(t *testing.T) {
 				changes: []Change{
 					{
 						Col:  "field_a",
-						Expr: postgres.NewArgument("value_a", 1),
+						Expr: postgres.NewArgument(1, "value_a"),
 					},
 					{
 						Col:  "field_b",
-						Expr: postgres.NewArgument("value_a", 2),
+						Expr: postgres.NewArgument(2, "value_a"),
 					},
 				},
 			},
@@ -72,7 +72,7 @@ func TestWriteSet(t *testing.T) {
 		if err := Write(writer, []Change{
 			{
 				Col:  "field_a",
-				Expr: postgres.NewArgument("value_a", 1),
+				Expr: postgres.NewArgument(1, "value_a"),
 			},
 		}); err == nil {
 			t.Errorf("Set() error = %v, wantErr %v", err, true)
